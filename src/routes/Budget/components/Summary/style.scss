@@ -1,0 +1,53 @@
+@import '~styles/colors';
+
+.budget-summary {
+	background: $primary;
+	display: flex;
+	min-height: 10rem;
+	max-height: 15rem;
+	align-items: center;
+
+	&__sum {
+		flex-basis: 50%;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		transition: flex-basis 0.3s ease;
+
+		&--wide {
+			flex-basis: 100%;
+		}
+	}
+
+	&__sum-text {
+		font-size: 8vmin;
+		margin: auto;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		align-content: center;
+	}
+
+	&__sum-currency {
+	}
+
+
+	&__sum-sign {
+		width: 2rem;
+		height: 2rem;
+		border-radius: 2rem;
+		margin-right: 1rem;
+		text-align: center;
+		background: $secondary;
+		line-height: 2rem;
+		font-size: 1.5rem;
+
+		&--hidden {
+			display: none;
+		}
+
+		&--negative {
+			background: $negative;
+		}
+	}
+}

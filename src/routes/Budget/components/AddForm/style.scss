@@ -1,0 +1,31 @@
+@import '~styles/colors';
+
+.budget-add-form {
+	width: 100%;
+	height: 5rem;
+	display: flex;
+	align-items: center;
+	padding: 0.25rem 1.5rem;
+	background: $primary-light;
+
+	&__input {
+		border: none;
+		border-bottom: 1px solid $primary-dark;
+		transition: border-width 0.1s ease;
+		outline: none;
+		flex: 1;
+		background: transparent;
+		margin-right: 1rem;
+
+		&:focus {
+			border-width: 2px;
+		}
+	}
+
+	&__check-btn {
+		font-size: 3rem;
+		width: 3rem;
+		display: inline-block;
+		text-align: center;
+	}
+}

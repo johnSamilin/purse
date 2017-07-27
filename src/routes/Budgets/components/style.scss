@@ -1,0 +1,32 @@
+.budget-list {
+	width: 0px;
+	max-width: 300px;
+
+	&__list {
+		overflow: auto;
+		height: 100%;
+	}
+
+	&__fab {
+		background: green;
+		width: 5rem;
+		height: 5rem;
+		position: absolute;
+		bottom: 2rem;
+		right: 2rem;
+		color: #fff;
+		border-radius: 50%;
+		border: none;
+		font-size: 3.5rem;
+	}
+}
+.core-layout {
+	&__viewport {
+		&--mobile {
+			& .budget-list {
+				width: 100%;
+				max-width: 100%;
+			}
+		}
+	}
+}

@@ -1,0 +1,63 @@
+@import '~styles/colors';
+
+.budget-transaction {
+	min-height: 5rem;
+	padding: 0.5rem 1.5rem;
+	border-bottom: 1px solid #eee;
+
+	&__mandatory-info {
+		display: flex;
+		flex-grow: 1;
+	}
+
+	&__info {
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		& span {
+			width: 100%;
+			display: inline-block;
+			text-align: left;
+		}
+	}
+
+	&__amount {
+		align-items: center;
+		display: flex;
+		width: 10rem;
+		& span {
+			width: 100%;
+			display: inline-block;
+			text-align: right;
+		}
+	}
+
+	&__author {
+		font-weight: bold;
+	}
+	&__author-contacts {
+		font-size: smaller;
+	}
+
+	&__note {
+		margin-top: 1rem;
+		&--hidden {
+			display: none;
+		}
+	}
+
+	&--cancelled {
+		.budget-transaction__info {
+			& span {
+				text-decoration: line-through;
+			}
+		}
+
+		.budget-transaction__amount {
+			& span {
+				text-decoration: line-through;
+			}
+		}
+	}
+}

@@ -1,0 +1,21 @@
+@import '~styles/colors';
+
+.budget-transactions-empty-state {
+	align-items: center;
+	color: #eee;
+	display: flex;
+	flex-direction: column;
+	font-size: 3rem;
+	height: 100%;
+	margin: auto;
+	text-align: center;
+
+	& span {
+		margin: auto;
+	}
+
+	&__icon {
+		margin: auto auto 0;
+		font-size: 20rem;
+	}
+}

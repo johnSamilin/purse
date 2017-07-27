@@ -1,0 +1,25 @@
+@import '~styles/colors';
+
+.budget-transactions {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	overflow: auto;
+
+	&__loader {
+		margin: auto;
+		width: 15rem;
+	}
+
+	&-divider {
+		background: $grey;
+		display: flex;
+
+		&__text {
+			color: darken($grey, 50%);
+			font-weight: bold;
+			margin: 2px auto;
+			display: inline-block;
+		}
+	}
+}
