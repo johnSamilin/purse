@@ -39,7 +39,7 @@ webpackConfig.entry = {
 // Bundle Output
 // ------------------------------------
 webpackConfig.output = {
-  filename   : `[name].[${project.compiler_hash_type}].js`,
+  filename   : `[name].js`,
   path       : project.paths.dist(),
   publicPath : project.compiler_public_path
 }
@@ -213,7 +213,7 @@ if (!__DEV__) {
   })
 
   webpackConfig.plugins.push(
-    new ExtractTextPlugin('[name].[contenthash].css', {
+    new ExtractTextPlugin('[name].css', {
       allChunks : true
     })
   )

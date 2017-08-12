@@ -1,10 +1,13 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
+import { Link } from 'react-router';
+import { paths } from 'routes/Budgets/const';
+
 import Info from './Info';
 import './style.scss';
 
 export const Budgets = (props) => {
-	const classes = new BEMHelper('budget-list');
+  const classes = new BEMHelper('budget-list');
   let pageClasses = new BEMHelper('page');
   pageClasses = pageClasses({ modifiers: { next: props.isNext, active: props.isActive } }).className;
 	const { list, activeId, load } = props;
@@ -17,7 +20,7 @@ export const Budgets = (props) => {
 				<Info key={i} {...budget} isActive={activeId === budget.id} />
 			)}
 		</ul>
-		<button onClick={props.add} {...classes('fab')}>+</button>
+		<Link to={paths.construct()} {...classes('fab')}>+</Link>
 	  </div>
 	)
 }

@@ -15,17 +15,17 @@ class Budget extends Component {
     this.toggleTransactionState = this.toggleTransactionState.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
     this.onTransactionsUpdated = this.onTransactionsUpdated.bind(this);
-    this.usersList = [];
+    this.onBudgetUpdated = this.onBudgetUpdated.bind(this);
+    this.onUsersUpdated = this.onUsersUpdated.bind(this);
   }
 
   componentWillMount() {
+    
   }
 
   componentWillReceiveProps(newProps) {
     if(this.props.id !== newProps.id) {
       if (newProps.id) {
-        // this.props.loadBudget(newProps.id);
-        // this.props.loadTransactions(newProps.id);
         this.loadBudget(newProps.id);
       } else {
         this.props.clearBudget();
@@ -45,12 +45,13 @@ class Budget extends Component {
         if (this.budgetSub) {
           this.budgetSub.unsubscribe();
         }
-        this.budgetSub = b.$.subscribe(this.onBudgetUpdated.bind(this));
+        this.budgetSub = b.$.subscribe(this.onBudgetUpdated);
 
-        database.users
-          .find()
+        const usersQuery = database.users.find();
+        usersQuery.$.subscribe(this.onUsersUpdated);
+        usersQuery
           .exec()
-          .then(users => this.usersList = users);
+          .then(this.onUsersUpdated);
 
         this.transactionsQuery = database.transactions
           .find()
@@ -62,19 +63,27 @@ class Budget extends Component {
         });
         this.transactionsQuery
           .exec()
-          .then(t => this.onTransactionsUpdated);
+          .then(this.onTransactionsUpdated);
       });
   }
 
   unload() {
-    this.props.selectBudget({});
-    this.budgetSub.unsubscribe();
-    this.transactionsSub.unsubscribe();
+    try {
+      this.budgetSub.unsubscribe();
+      this.usersSub.unsubscribe();
+      this.transactionsSub.unsubscribe();
+    } catch(er) {
+      // ignore
+    }
     this.isLoaded = false;
   }
 
   onBudgetUpdated(budget) {
     this.props.selectBudget(budget);
+  }
+
+  onUsersUpdated(users) {
+    this.usersList = users || [];
   }
 
   onTransactionsUpdated(transactions) {
@@ -128,7 +137,7 @@ class Budget extends Component {
       date: Date.now().toString(),
       note,
       cancelled: false,
-      ownerId: parseInt(this.props.currentUserId, 10),
+      ownerId: parseInt(this.props.currentUserId),
     });
   }
 
@@ -156,13 +165,17 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, ownProps) => {
   const budget = select.budget(state);
   const transactions = select.transactions(state);
-  const currentUserId = '1';
-  let status = 'none';
-  budget.users && budget.users.forEach((user) => {
-    if (user.id === currentUserId) {
-      status = user.status;
-    }
-  });
+  const currentUserId = get(state, 'auth.data.id', -1);
+  let status = 'none';  
+  if (budget.ownerId === currentUserId) {
+    status = 'active';
+  } else {
+    budget.users && budget.users.forEach((user) => {
+      if (user.id === currentUserId) {
+        status = user.status;
+      }
+    });
+  }
 
   return {
     id: ownProps.params.id,

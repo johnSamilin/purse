@@ -9,6 +9,12 @@ import {
   csrf,
 } from './const';
 import api from 'services/api';
+import { registerServiceWorker } from 'services/helpers';
+
+// SW
+if (!__DEV__) {
+  registerServiceWorker();
+}
 
 // ========================================================
 // Store Instantiation
@@ -41,7 +47,6 @@ const MOUNT_NODE = document.getElementById('root')
 
 let render = () => {
   const routes = require('./routes/index').default(store)
-  database.init(store)
 
   ReactDOM.render(
     <AppContainer store={store} routes={routes} />,
@@ -83,4 +88,5 @@ if (__DEV__) {
 // ========================================================
 // Go!
 // ========================================================
-render()
+database.init(store);
+render();

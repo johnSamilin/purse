@@ -17,6 +17,10 @@ function init(store) {
 	store.dispatch(getToken() ? actions.login() : actions.logout());
 }
 
+actions.login({
+	id: '0',
+});
+
 export default {
 	init,
 	getToken,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
+import Header from 'components/Header';
 import EmptyState from './EmptyState';
 import Summary from './Summary';
 import Transactions from './Transactions';
@@ -29,10 +30,10 @@ export const Budget = (props) => {
     <div
       {...classes({ extra: pageClasses })}
     >
+      <Header title={budget.title} backurl='/' />
       <div {...classes('budget')}>
         {budget.id
           ? [
-            <Link key={1} to='/budgets'>Назад</Link>,
             <Summary
               key={2}
               transactions={transactions}

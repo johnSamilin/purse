@@ -16,18 +16,6 @@ class Budgets extends Component {
 }
 
 const mapDispatchToProps = {
-  add: () => {
-  	database.budgets.insert({
-	  	id: Date.now().toString(),
-	  	ownerId: 0,
-		state: "opened",
-		title: `Budget #${Date.now()}`,
-		currencyId: 0,
-		sharelink: "",
-	  });
-
-	  return actions.create();
-  },
   load: actions.load,
 }
 

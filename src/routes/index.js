@@ -1,6 +1,7 @@
 // We only need to import the modules necessary for initial render
 import CoreLayout from '../layouts/CoreLayout';
 import BudgetRoute from './Budget';
+import ConstructorRoute from './Constructor';
 import BudgetsRoute from './Budgets';
 import LoginRoute from './Login';
 
@@ -15,6 +16,7 @@ export const createRoutes = (store) => ({
     BudgetsRoute(store),
     BudgetRoute(store),
     LoginRoute(store),
+    ConstructorRoute(store),
   ],
 })
 

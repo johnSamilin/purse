@@ -4,13 +4,17 @@ import { connect } from 'react-redux';
 
 import { Budget } from 'routes/Budget';
 import { Budgets } from 'routes/Budgets';
+import { Construct } from 'routes/Constructor';
 import { Login } from 'routes/Login';
 
 import './CoreLayout.scss';
 
+const MobileDetect = require('mobile-detect');
+
 export const CoreLayout = ({ children, isLoggedIn }) => {
 	const classes = new BEMHelper('core-layout');
-	const isMobile = true;
+	const md = new MobileDetect(window.navigator.userAgent);
+	const isMobile = md.mobile()  && !md.tablet();
 	const isOffline = false;
 
 	return (
@@ -19,6 +23,7 @@ export const CoreLayout = ({ children, isLoggedIn }) => {
 			{isLoggedIn === true
 				? [
 					<Budget />,
+					<Construct />,
 					<Budgets />
 				]
 				: <Login />

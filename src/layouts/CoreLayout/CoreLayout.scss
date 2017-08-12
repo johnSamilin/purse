@@ -21,11 +21,13 @@
 			opacity: 1;
 			transition: transform 0.4s ease-out;
 			position: relative;
+			display: flex;
+			flex-direction: column;
 
 			&--active {
 				z-index: 2;
 
-				+ .page {
+				~ .page {
 					z-index: 1;
 				}
 			}
@@ -42,7 +44,7 @@
 				width: 100%;
 
 				&--active {
-					+ .page {
+					~ .page {
 						transform: translateX(-10%);
 						opacity: 0.75;
 					}

@@ -1,0 +1,61 @@
+@import '~styles/core.scss';
+
+.construct {
+	flex-grow: 1;
+	width: 0px;
+	max-width: 0px;
+	overflow-x: hidden;
+
+	&.page--active {
+		width: 300px;
+		max-width: 300px;
+	}
+
+	&__title {
+		background: $primary-light;
+		display: flex;
+		font-size: 3rem;
+
+		&-input {
+			border: none;
+			border-bottom: 1px solid $primary-dark;
+			transition: border-width 0.1s ease;
+			outline: none;
+			flex: 1;
+			background: transparent;
+			margin: 4rem 2rem;
+			width: 100%;
+		}
+	}
+
+	&__subtitle {
+		background: lighten($primary-light, 10%);
+		display: flex;
+	}
+
+	&__select {
+		background: transparent;
+		margin: 2rem;
+		width: 100%;
+	}
+
+	&__users {
+		flex: 1;
+	}
+}
+
+.core-layout {
+	&__viewport {
+		&--mobile {
+			& .construct {
+				width: 100%;
+				max-width: 100%;
+
+				&.page--active {
+					width: 100%;
+					max-width: 100%;
+				}
+			}
+		}
+	}
+}

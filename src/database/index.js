@@ -23,15 +23,15 @@ function init(store) {
   }).then(db => {
     database = db;
     // budgets
-    db.collection({
+    const budgetsCollection = db.collection({
       name: 'budgets',
       schema: schemas.budgets,
     }).then((collection) => {
         database.budgets.sync(`${dbUrl}/budgets`);
-        collection
+        return collection
           .find()
           .$.subscribe(budgetsChanged.bind(null, store));
-return;
+
        collection.find().remove().then(() => {
           collection.insert({
             title: 'Test budget 1',
@@ -87,12 +87,12 @@ return;
     );
 
     // transactions
-    db.collection({
+    const transactionsCollection = db.collection({
       name: 'transactions',
       schema: schemas.transactions,
     }).then((col) => {
-      database.transactions.sync(`${dbUrl}/transactions`);
-return;
+      return database.transactions.sync(`${dbUrl}/transactions`);
+
       col.find().remove().then(() => {
         col.insert({
                 id: '1',
@@ -159,11 +159,11 @@ return;
               });
       });
     });
-    db.collection({
+    const usersCollection = db.collection({
       name: 'users',
       schema: schemas.users,
     }).then((col) => {
-      database.users.sync(`${dbUrl}/users`);
+      return database.users.sync(`${dbUrl}/collaborators`);
 
       col.find().remove().then(() => {
         col.insert({

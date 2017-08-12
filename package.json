@@ -56,7 +56,7 @@
       }
     },
     "start": {
-      "command": "node bin/dev-server",
+      "command": "node bin/dev-server -- --open --https",
       "env": {
         "DEBUG": "app:*"
       }
@@ -99,6 +99,7 @@
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
     "material-icons": "^0.1.0",
+    "mobile-detect": "^1.3.6",
     "moment": "^2.18.1",
     "node-sass": "^4.0.0",
     "normalize.css": "^5.0.0",
