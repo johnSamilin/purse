@@ -22,9 +22,14 @@ const statusesMap = {
 		nextStatus: 'active',
 	},
 	removed: {
-		title: 'Return',
+		title: 'Invite',
 		modifier: 'success',
-		nextStatus: 'active',
+		nextStatus: 'invited',
+	},
+	invited: {
+		title: 'Revoke',
+		modifier: 'removed',
+		nextStatus: '',
 	},
 };
 

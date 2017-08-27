@@ -22,6 +22,7 @@ export const Budget = (props) => {
     addTransaction,
     usersList,
     isOwner,
+    respondInvite,
   } = props;
 
   const classes = new BEMHelper('budget-details');
@@ -69,7 +70,12 @@ export const Budget = (props) => {
               />
             </div>,
             budget.state === 'opened'
-              ? <Status key={5} status={status} requestMembership={requestMembership} />
+              ? <Status
+                key={5}
+                status={status}
+                requestMembership={requestMembership}
+                respondInvite={respondInvite}
+              />
               : null
           ]
           : <EmptyState />

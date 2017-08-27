@@ -15,6 +15,7 @@ class Budget extends Component {
     this.toggleTransactionState = this.toggleTransactionState.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
     this.changeUserStatus = this.changeUserStatus.bind(this);
+    this.respondInvite = this.respondInvite.bind(this);
 
     this.onTransactionsUpdated = this.onTransactionsUpdated.bind(this);
     this.onBudgetUpdated = this.onBudgetUpdated.bind(this);
@@ -99,8 +100,7 @@ class Budget extends Component {
           }
         }
         return u;
-      }
-      );
+      });
       if (!found) {
         users.push({
           id: this.props.currentUserId,
@@ -110,6 +110,20 @@ class Budget extends Component {
       this.budgetDocument.users = users;
       this.budgetDocument.save().then(() => {}).catch((er) => {});
     }
+  }
+
+  respondInvite(isAccepted = false) {
+    const users = this.budgetDocument.users.map((u, i) => {
+      if (u.id === this.props.currentUserId) {
+        return {
+          ...u,
+          status: isAccepted ? 'active' : 'removed',
+        }
+      }
+      return u;
+    });
+    this.budgetDocument.users = users;
+    this.budgetDocument.save().then(() => {}).catch((er) => {});
   }
 
   toggleTransactionState(id) {
@@ -124,7 +138,12 @@ class Budget extends Component {
   }
   
   changeUserStatus(user, newStatus) {
-    const updatedUsers = this.budgetDocument.users.map(u => {
+    let updatedUsers = this.budgetDocument.users;
+    if (newStatus === '') {
+      // revoked invite
+      updatedUsers = updatedUsers.filter(u => u.id !== user.id);
+    }
+    updatedUsers = updatedUsers.map(u => {
       if (u.id === user.id) {
         u.status = newStatus;
       }
@@ -153,6 +172,7 @@ class Budget extends Component {
       toggleTransactionState: this.toggleTransactionState,
       addTransaction: this.addTransaction,
       changeUserStatus: this.changeUserStatus,
+      respondInvite: this.respondInvite,
     });
   }
 }

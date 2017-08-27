@@ -11,6 +11,7 @@ function Button(props) {
     onClick,
     mods = [],
     disabled,
+    type,
   } = props;
   const modifiers = [];
   if (disabled) {
@@ -18,9 +19,13 @@ function Button(props) {
   }
 
   return (
-    <div {...classes({ extra: className, modifiers: mods.concat(modifiers) })} onClick={onClick}>
+    <button
+      {...classes({ extra: className, modifiers: mods.concat(modifiers) })}
+      onClick={onClick}
+      type={type}
+    >
       <span>{children}</span>
-    </div>
+    </button>
   );
 }
 

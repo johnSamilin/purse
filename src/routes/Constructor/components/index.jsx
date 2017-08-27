@@ -8,21 +8,53 @@ import {
   ListItem,
   UserInfo,
 } from 'components';
-import { Form, Field } from 'redux-form';
+import { Field } from 'redux-form';
 
 import './style.scss';
 
+function Title({ input, className }) {
+  return <input
+      className={className}
+      placeholder='Название'
+      value={input.value}
+      onChange={input.onChange}
+    />;
+}
+
+function Currency({ input, className }) {
+  return <select
+      className={className}
+      value={input.value}
+      onChange={input.onChange}
+    >
+      {currencies.map(cur =>
+        <option value={cur.id}>{cur.label}</option>
+      )}
+  </select>;
+}
+
+function Checkbox({ input, className }) {
+  const classes = new BEMHelper('construct');
+  return <div {...classes({
+      element: 'checkbox',
+      extra: 'mi mi-check',
+      modifiers: { checked: input.value }
+    })}>
+      <input
+        type="checkbox"
+        value={input.value}
+        onChange={input.onChange}
+        id={input.name}
+      />
+      <label htmlFor={input.name}></label>
+    </div>;
+}
+
 export const Construct = (props) => {
   const {
-    doCreate,
-    setTitle,
-    setCurrency,
     canCreate,
     users,
-    toggleUser,
-    invitedUsers,
-    gainFocus,
-    title,
+    onSubmit,
   } = props;
 
   const classes = new BEMHelper('construct');
@@ -30,37 +62,24 @@ export const Construct = (props) => {
   pageClasses = pageClasses({ modifiers: { next: props.isNext, active: props.isActive } }).className;
 
   return (
-    <Form
-      {...props}
+    <form
+      onSubmit={props.handleSubmit(onSubmit)}
       {...classes({ extra: pageClasses })}
     >
       <Header title='Create new budget' backurl='/' />
       <div {...classes('title')}>
-        <Field component={({ input }) => {
-          return <input
-            {...classes('title-input')}
-            placeholder='Название'
-            value={input.value}
-            onChange={input.onChange}
-          />
-        }} />
+        <Field component={Title} {...classes('title-input')} name={'title'} />
       </div>
       <div {...classes('subtitle')}>
-        <select {...classes('select')} onChange={event => setCurrency(event.target.value)}>
-          {currencies.map(cur =>
-            <option value={cur.id}>{cur.label}</option>
-          )}
-        </select>
+        <Field component={Currency} {...classes('select')} name={'currency'} />
       </div>
       <div {...classes('users')}>
         {users && users.map((user, k) => <ListItem index={k} {...classes('user')}>
-          <input
-            type="checkbox"
-            value={users.length ? user.id in invitedUsers : false}
-            name={`user[${user.id}]`}
-            onChange={(e) => toggleUser(user, e.target.value)}
-          />
           <UserInfo {...user} />
+          <Field
+            component={Checkbox}            
+            name={`invitedUsers[${user.id}]`}
+          />
         </ListItem>)}
       </div>
       <Button
@@ -70,7 +89,7 @@ export const Construct = (props) => {
       >
         Создать
       </Button>
-    </Form>
+    </form>
   )
 }
 

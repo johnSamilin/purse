@@ -39,7 +39,7 @@ function Info(props) {
 				<span {...classes('date')}>{moment(date).format('DD.MM.Y')}</span>
 				<span {...classes('title')}>{title}</span>
 			</Link>
-			{state === 'opened' && canManage
+			{canManage
 				? <Dropdown {...classes('menu')} ref={(element) => {
 						if (element && !menuInstance) {
 							menuInstance = element;
@@ -47,22 +47,17 @@ function Info(props) {
 					}}
 					>
 					<DropdownTrigger>
-							<span {...classes('menu-trigger')}>...</span>
-						</DropdownTrigger>
-						<DropdownContent>
-								<div {...classes('menu-item')} onClick={() => {
-									closeBudget(id);
-									menuInstance.hide();
-								}}>Закрыть</div>
-							}
-							{state === 'closed' &&
-								<div {...classes('menu-item')} onClick={() => {
-									openBudget(id);
-									menuInstance.hide();
-								}}>Открыть</div>
-							}
-						</DropdownContent>
-					</Dropdown>
+						<span {...classes('menu-trigger')}>...</span>
+					</DropdownTrigger>
+					<DropdownContent>
+						<div {...classes('menu-item')} onClick={() => {
+							state === 'closed'
+								? openBudget(id)
+								: closeBudget(id);
+							menuInstance.hide();
+						}}>{`${state === 'closed' ? 'Открыть' : 'Закрыть'}`}</div>
+					</DropdownContent>
+				</Dropdown>
 				: null
 			}
 		</li>
