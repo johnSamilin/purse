@@ -26,7 +26,12 @@ const paths = {
 	budget: id => `/budgets/${id}`,
 };
 
+const forms = {
+	constructor: 'constructor',
+};
+
 export {
 	currencies,
 	paths,
+	forms,
 };

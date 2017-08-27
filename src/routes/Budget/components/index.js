@@ -15,11 +15,13 @@ export const Budget = (props) => {
     budget,
     currentUserId,
     requestMembership,
+    changeUserStatus,
     transactions,
     toggleTransactionState,
     status,
     addTransaction,
     usersList,
+    isOwner,
   } = props;
 
   const classes = new BEMHelper('budget-details');
@@ -44,7 +46,7 @@ export const Budget = (props) => {
             />,
             <div {...classes('budget-users-transactions')}>
               <div {...classes('budget-users')}>
-                {status === 'active' &&
+                {budget.state === 'opened' && status === 'active' &&
                   <AddForm
                     key={3}
                     currency={budget.currency.key}
@@ -61,9 +63,14 @@ export const Budget = (props) => {
               <Users
                 key={6}
                 users={usersList}
+                canManage={isOwner}
+                onChangeStatus={changeUserStatus}
+                ownerId={budget.ownerId}
               />
             </div>,
-            <Status key={5} status={status} requestMembership={requestMembership} />
+            budget.state === 'opened'
+              ? <Status key={5} status={status} requestMembership={requestMembership} />
+              : null
           ]
           : <EmptyState />
         }

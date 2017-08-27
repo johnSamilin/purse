@@ -20,10 +20,9 @@ const mapDispatchToProps = {
   
 }
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state, ownProps) => { 
 
   return {
-    
   }
 }
 

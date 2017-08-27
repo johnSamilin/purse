@@ -2,7 +2,7 @@ import React from 'react';
 import BEMHelper from 'react-bem-helper';
 import moment from 'moment';
 import Transaction from './Transaction';
-import EmptyState from './EmptyState';
+import { EmptyState } from 'components';
 import './style.scss';
 
 function Divider({ text }) {
@@ -14,9 +14,9 @@ function Divider({ text }) {
 
 function Transactions(props) {
 	const {
-		data,
+		data = [],
 		isLoading,
-		users,
+		users = [],
 		currency,
 		onTransactionClick,
 	} = props;
@@ -35,7 +35,7 @@ function Transactions(props) {
 				{!isLoading && (data.length
 					? <ul>
 						{data.map((transaction, i) => {
-							const nextDateBlock = moment(transaction.date, 'YYYY-DD-MM h:mm:ss').calendar(null, {
+							const nextDateBlock = moment(transaction.date, 'x').calendar(null, {
 						    sameDay: '[Сегодня]',
 						    nextDay: '[Завтра]',
 						    nextWeek: 'dddd',
@@ -65,7 +65,7 @@ function Transactions(props) {
 						}
 						)}
 					</ul>
-					: <EmptyState />
+					: <EmptyState message={'No transactions yet'} />
 				)}
 		</div>
 	);

@@ -1,53 +1,28 @@
 // ------------------------------------
 // Constants
 // ------------------------------------
-const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN'
-const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT'
+const USERS_UPDATED = 'USERS_UPDATED';
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-function doLogin(userInfo) {
-	return {
-		type: AUTH_LOGGED_IN,
-		payload: {
-			loggedIn: true,
-			...userInfo,
-		}
-	}
-}
 
-function doLogout() {
+function updated(users) {
 	return {
-		type: AUTH_LOGGED_OUT,
-		payload: {
-			loggedIn: false,
-		},
+		type: USERS_UPDATED,
+		payload: users,
 	};
 }
 
-function login(userInfo) {
-	localStorage.setItem('userinfo', JSON.stringify(userInfo));
-	return doLogin(userInfo);
-}
-
-function logout() {
-	localStorage.removeItem('userinfo');
-}
-
 export const actions = {
-  login,
-  logout,
+  updated,
 }
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [AUTH_LOGGED_IN]: (state, action) => {
-  	return { ...state, data: action.payload };
-  },
-  [AUTH_LOGGED_OUT]: (state, action) => {
+  [USERS_UPDATED]: (state, action) => {
   	return { ...state, data: action.payload };
   },
 }

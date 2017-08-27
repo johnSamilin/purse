@@ -10,7 +10,26 @@ const apiPaths = {
 	transactions: budgetId => `transactions/${budgetId}`,
 };
 
+const statusesMap = {
+	active: {
+		title: 'Disable',
+		modifier: 'removed',
+		nextStatus: 'removed',
+	},
+	pending: {
+		title: 'Approve',
+		modifier: 'success',
+		nextStatus: 'active',
+	},
+	removed: {
+		title: 'Return',
+		modifier: 'success',
+		nextStatus: 'active',
+	},
+};
+
 export {
 	apiPaths,
 	userStatuses,
+	statusesMap,
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
 import numeral from 'numeral';
+import { UserInfo } from 'components';
 import './style.scss';
 
 function Transaction(props) {
@@ -19,10 +20,7 @@ function Transaction(props) {
 	return (
 		<div {...classes({ modifiers: { cancelled } })} onClick={() => onClick(id)}>
 			<div {...classes('mandatory-info')}>
-				<div {...classes('info')}>
-					<span {...classes('author')}>{author.name} </span>
-					<span {...classes('author-contacts')}>{author.phone ? author.phone : author.email}</span>
-				</div>
+				<UserInfo {...classes('info')} {...author} />
 				<div {...classes('amount')}>
 					<span>{numeral(amount).format('0,[.]00').replace(',', ' ')} {currency}</span>
 				</div>

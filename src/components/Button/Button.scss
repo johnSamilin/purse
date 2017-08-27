@@ -13,6 +13,7 @@
 		background: $secondary;
 	}
 
+	/*TODO: move to somewhere else*/
 	&--active {
 		position: absolute;
 		bottom: 0;
@@ -37,5 +38,16 @@
 		display: inline-block;
 		margin: auto;
 		font-size: 1.7rem;
+	}
+	
+	&--inline {
+		width: auto;
+		height: auto;
+		border-radius: 3px;
+		padding: 0.5rem 1rem;
+
+		& span {
+			font-size: $font-size-base;
+		}
 	}
 }

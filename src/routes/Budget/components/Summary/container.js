@@ -19,13 +19,19 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, ownProps) => {
 	let total = 0;
 	let myTotal = 0;
-	ownProps.transactions.forEach((t) => {
+	const {
+		transactions = [],
+		users = [],
+		currentUserId,
+	} = ownProps;
+	const activeUsers = users.filter(user => user.status === 'active');
+	transactions.forEach((t) => {
 		total += !t.cancelled ? t.amount : 0;
 	});
-	ownProps.transactions.forEach((t) => {
-		myTotal += t.ownerId === ownProps.currentUserId && !t.cancelled ? t.amount : 0
+	transactions.forEach((t) => {
+		myTotal += t.ownerId === currentUserId && !t.cancelled ? t.amount : 0
 	});
-	myTotal = getBalance(total, myTotal, ownProps.users.length);
+	myTotal = getBalance(total, myTotal, activeUsers.length);
 
   return {
     total,

@@ -1,9 +1,10 @@
 @import '~styles/colors';
+@import '~react-simple-dropdown/styles/Dropdown';
 
 .budget-list-item {
 	display: flex;
 	flex-direction: row;
-	overflow: auto;
+	overflow: visible;
 	border-bottom: 1px solid #eee;
 	position: relative;
 
@@ -14,7 +15,6 @@
 	&:active, &:focus, &:hover {
 		color: #333;
 		text-decoration: none;
-		background: #eee;
 	}
 
 	&__badge {
@@ -65,5 +65,29 @@
 	&__title {
 		font-size: 2rem;
 		margin: 0.5rem 0;
+	}
+
+	&__menu {
+		align-self: center;
+		width: 3.5rem;
+		padding: 1rem;
+		cursor: pointer;
+
+		&-trigger {
+			color: $black;
+		}
+
+		&-item {
+			cursor: pointer;
+		}
+
+		& .dropdown__content {
+			position: absolute;
+			right: 0;
+			border: 1px solid #eee;
+			padding: 5px 15px;
+			border-radius: 3px;
+			background: $white;
+		}
 	}
 }

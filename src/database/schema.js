@@ -10,7 +10,7 @@ const schemas = {
 				"primary": true
 			},
 			"ownerId": {
-				"type": "integer"
+				"type": "string"
 			},
 			"state": {
 				"type": "string",
@@ -39,7 +39,7 @@ const schemas = {
 					"id": "string",
 					"status": {
 						"type": "string",
-						"enum": ["active", "pending", "removed"]
+						"enum": ["active", "pending", "removed", "invited"]
 					}
 				},
 				"required": [
@@ -74,7 +74,7 @@ const schemas = {
 	        	"type": "boolean"
 	        },
 	        "ownerId": {
-	        	"type": "number"
+	        	"type": "string"
 	        }
         },
     },

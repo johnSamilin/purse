@@ -2,5 +2,32 @@
 
 .budget-users {
 	flex-grow: 1;
-	display: none;
+
+	&__user {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.5rem;
+		border-bottom: 1px solid #eee;
+	}
+	&__actions {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		margin: 0.5rem;
+	}
+	&__status {
+		&--active {
+			color: $secondary;
+		}
+		&--pending {
+			color: $grey;
+		}
+		&--removed {
+			color: $negative;
+		}
+	}
+	&__action {
+		margin-left: 0.5rem;
+	}
 }

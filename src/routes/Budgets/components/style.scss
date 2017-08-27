@@ -1,3 +1,5 @@
+@import '~styles/core';
+
 .budget-list {
 	width: 300px;
 	max-width: 300px;
@@ -14,7 +16,6 @@
 		position: absolute;
 		bottom: 2rem;
 		right: 2rem;
-		color: #fff;
 		border-radius: 50%;
 		border: none;
 		font-size: 3.5rem;
@@ -22,7 +23,17 @@
 		align-items: center;
 		justify-content: center;
 		text-decoration: none;
-		color: #000;
+		color:$black;
+
+		&:hover, &:active {
+			color: $black;
+		}
+	}
+
+	&__username {
+		width: 100%;
+		text-align: center;
+		padding: 2rem;
 	}
 }
 .core-layout {
