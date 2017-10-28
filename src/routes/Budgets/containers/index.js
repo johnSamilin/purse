@@ -8,8 +8,10 @@ import presenter from '../components';
 import select from '../modules/selectors';
 
 class Budgets extends Component {
-	componentWillMount() {
-		// this.props.load();
+	componentWillReceiveProps(nextProps) {
+		if (this.props.isLoading === false && nextProps.isLoading === true) {
+			this.props.load();
+		}
 	}
 
 	render() {
@@ -22,7 +24,8 @@ const mapDispatchToProps = {
   selectUser: authActions.login,
 }
 
-const mapStateToProps = (state) => {
+function mapStateToProps(state) {
+	const isLoading = get(state, 'budgets.isLoading', false);
 
 	return {
 	  list: select.list(state),
@@ -33,6 +36,8 @@ const mapStateToProps = (state) => {
 		  id: -1,
 		  name: 'unknown user',
 	  }),
+	  isLoading,
+	  availableUsers: select.availableUsers(state),
 	}
 }
 

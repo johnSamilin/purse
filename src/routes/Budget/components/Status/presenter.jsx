@@ -15,10 +15,10 @@ function Status(props) {
 	return (
 		status === 'invited'
 			? <div {...classes('buttons')}>
-				<Button mods={'success'} onClick={() => respondInvite(true)}>
+				<Button mods={['success']} onClick={() => respondInvite(true)}>
 					Вступить
 				</Button>
-				<Button mods={'removed'} onClick={() => respondInvite(false)}>
+				<Button mods={['removed']} onClick={() => respondInvite(false)}>
 					Скрыть
 				</Button>
 			</div>

@@ -15,7 +15,7 @@ function Summary(props) {
 	const classes = new BEMHelper('budget-summary');
 	const totalSum = numeral(total);
 	const mySum = numeral(myTotal);
-	const format = '(0,[.]00)';
+	const format = '(0,[.]00 a)';
 
 	return (
 		<div {...classes()}>

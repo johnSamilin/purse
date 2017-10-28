@@ -2,30 +2,50 @@
 
 .budget-add-form {
 	width: 100%;
-	height: 5rem;
 	display: flex;
-	align-items: center;
-	padding: 0.25rem 1.5rem;
+	flex-direction: column;
+	padding: 1rem 1.5rem;
 	background: $primary-light;
+
+	&__amount {
+		display: flex;
+		align-items: center;
+	}
 
 	&__input {
 		border: none;
 		border-bottom: 1px solid $primary-dark;
-		transition: border-width 0.1s ease;
+		transition: border-width 0.1s ease, height 0.1s ease;
 		outline: none;
 		flex: 1;
 		background: transparent;
 		margin-right: 1rem;
+		margin: 0.25rem 0;
 
 		&:focus {
 			border-width: 2px;
 		}
+
+		&--hidden {
+			height: 0;
+			border: none;
+			margin: 0;
+			padding: 0;
+		}
 	}
 
 	&__check-btn {
+		padding: 0;
+		background: transparent;
+		width: auto;
+		height: auto;
+	}
+
+	&__check-btn-ico {
 		font-size: 3rem;
 		width: 3rem;
 		display: inline-block;
 		text-align: center;
+		padding: 0;
 	}
 }

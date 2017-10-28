@@ -1,20 +1,30 @@
+const version = 'v1.0.5';
+const precachedUrls = [
+  '/bootstrap.min.css',
+  '/giphy-downsized.gif',
+  '/loader.gif',
+  '/app.js',
+];
+
 self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open('v1').then(function(cache) {
-      return cache.addAll([
-        '/bootstrap.min.css',
-        '/giphy-downsized.gif',
-        '/200w_d.gif',
-        '/app.js?v=1.0',
-      ]);
+    caches.open(version).then(function(cache) {
+      return cache.addAll(precachedUrls);
     })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', function(event) {    
     event.respondWith(
-      caches.match(event.request).then(function(response) {
-        return response || fetch(event.request);
-      })
+      caches.open(version)
+        .then((cache) => {
+          cache.match(event.request)
+            .then((response) => {
+              return response || fetch(event.request)
+                .then(res => {
+                  cache.add(res);
+                });
+            })
+        })
     );
 });

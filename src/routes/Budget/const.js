@@ -10,6 +10,10 @@ const apiPaths = {
 	transactions: budgetId => `transactions/${budgetId}`,
 };
 
+const paths = {
+	collaborators: budgetId => `/budgets/${budgetId}/collaborators`,
+};
+
 const statusesMap = {
 	active: {
 		title: 'Disable',
@@ -29,12 +33,18 @@ const statusesMap = {
 	invited: {
 		title: 'Revoke',
 		modifier: 'removed',
-		nextStatus: '',
+		nextStatus: 'removed',
 	},
+};
+
+const forms = {
+	transaction: 'transaction',
 };
 
 export {
 	apiPaths,
+	paths,
 	userStatuses,
 	statusesMap,
+	forms,
 };

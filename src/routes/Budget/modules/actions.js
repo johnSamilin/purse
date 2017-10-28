@@ -7,10 +7,11 @@ import {
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const BUDGET_SELECTED = 'BUDGET_SELECTED'
-export const BUDGET_UPDATED = 'BUDGET_UPDATED'
-export const TRANSACTIONS_SELECTED = 'TRANSACTIONS_SELECTED'
-
+export const BUDGET_SELECTED = 'BUDGET_SELECTED';
+export const BUDGET_UPDATED = 'BUDGET_UPDATED';
+export const TRANSACTIONS_SELECTED = 'TRANSACTIONS_SELECTED';
+export const TRANSACTIONS_UPDATED = 'TRANSACTIONS_UPDATED';
+export const SEEN_TRANSACTIONS_CHANGED = 'SEEN_TRANSACTIONS_CHANGED';
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -35,6 +36,20 @@ function updateTransactions(transactions) {
 	return {
 		type: TRANSACTIONS_SELECTED,
 		payload: transactionsSorted,
+	};
+}
+
+function updateTransactionsGlobal(map) {
+  return {
+		type: TRANSACTIONS_UPDATED,
+		payload: map,
+	};
+}
+
+function updateSeenTransactions(map) {
+  return {
+		type: SEEN_TRANSACTIONS_CHANGED,
+		payload: map,
 	};
 }
 
@@ -73,6 +88,8 @@ export const actions = {
   	select: updateTransactions,
     load: loadTransactions,
     clear: clearTransactions,
+    updated: updateTransactionsGlobal,
+    seen: updateSeenTransactions,
   },
 }
 
@@ -85,6 +102,8 @@ const BUDGET_ACTION_HANDLERS = {
 }
 const TRANSACTIONS_ACTION_HANDLERS = {
   [TRANSACTIONS_SELECTED]: (state, action) => ({ ...state, data: action.payload }),
+  [TRANSACTIONS_UPDATED]: (state, action) => ({ ...state, list: action.payload }),
+  [SEEN_TRANSACTIONS_CHANGED]: (state, action) => ({ ...state, seen: action.payload }),
 }
 // ------------------------------------
 // Reducer

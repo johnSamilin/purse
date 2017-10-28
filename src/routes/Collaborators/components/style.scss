@@ -1,0 +1,50 @@
+@import '~styles/core.scss';
+
+.collaborators {
+    width: 300px;
+    max-width: 300px;
+
+	&__user {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.5rem 2rem;
+		border-bottom: 1px solid $grey-light;
+	}
+	&__actions {
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		margin: 0.5rem;
+	}
+	&__status {
+		&--active {
+			color: $secondary;
+		}
+		&--pending {
+			color: $grey;
+		}
+		&--removed {
+			color: $negative;
+		}
+	}
+	&__action {
+		margin-left: 0.5rem;
+	}
+}
+
+.core-layout {
+	&__viewport {
+		&--mobile {
+			& .collaborators {
+				width: 100%;
+				max-width: 100%;
+
+				&.page--active {
+					width: 100%;
+					max-width: 100%;
+				}
+			}
+		}
+	}
+}

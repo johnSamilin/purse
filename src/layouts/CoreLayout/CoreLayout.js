@@ -6,6 +6,7 @@ import { Budget } from 'routes/Budget';
 import { Budgets } from 'routes/Budgets';
 import { Construct } from 'routes/Constructor';
 import { Login } from 'routes/Login';
+import { Collaborators } from 'routes/Collaborators';
 
 import './CoreLayout.scss';
 
@@ -19,16 +20,17 @@ export const CoreLayout = ({ children, isLoggedIn }) => {
 
 	return (
 	  <div className='container'>
-		<div {...classes({ element: 'viewport', modifiers: { mobile: isMobile, offline: isOffline } })}>
-			{isLoggedIn === true
-				? [
-					<Budget />,
-					<Construct />,
-					<Budgets />
-				]
-				: <Login />
-			}
-		</div>
+			<div {...classes({ element: 'viewport', modifiers: { mobile: isMobile, offline: isOffline } })}>
+				{isLoggedIn === true
+					? [
+						<Collaborators />,
+						<Budget />,
+						<Construct />,
+						<Budgets />
+					]
+					: <Login />
+				}
+			</div>
 	  </div>
 	)
 }

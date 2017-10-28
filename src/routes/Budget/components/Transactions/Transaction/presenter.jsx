@@ -22,7 +22,7 @@ function Transaction(props) {
 			<div {...classes('mandatory-info')}>
 				<UserInfo {...classes('info')} {...author} />
 				<div {...classes('amount')}>
-					<span>{numeral(amount).format('0,[.]00').replace(',', ' ')} {currency}</span>
+					<span>{numeral(amount).format('0,[.]00').replace(/,/gi, ' ')} {currency}</span>
 				</div>
 			</div>
 			<div {...classes({ element: 'note', modifiers: { hidden: !note } })}>

@@ -17,6 +17,7 @@ function Info(props) {
 		closeBudget,
 		openBudget,
 		newTransactionsCount = 0,
+		transactionsCount = 0,
 		canManage = false,
 	} = props;
 	const classes = new BEMHelper('budget-list-item');
@@ -31,7 +32,7 @@ function Info(props) {
 					extra: isClosed ? 'mi mi-lock-outline' : '',
 				})}>
 					{!isClosed &&
-						`${newTransactionsCount > 0 ? '+' : ''}${newTransactionsCount}`
+						`${newTransactionsCount > 0 ? '+'+newTransactionsCount : transactionsCount}`
 					}
 				</i>
 			</div>
