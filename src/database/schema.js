@@ -4,6 +4,7 @@ const schemas = {
 		"version": 0,
 		"description": "budgets",
 		"type": "object",
+		"disableKeyCompression": true,
 		"properties": {
 			"id": {
 				"type": "string",
@@ -53,6 +54,7 @@ const schemas = {
 		"version": 0,
 		"description": "transactions",
 		"type": "object",
+		"disableKeyCompression": true,
 		"properties": {
 	        "id": {
 	        	"type": "string",
@@ -83,6 +85,7 @@ const schemas = {
 		"version": 0,
 		"description": "users",
 		"type": "object",
+		"disableKeyCompression": true,
 		"properties": {
 	        "id": {
 	        	"type": "string",
@@ -98,7 +101,23 @@ const schemas = {
 				"type": "string"
 			},
 	    },
-    },
+	},
+	seenTransactions: {
+		"title": "seentransactions",
+		"version": 0,
+		"description": "",
+		"type": "object",
+		"disableKeyCompression": true,
+		"properties": {
+			"budgetId": {
+				"type": "string",
+				"primary": true,
+			},
+			"transactions": {
+				"type": "number",
+			},
+		},
+	},
 };
 
 export default schemas;

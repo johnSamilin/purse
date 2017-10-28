@@ -19,7 +19,7 @@ export default (store) => {
       }, 'budgets')
     },
     onEnter: () => {
-      store.dispatch(setActiveModule('budget', []))
+      store.dispatch(setActiveModule('budget', ['collaborators']))
     },
   })
 }

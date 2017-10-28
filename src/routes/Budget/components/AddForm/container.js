@@ -2,41 +2,34 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
 import { get } from 'lodash';
-import { actions } from '../../modules/actions'
-import presenter from './presenter'
+import { reduxForm, reset } from 'redux-form';
+import { actions } from '../../modules/actions';
+import { forms } from '../../const';
+import presenter from './presenter';
 
+@reduxForm({
+	form: forms.transaction,
+})
 class AddForm extends Component {
-	constructor() {
-		super();
-		this.state = {
-			isExpanded: false,
-		};
-		this.toggle = this.toggle.bind(this);
-	}
-
-	toggle(newState) {
-		this.setState({
-			isExpanded: newState,
-		})
-	}
-
 	render() {
-		return presenter({
-			...this.props,
-			...this.state,
-			toggle: this.toggle,
-		})
+		return presenter(this.props);
 	}
 }
 
 const mapDispatchToProps = {
-  
+  flush: () => reset(forms.transaction),
 }
 
-const mapStateToProps = (state, ownProps) => {	
-
-  return {
-  }
+const mapStateToProps = (state, ownProps) => {
+	const formValues = get(state, 'form.transaction.values');
+	const amount = get(formValues, 'amount', '');
+	return {
+		isExpanded: amount ? amount.trim().length > 0 : false,
+		initialValues: {
+			amount: '',
+			note: '',
+		},
+	};
 }
 
 function mergeProps(stateProps, dispatchProps, ownProps) {
@@ -44,13 +37,15 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
 		...stateProps,
 		...dispatchProps,
 		...ownProps,
-		add: (amount, note) => {
-			if (!amount.trim()) {
+		onSubmit: ({ amount, note }) => {
+			const sum = parseInt(amount.replace(/[\s\D]*/g, ''), 10);
+			if (!sum) {
 				return;
 			}
 			ownProps.onAdd(amount, note);
+			dispatchProps.flush();
 		}
 	}
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(AddForm))
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(AddForm);

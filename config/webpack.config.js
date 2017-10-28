@@ -92,7 +92,7 @@ if (__DEV__) {
     new webpack.NoErrorsPlugin()
   )
 } else if (__PROD__) {
-  debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
+  /*debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
@@ -107,7 +107,7 @@ if (__DEV__) {
       },
     }),
     new webpack.optimize.AggressiveMergingPlugin()
-  )
+  )*/
 }
 
 // Don't split bundles during testing, since we only want import one bundle

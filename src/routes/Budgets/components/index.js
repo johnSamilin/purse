@@ -2,6 +2,7 @@ import React from 'react';
 import BEMHelper from 'react-bem-helper';
 import { Link } from 'react-router';
 import { paths } from 'routes/Budgets/const';
+import LoadingPanel from 'components/LoadingPanel';
 
 import Info from './Info';
 import './style.scss';
@@ -18,6 +19,8 @@ export const Budgets = (props) => {
 		openBudget,
 		userInfo,
 		selectUser,
+		isLoading,
+		availableUsers,
 	} = props;
 	return (
 	  <div
@@ -25,9 +28,9 @@ export const Budgets = (props) => {
 	  >
 			<div {...classes('username')}>
 				<select onChange={e => selectUser(e.target.value)} value={userInfo.id}>
-					<option value={0}>Me</option>
-					<option value={1}>Not me</option>
-					<option value={2}>Who</option>
+					{availableUsers.map(user =>
+						<option value={user.id}>{user.name}</option>
+					)}
 				</select>
 			</div>
 			<ul {...classes('list')}>
@@ -42,6 +45,7 @@ export const Budgets = (props) => {
 				)}
 			</ul>
 			<Link to={paths.construct()} {...classes('fab')}>+</Link>
+			<LoadingPanel isActive={isLoading} />
 	  </div>
 	)
 }

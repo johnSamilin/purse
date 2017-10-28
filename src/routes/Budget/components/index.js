@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
-import Header from 'components/Header';
+import {
+  Header,
+  Button,
+} from 'components';
 import EmptyState from './EmptyState';
 import Summary from './Summary';
 import Transactions from './Transactions';
@@ -23,6 +26,9 @@ export const Budget = (props) => {
     usersList,
     isOwner,
     respondInvite,
+    isLoading,
+    showCollaborators,
+    newUsersCount,
   } = props;
 
   const classes = new BEMHelper('budget-details');
@@ -33,7 +39,14 @@ export const Budget = (props) => {
     <div
       {...classes({ extra: pageClasses })}
     >
-      <Header title={budget.title} backurl='/' />
+      <Header title={budget.title} backurl='/'>
+        <Button onClick={showCollaborators} {...classes({
+          element: 'collaborators',
+          extra: 'mi mi-tag-faces',
+        })}>
+          {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}          
+        </Button>
+      </Header>
       <div {...classes('budget')}>
         {budget.id
           ? [
@@ -45,28 +58,19 @@ export const Budget = (props) => {
               currency={budget.currency.label}
               showMyBalance={status === 'active'}
             />,
-            <div {...classes('budget-users-transactions')}>
-              <div {...classes('budget-users')}>
-                {budget.state === 'opened' && status === 'active' &&
-                  <AddForm
-                    key={3}
-                    currency={budget.currency.key}
-                    onAdd={addTransaction}
-                  />}
-                <Transactions
-                  key={4}
-                  data={transactions}
-                  users={usersList}
+            <div {...classes('budget-transactions')}>
+              {budget.state === 'opened' && status === 'active' &&
+                <AddForm
+                  key={3}
                   currency={budget.currency.key}
-                  onTransactionClick={toggleTransactionState}         
-                />
-              </div>
-              <Users
-                key={6}
+                  onAdd={addTransaction}
+                />}
+              <Transactions
+                key={4}
+                data={transactions}
                 users={usersList}
-                canManage={isOwner}
-                onChangeStatus={changeUserStatus}
-                ownerId={budget.ownerId}
+                currency={budget.currency.key}
+                onTransactionClick={toggleTransactionState}         
               />
             </div>,
             budget.state === 'opened'

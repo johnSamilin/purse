@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
+import { push } from 'react-router-redux';
 import { get, sortBy } from 'lodash';
 import { database } from 'database';
 import { actions } from '../modules/actions';
 import presenter from '../components';
 import select from '../modules/selectors';
-import { userStatuses } from '../const';
+import { userStatuses, paths } from '../const';
 
 class Budget extends Component {
   constructor() {
@@ -34,6 +35,13 @@ class Budget extends Component {
         this.props.clearBudget();
         this.props.clearTransactions();
       }
+      return;
+    }
+
+    if (this.props.budgetsLoading === true && newProps.budgetsLoading === false) {
+      if (newProps.id) {
+        this.loadBudget(newProps.id);
+      }
     }
   }
 
@@ -54,17 +62,18 @@ class Budget extends Component {
         this.transactionsSub = this.transactionsQuery.$.subscribe((transactions) => {
           if (transactions) {
             this.onTransactionsUpdated(transactions);
+            this.updateSeenTransactions(transactions.length);
           }
         });
         this.transactionsQuery
           .exec()
           .then(this.onTransactionsUpdated);
       });
-      budgetsQuery.$.subscribe((event) => {
-        if (Array.isArray(event)) {
-          this.onBudgetUpdated(event[0]);
-        }
-      });
+    budgetsQuery.$.subscribe((event) => {
+      if (Array.isArray(event)) {
+        this.onBudgetUpdated(event[0]);
+      }
+    });
   }
 
   unload() {
@@ -73,6 +82,7 @@ class Budget extends Component {
       this.transactionsSub.unsubscribe();
     } catch(er) {
       // ignore
+      console.error(er);
     }
     this.isLoaded = false;
   }
@@ -82,8 +92,6 @@ class Budget extends Component {
   }
 
   onTransactionsUpdated(transactions) {
-    const ids = new Set();
-    transactions.forEach(transaction => ids.add(transaction.ownerId));
     const transactionsSorted = sortBy(transactions, transaction => transaction.date);
     this.props.selectTransactions(transactionsSorted.reverse());
   }
@@ -108,7 +116,7 @@ class Budget extends Component {
         });
       }
       this.budgetDocument.users = users;
-      this.budgetDocument.save().then(() => {}).catch((er) => {});
+      this.budgetDocument.save();
     }
   }
 
@@ -123,7 +131,7 @@ class Budget extends Component {
       return u;
     });
     this.budgetDocument.users = users;
-    this.budgetDocument.save().then(() => {}).catch((er) => {});
+    this.budgetDocument.save();
   }
 
   toggleTransactionState(id) {
@@ -133,7 +141,7 @@ class Budget extends Component {
     }
     if (transaction.cancelled || confirm('Удалить? Точно')) {
       transaction.cancelled = !transaction.cancelled;
-      transaction.save().catch(() => {});
+      transaction.save();
     }
   }
   
@@ -150,7 +158,7 @@ class Budget extends Component {
       return u;
     });
     this.budgetDocument.users = updatedUsers;
-    this.budgetDocument.save().catch(() => {});
+    this.budgetDocument.save();
   }
 
   addTransaction(amount, note) {
@@ -163,6 +171,23 @@ class Budget extends Component {
       cancelled: false,
       ownerId: this.props.currentUserId,
     });
+  }
+
+  updateSeenTransactions(count) {
+    const query = database.seentransactions
+      .findOne(this.props.id);
+    query.exec()
+      .then((budget) => {
+        if (budget === null) {
+          database.seentransactions.insert({
+            budgetId: this.props.id,
+            transactions: count,
+          });
+          return;
+        }
+        budget.transactions = count;
+        budget.save();
+      });
   }
 
   render() {
@@ -185,6 +210,7 @@ const mapDispatchToProps = {
   // loadBudget: actions.budget.load,
   clearTransactions: actions.transactions.clear,
   clearBudget: actions.budget.clear,
+  redirect: push,
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -203,6 +229,8 @@ const mapStateToProps = (state, ownProps) => {
       }
     });
   }
+  const budgetsLoading = get(state, 'budgets.isLoading', false);
+  const newUsersCount = usersList.filter(user => ['pending', 'invited'].includes(user.status)).length;
 
   return {
     id: ownProps.params.id,
@@ -214,6 +242,8 @@ const mapStateToProps = (state, ownProps) => {
     status,
     usersList,
     isOwner,
+    budgetsLoading,
+    newUsersCount,
   }
 }
 
@@ -222,6 +252,9 @@ function mergeProps(state, dispatch, own) {
     ...state,
     ...dispatch,
     ...own,
+    showCollaborators() {
+      dispatch.redirect(paths.collaborators(state.id));
+    },
   };
 }
 
