@@ -10,5 +10,7 @@ jobs:
         - develop
         - master
     steps:
+      - run: npm install
       - run: npm run deploy:prod
-    machine: true
+    docker:
+      image: circleci/node:latest
