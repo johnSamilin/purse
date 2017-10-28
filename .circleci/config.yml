@@ -13,6 +13,5 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run deploy:prod
-      - deploy
     docker:
       - image: circleci/node:latest
