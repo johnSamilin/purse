@@ -1,8 +1,4 @@
-deployment:
-  staging:
-    branch: develop
-    heroku:
-      appname: purse-front
+version: 2
 jobs:
   build:
     branches:
@@ -15,3 +11,32 @@ jobs:
       - run: npm run deploy:prod
     docker:
       - image: circleci/node:latest
+    deploy-job:
+      docker:
+        - image: circleci/node:latest
+      steps:
+        - run:
+            name: Run setup script
+            command: bash .circleci/setup-heroku.sh
+        - add_ssh_keys:
+            fingerprints:
+              - "ec:c1:80:a2:95:d2:64:43:8b:64:aa:8f:b3:5e:d1:97"
+        - run:
+            name: Deploy Develop to Heroku
+            command: |
+              git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/develop
+              heroku run python manage.py deploy
+              heroku restart
+               
+ workflows:
+   version: 2
+   build-deploy:
+     jobs:
+       - build-job
+       - deploy-job:
+           requires:
+             - build
+           filters:
+             branches:
+               - master
+               - develop

@@ -7,3 +7,6 @@ dist
 coverage
 
 .idea/
+
+.circleci/heroku
+.circleci/heroku.pub
