@@ -3,3 +3,12 @@ deployment:
     branch: develop
     heroku:
       appname: purse-front
+jobs:
+  build:
+    branches:
+      only:
+        - develop
+        - master
+    steps:
+      - run: npm run deploy:prod
+    machine: true
