@@ -10,9 +10,9 @@ RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
-const syncEnabled = false;
+const syncEnabled = true;
 let database;
-const dbUrl = 'https://couchdb-c9ebdb.smileupps.com';
+const dbUrl = 'https://couchdb-d3b940.smileupps.com';
 
 function budgetsRequested(store) {
   store.dispatch(budgetsActions.request());

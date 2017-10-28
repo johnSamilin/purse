@@ -3,3 +3,9 @@ deployment:
     branch: develop
     heroku:
       appname: purse-front
+jobs:
+  build:
+    branches:
+      only:
+        - develop
+        - master
