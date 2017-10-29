@@ -3,16 +3,3 @@ deployment:
     branch: develop
     heroku:
       appname: purse-front
-version: 2
-jobs:
-  build:
-    branches:
-      only:
-        - develop
-        - master
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm run deploy:prod
-    docker:
-      - image: circleci/node:latest
