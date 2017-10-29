@@ -18,8 +18,11 @@ jobs:
       - run:
           name: Deploy to Heroku
           command: |
+            heroku login
             cd dist
             git init
+            git config user.email $HEROKU_LOGIN
+            git config user.name "Heroku"
             heroku git:remote -a purse-front
             git add .
             git commit -m "dist"
