@@ -18,13 +18,13 @@ jobs:
       - run:
           name: Deploy to Heroku
           command: |
+            echo ~/.netrc
             heroku login
             cd dist
             git init
             heroku git:remote -a purse-front
             git add .
             git commit -m "dist"
-            git push
-            git push --force purse-front
+            git push heroku master --force
     docker:
       - image: circleci/node:latest
