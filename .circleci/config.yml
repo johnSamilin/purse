@@ -26,4 +26,5 @@ jobs:
             git commit -m "dist"
             git push
             git push --force $HEROKU_APP_NAME
-    machine: true
+    docker:
+      - image: circleci/node:latest
