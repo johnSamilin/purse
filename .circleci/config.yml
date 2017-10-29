@@ -18,12 +18,16 @@ jobs:
       - run:
           name: Deploy Master to Heroku
           command: |
+            heroku login
             cd dist
             git init
-            git remote add origin git@heroku.com:$HEROKU_APP_NAME.git
+            heroku git:remote -a git@heroku.com:$HEROKU_APP_NAME.git
             git add .
             git commit -m "dist"
             git push
-            git push --force origin master
+            git push --force $HEROKU_APP_NAME
+            heroku run python manage.py deploy
+            yes
+            heroku restart
     docker:
       - image: circleci/node:latest
