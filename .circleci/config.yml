@@ -18,8 +18,6 @@ jobs:
       - run:
           name: Deploy to Heroku
           command: |
-            cat ~/.netrc
-            heroku login
             cd dist
             git init
             heroku git:remote -a purse-front
