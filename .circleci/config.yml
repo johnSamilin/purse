@@ -16,17 +16,14 @@ jobs:
           fingerprints:
             - "ec:c1:80:a2:95:d2:64:43:8b:64:aa:8f:b3:5e:d1:97"
       - run:
-          name: Deploy Master to Heroku
+          name: Deploy to Heroku
           command: |
-            /usr/local/bin/heroku login
+            heroku login
             cd dist
             git init
-            /usr/local/bin/heroku git:remote -a git@heroku.com:$HEROKU_APP_NAME.git
+            heroku git:remote -a git@heroku.com:$HEROKU_APP_NAME.git
             git add .
             git commit -m "dist"
             git push
             git push --force $HEROKU_APP_NAME
-            heroku run python manage.py deploy
-            yes
-            heroku restart
     machine: true
