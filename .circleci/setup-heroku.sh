@@ -8,9 +8,9 @@
   machine api.heroku.com
     login $HEROKU_LOGIN
     password $HEROKU_API_KEY
-  ELN
+ELN
 
   cat >> ~/.ssh/config << ELN
   VerifyHostKeyDNS yes
   StrictHostKeyChecking no
-  ELN
+ELN
