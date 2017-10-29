@@ -17,3 +17,11 @@ EOF
   VerifyHostKeyDNS yes
   StrictHostKeyChecking no
 EOF
+
+  cat >> dist/composer.json << EOF
+  {}
+EOF
+
+  cat >> dist/index.php << EOF
+  <?php include_once('index.html'); ?>
+EOF
