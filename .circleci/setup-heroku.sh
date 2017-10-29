@@ -6,6 +6,8 @@
      
   cat > ~/.netrc "machine api.heroku.com\n \tlogin $HEROKU_LOGIN\n \tpassword $HEROKU_API_KEY"
 
+  echo ~/.netrc
+
   cat >> ~/.ssh/config << EOF
   VerifyHostKeyDNS yes
   StrictHostKeyChecking no
