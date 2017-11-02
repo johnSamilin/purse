@@ -33,11 +33,17 @@ function login(userInfo) {
 
 function logout() {
 	localStorage.removeItem('userinfo');
+	return doLogout();
+}
+
+function refreshLogin() {
+	return doLogin();
 }
 
 export const actions = {
   login,
   logout,
+  refreshLogin,
 }
 
 // ------------------------------------

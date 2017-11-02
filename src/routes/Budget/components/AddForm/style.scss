@@ -13,12 +13,9 @@
 	}
 
 	&__input {
-		border: none;
 		border-bottom: 1px solid $primary-dark;
 		transition: border-width 0.1s ease, height 0.1s ease;
-		outline: none;
 		flex: 1;
-		background: transparent;
 		margin-right: 1rem;
 		margin: 0.25rem 0;
 

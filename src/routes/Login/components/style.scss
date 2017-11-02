@@ -1,2 +1,82 @@
-.login.page {
+@import '~styles/core.scss';
+
+.login {
+    width: 50%;
+    max-width: 50%;
+    margin: auto;
+    border: none !important;
+
+    &__heading {
+        padding: 2rem 15%;
+    }
+
+    &__buttons {
+        display: flex;
+    }
+
+    &__title {
+        padding-bottom: 2rem;
+        text-align: center;
+    }
+
+    &__tabs {
+        flex-grow: 1;
+    }
+
+    &__tabs-list {
+        display: flex;
+        list-style: none;
+    }
+
+    &__tab {
+        flex: 1;
+        border-bottom: 1px solid $secondary;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+
+        &--selected {
+            border-bottom-width: 2px;
+            padding-bottom: calc( 0.5rem - 1px );
+        }
+    }
+
+    &__tab-content {
+        padding: 0.5rem 1rem;
+        box-sizing: border-box;
+        display: none;
+
+        &--selected {
+            display: block;
+        }
+    }
+
+    &__input {
+        display: flex;
+        padding: 1rem 0;
+    }
+
+    &__country-code {
+        margin-right: 0.5rem;
+        width: auto;
+    }
+
+    &__phone {
+        flex-grow: 1;
+    }
+}
+
+.core-layout {
+	&__viewport {
+		&--mobile {
+			& .login {
+				width: 100%;
+				max-width: 100%;
+
+				&.page--active {
+					width: 100%;
+					max-width: 100%;
+				}
+			}
+		}
+	}
 }

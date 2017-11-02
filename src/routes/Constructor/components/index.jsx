@@ -7,13 +7,15 @@ import {
   Header,
   ListItem,
   UserInfo,
+  Select,
+  Input,
 } from 'components';
 import { Field } from 'redux-form';
 
 import './style.scss';
 
 function Title({ input, className }) {
-  return <input
+  return <Input
       className={className}
       placeholder='Название'
       value={input.value}
@@ -22,15 +24,12 @@ function Title({ input, className }) {
 }
 
 function Currency({ input, className }) {
-  return <select
+  return <Select
       className={className}
       value={input.value}
       onChange={input.onChange}
-    >
-      {currencies.map(cur =>
-        <option value={cur.id}>{cur.label}</option>
-      )}
-  </select>;
+      options={currencies}
+    />;
 }
 
 function Checkbox({ input, className }) {
@@ -55,6 +54,7 @@ export const Construct = (props) => {
     canCreate,
     users,
     onSubmit,
+    handleSubmit,
   } = props;
 
   const classes = new BEMHelper('construct');
@@ -63,7 +63,7 @@ export const Construct = (props) => {
 
   return (
     <form
-      onSubmit={props.handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit)}
       {...classes({ extra: pageClasses })}
     >
       <Header title='Create new budget' backurl='/' />

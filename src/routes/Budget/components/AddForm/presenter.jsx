@@ -4,11 +4,12 @@ import { userStatuses } from 'routes/Budget/const';
 import { Field } from 'redux-form';
 import {
 	Button,
+	Input,
 } from 'components';
 import './style.scss';
 
-function Input({ input, className, placeholder, type = 'text' }) {
-	return <input
+function FormInput({ input, className, placeholder, type = 'text' }) {
+	return <Input
 		className={className}
 		value={input.value}
 		onChange={input.onChange}
@@ -35,7 +36,7 @@ function AddForm(props) {
 		>
 			<div {...classes('amount')}>
 				<Field
-					component={Input}
+					component={FormInput}
 					{...classes('input')}
 					name={'amount'}
 					placeholder={`100 ${currency}`}

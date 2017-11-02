@@ -13,12 +13,11 @@ function setToken(token) {
 
 function init(store) {
 	injectReducer(store, { key: 'auth', reducer } );
-	// store.dispatch(getToken() ? actions.login() : actions.logout());
-	const currentUser = JSON.parse(localStorage.getItem('userinfo')) || {
-		id: '0',
-		name: 'user #0',
-	};
-	store.dispatch(actions.login(currentUser));
+	if (getToken()) {
+		store.dispatch(actions.refreshLogin());
+	} else {
+		store.dispatch(actions.logout());
+	}
 }
 
 export default {
