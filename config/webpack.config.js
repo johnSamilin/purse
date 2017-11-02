@@ -1,15 +1,16 @@
-const argv = require('yargs').argv
-const webpack = require('webpack')
-const cssnano = require('cssnano')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const project = require('./project.config')
-const debug = require('debug')('app:config:webpack')
-const path = require('path')
+const argv = require('yargs').argv;
+const webpack = require('webpack');
+const cssnano = require('cssnano');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const project = require('./project.config');
+const debug = require('debug')('app:config:webpack');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const __DEV__ = project.globals.__DEV__
-const __PROD__ = project.globals.__PROD__
-const __TEST__ = project.globals.__TEST__
+const __DEV__ = project.globals.__DEV__;
+const __PROD__ = project.globals.__PROD__;
+const __TEST__ = project.globals.__TEST__;
 
 debug('Creating configuration.')
 const webpackConfig = {
@@ -66,7 +67,11 @@ webpackConfig.plugins = [
     minify   : {
       collapseWhitespace : true
     }
-  })
+  }),
+  new CopyWebpackPlugin([{
+    from: project.paths.client('services/serviceWorker.js'),
+    to: project.paths.dist('serviceWorker.js'),
+  }]),
 ]
 
 // Ensure that the compiler exits on errors during testing so that
@@ -116,7 +121,7 @@ if (!__TEST__) {
     new webpack.optimize.CommonsChunkPlugin({
       names : ['vendor']
     })
-  )
+  );
 }
 
 // ------------------------------------

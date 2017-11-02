@@ -44,7 +44,6 @@ class Login extends Component {
       this.state.activeTab,
       params, // will use default values if not specified
       (response) => {
-        console.log(response);
         if (response.status === "PARTIALLY_AUTHENTICATED") {
           const code = response.code;
           const csrf = response.state;
@@ -52,10 +51,11 @@ class Login extends Component {
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure
-          this.props.login(response.status);
         }
         else if (response.status === "BAD_PARAMS") {
           // handle bad parameters
+        } else {
+          this.props.login(response.status);
         }
       },
     );
