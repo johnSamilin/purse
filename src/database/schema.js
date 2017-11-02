@@ -82,7 +82,7 @@ const schemas = {
     },
 	users: {
 		"title": "users",
-		"version": 0,
+		"version": 1,
 		"description": "users",
 		"type": "object",
 		"disableKeyCompression": true,
@@ -100,7 +100,16 @@ const schemas = {
 			"email": {
 				"type": "string"
 			},
-	    },
+			"token": {
+				"type": "string",
+			},
+		},
+		"migrationStrategies": {
+			1: function (user) {
+				user.token = '';
+				return user;
+			},
+		},
 	},
 	seenTransactions: {
 		"title": "seentransactions",

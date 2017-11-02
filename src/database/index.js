@@ -54,6 +54,7 @@ function init(store) {
     const budgetsCollection = db.collection({
       name: 'budgets',
       schema: schemas.budgets,
+      migrationStrategies: schemas.budgets.migrationStrategies,
     }).then((collection) => {
         if(syncEnabled) {
           database.budgets.sync(`${dbUrl}/budgets`);
@@ -67,6 +68,7 @@ function init(store) {
     const transactionsCollection = db.collection({
       name: 'transactions',
       schema: schemas.transactions,
+      migrationStrategies: schemas.transactions.migrationStrategies,
     }).then((collection) => {
         if(syncEnabled) {
           database.transactions.sync(`${dbUrl}/transactions`);
@@ -80,6 +82,7 @@ function init(store) {
     const usersCollection = db.collection({
       name: 'users',
       schema: schemas.users,
+      migrationStrategies: schemas.users.migrationStrategies,
     }).then((collection) => {
         if(syncEnabled) {
           database.users.sync(`${dbUrl}/collaborators`);
@@ -93,6 +96,7 @@ function init(store) {
     const seenTransactions = db.collection({
       name: 'seentransactions',
       schema: schemas.seenTransactions,
+      migrationStrategies: schemas.seenTransactions.migrationStrategies,
     }).then((collection) => {
       return collection
         .find()

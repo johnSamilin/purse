@@ -1,8 +1,10 @@
+import module from './index';
+
 // ------------------------------------
 // Constants
 // ------------------------------------
-const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN'
-const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT'
+const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN';
+const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT';
 
 // ------------------------------------
 // Actions
@@ -12,7 +14,6 @@ function doLogin(userInfo) {
 		type: AUTH_LOGGED_IN,
 		payload: {
 			loggedIn: true,
-			...userInfo,
 		}
 	}
 }
@@ -26,13 +27,13 @@ function doLogout() {
 	};
 }
 
-function login(userInfo) {
-	localStorage.setItem('userinfo', JSON.stringify(userInfo));
-	return doLogin(userInfo);
+function login(token) {
+	module.setToken(token);
+	return doLogin();
 }
 
 function logout() {
-	localStorage.removeItem('userinfo');
+	return doLogout();
 }
 
 export const actions = {

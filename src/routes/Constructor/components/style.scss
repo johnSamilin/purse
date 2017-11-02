@@ -17,14 +17,10 @@
 		font-size: 3rem;
 
 		&-input {
-			border: none;
 			border-bottom: 1px solid $primary-dark;
 			transition: border-width 0.1s ease;
-			outline: none;
 			flex: 1;
-			background: transparent;
 			margin: 4rem 2rem;
-			width: 100%;
 		}
 	}
 
@@ -34,12 +30,7 @@
 	}
 
 	&__select {
-		background: transparent;
-		margin: 2rem;
-		width: 100%;
-		border: none;
-		border-bottom: 1px solid $primary;
-		outline: none;
+		margin: 2rem;		
 	}
 
 	&__users {

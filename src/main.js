@@ -3,11 +3,6 @@ import ReactDOM from 'react-dom';
 import createStore from './store/createStore';
 import AppContainer from './containers/AppContainer';
 import database from './database';
-import {
-  accountkitAppId,
-  accountkitApiVersion,
-  csrf,
-} from './const';
 import api from 'services/api';
 import { registerServiceWorker } from 'services/helpers';
 
@@ -21,16 +16,6 @@ if (!__DEV__) {
 // ========================================================
 const initialState = window.___INITIAL_STATE__
 const store = createStore(initialState)
-
-// Account kit
-/*window.AccountKit.init(
-  {
-    appId: accountkitAppId, 
-    state: csrf, 
-    version: accountkitApiVersion,
-    fbAppEventsEnabled: true
-  }
-);*/
 
 // ========================================================
 // Modules Setup
