@@ -13,8 +13,9 @@ function setToken(token) {
 
 function init(store) {
 	injectReducer(store, { key: 'auth', reducer } );
-	if (getToken()) {
-		store.dispatch(actions.refreshLogin());
+	const token = getToken();
+	if (token) {
+		store.dispatch(actions.login(token));
 	} else {
 		store.dispatch(actions.logout());
 	}

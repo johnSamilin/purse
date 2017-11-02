@@ -21,7 +21,9 @@ export default (store) => {
         debug: __DEV__ ? true : false,
       }
     );
-  } catch(er) {}
+  } catch(er) {
+    console.log(er);
+  }
 
   return ({
     path : 'login',

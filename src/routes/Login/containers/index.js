@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { reduxForm } from 'redux-form';
-import { actions } from '../modules/actions';
+import { actions as authActions } from 'modules/auth/actions';
 import { forms, tabs } from '../const';
 import presenter from '../components';
 
@@ -52,6 +52,7 @@ class Login extends Component {
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure
+          this.props.login(response.status);
         }
         else if (response.status === "BAD_PARAMS") {
           // handle bad parameters
@@ -77,5 +78,8 @@ const mapStateToProps = (state) => {
   };
 };
 
+const mapDispatchToProps = {
+  login: authActions.login,
+};
 
-export default connect(mapStateToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

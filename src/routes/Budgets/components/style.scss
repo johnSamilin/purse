@@ -35,6 +35,11 @@
 		text-align: center;
 		padding: 2rem;
 	}
+
+	&__exit {
+		font-size: 2rem;
+		cursor: pointer;
+	}
 }
 .core-layout {
 	&__viewport {

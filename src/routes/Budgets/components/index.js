@@ -18,20 +18,22 @@ export const Budgets = (props) => {
 		closeBudget,
 		openBudget,
 		userInfo,
-		selectUser,
 		isLoading,
-		availableUsers,
+		exit,
 	} = props;
 	return (
 	  <div
 			{...classes({ extra: pageClasses })}
 	  >
 			<div {...classes('username')}>
-				<select onChange={e => selectUser(e.target.value)} value={userInfo.id}>
-					{availableUsers.map(user =>
-						<option value={user.id}>{user.name}</option>
-					)}
-				</select>
+				<span
+					{...classes({
+						element: 'exit',
+						extra: 'mi mi-power-settings-new',
+					})}
+					onClick={exit}
+				></span>
+				<span {...classes('name')}>{userInfo.name}</span>
 			</div>
 			<ul {...classes('list')}>
 				{list && list.map((budget, i) =>
