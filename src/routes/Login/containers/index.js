@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { reduxForm } from 'redux-form';
 import { actions as authActions } from 'modules/auth/actions';
-import { forms, tabs } from '../const';
+import { forms, tabs, countryCodes } from '../const';
 import presenter from '../components';
 
 @reduxForm({
@@ -75,6 +75,9 @@ const mapStateToProps = (state) => {
 
   return {
     isActive: state.modules.active === 'login',
+    initialValues: {
+      countryCode: countryCodes[0].value,
+    },
   };
 };
 
