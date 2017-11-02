@@ -7,7 +7,9 @@
     border: none !important;
 
     &__heading {
-        padding: 2rem 15%;
+        padding: 2rem;
+        text-align: justify;
+        line-height: 1.8;
     }
 
     &__buttons {
@@ -17,6 +19,7 @@
     &__title {
         padding-bottom: 2rem;
         text-align: center;
+        font-weight: bold;
     }
 
     &__tabs {
@@ -41,7 +44,7 @@
     }
 
     &__tab-content {
-        padding: 0.5rem 1rem;
+        padding: 2rem;
         box-sizing: border-box;
         display: none;
 

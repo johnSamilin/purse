@@ -26,6 +26,7 @@ function Phone({ input, className }) {
     value={input.value}
     onChange={input.onChange}
     placeholder={'1234567'}
+    type={'tel'}
   />;
 }
 
