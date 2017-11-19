@@ -24,7 +24,8 @@ jobs:
             git config user.email $HEROKU_LOGIN
             git config user.name "Heroku"
             heroku git:remote -a purse-front
-            git add .
+            git checkout heroku master
+            git add ./*
             git commit -m "dist"
             git push heroku master --force
     docker:
