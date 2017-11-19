@@ -12,17 +12,18 @@ export default (store) => {
   injectReducer(store, { key: 'login', reducer: loginReducer });
   // Account kit
   try {
-    window.AccountKit.init(
+    AccountKit.init(
       {
         appId: accountkitAppId, 
         state: csrf, 
         version: accountkitApiVersion,
         fbAppEventsEnabled: true,
-        debug: __DEV__ ? true : false,
+        debug: __DEV__,
+        redirect: 'https://purse-back.herokuapp.com/auth/success',
       }
     );
   } catch(er) {
-    console.log(er);
+    console.error(er);
   }
 
   return ({
