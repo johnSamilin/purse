@@ -16,13 +16,15 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.open(version)
-      .then((cache) => {
-        cache.match(event.request)
-          .then((response) => {
-            return response || fetch(event.request);
-          })
-      })
+  if (precachedUrls.includes(event.request.url)) {
+    event.respondWith(
+      caches.open(version)
+        .then((cache) => {
+          cache.match(event.request)
+            .then((response) => {
+              return response || fetch(event.request);
+            })
+        })
     );
+  }
 });
