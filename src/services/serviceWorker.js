@@ -18,7 +18,7 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  if (precachedUrls.includes(event.request.url.substr(baseUrl))) {
+  if (precachedUrls.includes(event.request.url.substr(baseUrl.length))) {
     event.respondWith(
       caches.open(version)
         .then((cache) => {
