@@ -104,12 +104,6 @@ const schemas = {
 				"type": "string",
 			},
 		},
-		"migrationStrategies": {
-			1: function (user) {
-				user.token = '';
-				return user;
-			},
-		},
 	},
 	seenTransactions: {
 		"title": "seentransactions",
