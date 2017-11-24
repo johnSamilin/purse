@@ -23,7 +23,7 @@ jobs:
             git init
             git config user.email $HEROKU_LOGIN
             git config user.name "Heroku"
-            heroku git:remote -a purse-front
+            heroku git:remote -a purseapp
             git add ./*
             git commit -m "dist"
             git push heroku master --force
