@@ -8,7 +8,7 @@ import { registerServiceWorker } from 'services/helpers';
 
 // SW
 if (!__DEV__) {
-  registerServiceWorker();
+  // registerServiceWorker();
 }
 
 // ========================================================
