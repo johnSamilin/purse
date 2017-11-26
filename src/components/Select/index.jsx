@@ -19,7 +19,7 @@ function Select(props) {
       onChange={onChange}
     >
       {options.map(option =>
-        <option value={option.id}>{option.label}</option>
+        <option value={option.value}>{option.label}</option>
       )}
     </select>
   );

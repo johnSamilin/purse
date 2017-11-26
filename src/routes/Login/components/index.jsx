@@ -121,6 +121,7 @@ export const Login = (props) => {
         <Button
           {...classes('button')}
           mods={['success']}
+          type={'submit'}
         >
             Войти
         </Button>

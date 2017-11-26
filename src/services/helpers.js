@@ -10,7 +10,7 @@ function registerServiceWorker() {
 	};
 }
 
-function notify(text, callback) {
+function notify(text) {
   // Проверка поддерживаемости браузером уведомлений
   if (!("Notification" in window)) {
     return false;
