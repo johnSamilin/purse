@@ -69,8 +69,8 @@ class Login extends Component {
           this.props.getToken({
             code,
             csrf,
-          }).then(() => {
-            this.props.login('me');
+          }).then((res) => {
+            this.props.login(res.access_token);
           })
           .catch((er) => {
             notify('Попытка входа не удалась');
@@ -83,7 +83,7 @@ class Login extends Component {
         else if (response.status === "BAD_PARAMS") {
           // handle bad parameters
         } else {
-          this.props.login(response.status);
+          this.props.login(response.access_token);
         }
       },
     );
