@@ -80,6 +80,7 @@ class Api {
     const params = {
       method,
       headers: this.getHeaders(),
+      mode: 'no-cors',
     };
 
     if (payload && payload instanceof FormData) {

@@ -66,7 +66,16 @@ class Login extends Component {
         if (response.status === "PARTIALLY_AUTHENTICATED") {
           const code = response.code;
           const csrf = response.state;
-          // Send code to server to exchange for access token
+          this.props.getToken({
+            code,
+            csrf,
+          }).then(() => {
+            this.props.login('me');
+          })
+          .catch((er) => {
+            notify('Попытка входа не удалась');
+            console.error(er);
+          });
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure
@@ -100,7 +109,7 @@ class Login extends Component {
         .then(() => this.accountKitLogin(params))
         .catch((er) => {
           console.error(er);
-          notify('Oops, there was an error in login process');
+          notify('Кажется, что-то пошло не так');
         });
     } else {
       this.accountKitLogin(params);
@@ -129,6 +138,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   login: authActions.login,
+  getToken: authActions.getToken,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

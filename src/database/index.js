@@ -13,7 +13,7 @@ RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 
 const syncEnabled = true;
 let database;
-const dbUrl = 'https://couchdb-d3b940.smileupps.com';
+const dbUrl = 'https://couchdb-224842.smileupps.com';
 
 function budgetsRequested(store) {
   store.dispatch(budgetsActions.request());

@@ -1,3 +1,4 @@
+import { apiPaths as rootApiPaths } from 'const';
 const forms = {
     login: 'login',
 };
@@ -18,6 +19,10 @@ const countryCodes = [
     }
 ];
 
+const apiPaths = {
+    getToken: () => `${rootApiPaths.backend}/auth/success`,
+};
+
 function getFormAction (apiVersion, type) {
     switch(type) {
         case tabs.SMS:
@@ -28,6 +33,7 @@ function getFormAction (apiVersion, type) {
 };
 
 export {
+    apiPaths,
     forms,
     tabs,
     countryCodes,

@@ -1,3 +1,5 @@
+import Api from 'services/api';
+import { apiPaths } from 'routes/Login/const';
 import module from './index';
 
 // ------------------------------------
@@ -36,9 +38,17 @@ function logout() {
 	return doLogout();
 }
 
+function getToken({ code, csrf }) {
+	return dispatch => Api.doPost(
+		apiPaths.getToken(),
+		{ code, csrf }
+	);
+}
+
 export const actions = {
   login,
   logout,
+  getToken,
 }
 
 // ------------------------------------
