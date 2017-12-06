@@ -1,27 +1,18 @@
 {
-  "parser": "babel-eslint",
-  "extends": [
-    "standard",
-    "standard-react"
-  ],
-  "plugins": [
-    "babel",
-    "react",
-    "promise"
-  ],
   "env": {
-    "browser" : true
+    "browser": true,
   },
-  "globals": {
-    "__DEV__"      : false,
-    "__TEST__"     : false,
-    "__PROD__"     : false,
-    "__COVERAGE__" : false
-  },
+	"extends": "airbnb",
+	"globals": {
+		"__APP_TYPE_CENTRAL__": true,
+		"__APP_TYPE_NODE__": true,
+	},
+	"settings": {
+		"import/resolver": {
+			"webpack": { "config": "config/webpack.config.js" }
+		}
+	},
   "rules": {
-    "key-spacing"          : 0,
-    "jsx-quotes"           : [2, "prefer-single"],
-    "max-len"              : [2, 120, 2],
-    "object-curly-spacing" : [2, "always"]
+      "no-confusing-arrow": ["error", {"allowParens": true}]
   }
 }

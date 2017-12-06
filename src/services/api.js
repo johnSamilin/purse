@@ -1,5 +1,6 @@
 import { tokenName } from 'modules/auth/index';
 import URI from 'urijs';
+import { apiPaths } from 'const';
 
 const STATUS = {
   OK: 200,
@@ -13,7 +14,7 @@ const METHODS = {
 };
 const JSON_RESPONSE_TYPE = 'application/json';
 
-const apiRootPath = 'http://samilin.fvds.ru/';
+const apiRootPath = apiPaths.backend;
 
 class Api {
 

@@ -1,4 +1,3 @@
-import { apiPaths as rootApiPaths } from 'const';
 const forms = {
     login: 'login',
 };
@@ -20,7 +19,7 @@ const countryCodes = [
 ];
 
 const apiPaths = {
-    getToken: () => `${rootApiPaths.backend}/auth/success`,
+    getToken: () => `/auth/success`,
 };
 
 function getFormAction (apiVersion, type) {
