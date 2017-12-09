@@ -9,6 +9,7 @@ import {
   csrf,
 } from 'const';
 import { notify } from 'services/helpers';
+import Api from 'services/api';
 import { forms, tabs, countryCodes } from '../const';
 import presenter from '../components';
 
@@ -62,7 +63,6 @@ class Login extends Component {
       this.state.activeTab,
       params, // will use default values if not specified
       (response) => {
-        console.log(response);
         if (response.status === "PARTIALLY_AUTHENTICATED") {
           const code = response.code;
           const csrf = response.state;

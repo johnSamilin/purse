@@ -1,6 +1,7 @@
 import { tokenName } from 'modules/auth/index';
 import URI from 'urijs';
 import { apiPaths } from 'const';
+import { notify } from 'services/helpers';
 
 const STATUS = {
   OK: 200,
@@ -40,7 +41,7 @@ class Api {
 
   // eslint-disable-next-line class-methods-use-this
   handleUnexpectedError() {
-    alert('Oooops!.. Something went wrong :(');
+    notify('Oooops!.. Something went wrong :(');
   }
 
   getHeaders() {
@@ -81,7 +82,6 @@ class Api {
     const params = {
       method,
       headers: this.getHeaders(),
-      mode: 'no-cors',
     };
 
     if (payload && payload instanceof FormData) {
