@@ -52,8 +52,4 @@ export const Budgets = (props) => {
 	)
 }
 
-Budgets.propTypes = {
-  
-}
-
 export default Budgets

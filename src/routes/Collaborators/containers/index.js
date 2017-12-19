@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { get } from 'lodash';
-import { database } from 'database';
+import { Database } from 'database';
 import { notify } from 'services/helpers';
 import { actions } from '../modules/actions';
 import presenter from '../components';
@@ -25,7 +25,7 @@ class Collaborators extends Component {
   }
 
   loadCollaborators(budgetId) {      
-    const collaboratorsQuery = database
+    const collaboratorsQuery = Database.instance
         .collections
         .budgets
         .findOne(this.props.id);
@@ -35,7 +35,7 @@ class Collaborators extends Component {
             if (this.subscription) {
                 this.clearCollaborators();
             }
-            this.subscription = budget.$.subscribe(this.onBudgetUpdated);
+            this.subscription = budget.$.subscribe((budget) => this.loadCollaborators(budget.id));
         });
   }
   
@@ -73,7 +73,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, ownProps) => {
     const budget = get(state, 'budget.data');
     const users = get(state, 'users.data') || [];
-    const userId = get(state, 'auth.data.id', -1);
+    const userId = get(state, 'auth.data.userInfo.id', -1);
     const ownerId = get(budget, 'ownerId');
     const isOwner = ownerId === userId;
     const canManage = isOwner && budget.state === 'opened';
