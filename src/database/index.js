@@ -103,11 +103,12 @@ export class Database {
         .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
   }
 
-  static startSync({ userId, budgetIds = [] }) {
-    console.info('syncyng started')
+  static async startSync({ userId, budgetIds = [] }) {
     if (Database.isSyncing) {
-      Database.stopSync();
+      console.info('stopping sync...')
+      await Database.stopSync();
     }
+    console.info('syncyng started')
     Database.budgetsSync = Database.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
