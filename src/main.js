@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import createStore from './store/createStore';
 import AppContainer from './containers/AppContainer';
-import database from './database';
+import { Database } from 'database';
 import api from 'services/api';
 import { registerServiceWorker } from 'services/helpers';
 
@@ -73,5 +73,6 @@ if (__DEV__) {
 // ========================================================
 // Go!
 // ========================================================
-database.init(store);
-render();
+Database
+  .init(store)
+  .then(render);

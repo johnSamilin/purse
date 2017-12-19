@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect';
-import { get, findLast } from 'lodash';
+import get from 'lodash/get';
 import authModule from 'modules/auth';
 
 const getRawList = state => get(state, 'budgets.data.budgets', []) || [];
 const getActive = state => get(state, 'budget.data.id', '-1');
-const getUserId = state => get(state, 'auth.data.id', '-1');
+const getUserId = state => get(state, 'auth.data.userInfo.id', '-1');
+const getUserInfo = state => get(state, 'auth.data.userInfo', {});
 const getTransactionsMap = state => get(state, 'transactions.list', {});
 const getSeenTransactionsMap = state => get(state, 'transactions.seen', {});
 const getUsersList = state => get(state, 'users.data', []) || [];
@@ -25,12 +26,14 @@ const list = createSelector(
 	})
 );
 const active = createSelector(getActive, id => id);
-const userInfo = createSelector(
-	[ getUsersList, getUserToken ],
-	(users, token) => findLast(users, ['token', token]) || {});
+const availableBudgets = createSelector(
+	getRawList,
+	list => list.map(budget => budget.id)
+);
 
 export default {
 	active,
 	list,
-	userInfo,
+	userInfo: getUserInfo,
+	availableBudgets,
 }

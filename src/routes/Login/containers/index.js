@@ -79,11 +79,11 @@ class Login extends Component {
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure
+            notify('Попытка входа не удалась');
         }
         else if (response.status === "BAD_PARAMS") {
           // handle bad parameters
-        } else {
-          this.props.login(response.access_token);
+            notify('Попытка входа не удалась');
         }
       },
     );

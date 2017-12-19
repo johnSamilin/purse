@@ -5,6 +5,7 @@ import {
   Header,
   Button,
 } from 'components';
+import get from 'lodash/get';
 import EmptyState from './EmptyState';
 import Summary from './Summary';
 import Transactions from './Transactions';
@@ -55,21 +56,21 @@ export const Budget = (props) => {
               transactions={transactions}
               users={usersList}
               currentUserId={currentUserId}
-              currency={budget.currency.label}
+              currency={get(budget, 'currency.label')}
               showMyBalance={status === 'active'}
             />,
             <div {...classes('budget-transactions')}>
               {budget.state === 'opened' && status === 'active' &&
                 <AddForm
                   key={3}
-                  currency={budget.currency.key}
+                  currency={get(budget, 'currency.key')}
                   onAdd={addTransaction}
                 />}
               <Transactions
                 key={4}
                 data={transactions}
                 users={usersList}
-                currency={budget.currency.key}
+                currency={get(budget, 'currency.key')}
                 onTransactionClick={toggleTransactionState}         
               />
             </div>,
@@ -87,9 +88,6 @@ export const Budget = (props) => {
       </div>
     </div>
   )
-}
-
-Budget.propTypes = {
 }
 
 export default Budget

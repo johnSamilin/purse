@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { database } from 'database';
+import { Database } from 'database';
 import { get } from 'lodash'; 
 import authModule from 'modules/auth';
 import { actions as authActions } from 'modules/auth/actions';
@@ -11,15 +11,38 @@ import select from '../modules/selectors';
 class Budgets extends Component {
 	constructor() {
 		super();
-		this.state = {
-			userInfo: {},
-		};
+	}
+
+	componentDidMount() {
+		this.getUserInfo(authModule.getToken());
 	}
 
 	componentWillReceiveProps(nextProps) {
 		if (this.props.isLoading === false && nextProps.isLoading === true) {
-			this.props.load();
+			this.props.loadBudgets();
 		}
+		if (
+			(this.props.userInfo.id !== nextProps.userInfo.id) ||
+			(this.props.availableBudgets !== nextProps.availableBudgets)
+		) {
+			Database.startSync({
+				userId: nextProps.userInfo.id,
+				budgetIds: nextProps.availableBudgets,
+			});
+		}
+	}
+
+	componentWillUnmount() {
+		Database.stopSync();
+	}
+
+	async getUserInfo(token) {
+		await Database.usersSync.complete$;
+		const users = await Database.instance.users
+			.find()
+			.where({ token })
+			.exec();
+		this.props.dispatchUser(users[0]);
 	}
 
 	render() {
@@ -28,13 +51,15 @@ class Budgets extends Component {
 }
 
 const mapDispatchToProps = {
-  load: actions.load,
-  exit: authActions.logout,
+  loadBudgets: actions.load,
+  logout: authActions.logout,
+  dispatchUser: authActions.dispatch,
 }
 
 function mapStateToProps(state) {
 	const isLoading = get(state, 'budgets.isLoading', false);
-	const userInfo = select.userInfo();
+	const userInfo = select.userInfo(state);
+	const availableBudgets = select.availableBudgets(state);// for syncing
 
 	return {
 	  list: select.list(state),
@@ -43,6 +68,7 @@ function mapStateToProps(state) {
 	  isNext: state.modules.next.includes('budgets'),
 	  isLoading,
 	  userInfo,
+	  availableBudgets,	  
 	}
 }
 
@@ -52,14 +78,14 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
 		...dispatchProps,
 		...ownProps,
 		closeBudget(id) {
-			const budgetQuery = database.budgets.findOne(id);
+			const budgetQuery = Database.instance.budgets.findOne(id);
 			budgetQuery.exec().then((budget) => {
 					budget.state = 'closed';
 					budget.save();
 				});
 		},
 		openBudget(id) {
-			const budgetQuery = database.budgets.findOne(id);
+			const budgetQuery = Database.instance.budgets.findOne(id);
 			budgetQuery.exec().then((budget) => {
 					budget.state = 'opened';
 					budget.save();

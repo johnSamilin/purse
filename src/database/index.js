@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import * as RxDB from 'rxdb';
+import some from 'lodash/some';
 import schemas from './schema';
 import migrations from './migrations';
 import { actions as budgetsActions } from 'routes/Budgets/modules/actions';
@@ -12,105 +13,129 @@ RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
 const syncEnabled = true;
-let database;
 const dbUrl = 'https://couchdb-224842.smileupps.com';
 
-function budgetsRequested(store) {
-  store.dispatch(budgetsActions.request());
-}
+export class Database {
+  static instance;
+  static budgetsSync = null;
+  static transactionsSync = null;
+  static usersSync = null;
+  static isSyncing = false;
 
-function budgetsChanged(store, budgets) {
-  store.dispatch(budgetsActions.updated(budgets));
-}
-
-function usersChanged(store, users) {
-  store.dispatch(usersActions.updated(users));
-}
-
-function transactionsChanged(store, transactions) {
-  const map = mapTransactionsToBudgets(transactions);
-  store.dispatch(transactionsActions.transactions.updated(map));
-}
-
-function seenTransactionsChanged(store, transactions) {
-  const map = {};
-  if (transactions !== null) {
-    transactions.forEach((transaction) => {
-      map[transaction.budgetId] = transaction.transactions;
-    });
+  static budgetsRequested(store) {
+    store.dispatch(budgetsActions.request());
   }
-  store.dispatch(transactionsActions.transactions.seen(map));
-}
+  
+  static budgetsChanged(store, budgets) {
+    store.dispatch(budgetsActions.updated(budgets));
+  }
+  
+  static usersChanged(store, users) {
+    store.dispatch(usersActions.updated(users));
+  }
+  
+  static transactionsChanged(store, transactions) {
+    const map = mapTransactionsToBudgets(transactions);
+    store.dispatch(transactionsActions.transactions.updated(map));
+  }
+  
+  static seenTransactionsChanged(store, transactions) {
+    const map = {};
+    if (transactions !== null) {
+      transactions.forEach((transaction) => {
+        map[transaction.budgetId] = transaction.transactions;
+      });
+    }
+    store.dispatch(transactionsActions.transactions.seen(map));
+  }
 
-function init(store) {
-  budgetsRequested(store);
-  RxDB.create({
-    name: 'purse',
-    adapter: 'idb',          // <- storage-adapter
-    password: 'myPassword',     // <- password (optional)
-    multiInstance: false,
-  }).then(db => {
-    database = db;
+  static async init(store) {
+    if (Database.instance) {
+      return Database.instance;
+    }
+    Database.budgetsRequested(store);
+    Database.instance = await RxDB.create({
+      name: 'purse',
+      adapter: 'idb',          // <- storage-adapter
+      password: 'myPassword',     // <- password (optional)
+      multiInstance: false,
+    });
+
     // budgets
-    const budgetsCollection = db.collection({
+    await Database.instance.collection({
       name: 'budgets',
       schema: schemas.budgets,
       migrationStrategies: migrations.budgets,
-    }).then((collection) => {
-        if(syncEnabled) {
-          database.budgets.sync(`${dbUrl}/budgets`);
-        }
-        return collection
-          .find()
-          .$.subscribe(budgetsChanged.bind(null, store));
     });
+    await Database.instance.collections.budgets
+      .find()
+      .$.subscribe(Database.budgetsChanged.bind(null, store));
 
     // transactions
-    const transactionsCollection = db.collection({
+    await Database.instance.collection({
       name: 'transactions',
       schema: schemas.transactions,
       migrationStrategies: migrations.transactions,
-    }).then((collection) => {
-        if(syncEnabled) {
-          database.transactions.sync(`${dbUrl}/transactions`);
-        }
-        return collection
-          .find()
-          .$.subscribe(transactionsChanged.bind(null, store));
     });
+    await Database.instance.collections.transactions
+      .find()
+      .$.subscribe(Database.transactionsChanged.bind(null, store));
 
     // users
-    const usersCollection = db.collection({
+    await Database.instance.collection({
       name: 'users',
       schema: schemas.users,
       migrationStrategies: migrations.users,
-    }).then((collection) => {
-        if(syncEnabled) {
-          database.users.sync(`${dbUrl}/collaborators`);
-        }
-        return collection
-          .find()
-          .$.subscribe(usersChanged.bind(null, store));
     });
+    await Database.instance.collections.users
+      .find()
+      .$.subscribe(Database.usersChanged.bind(null, store));
+    Database.usersSync = Database.instance.users.sync({ remote: `${dbUrl}/collaborators` });
 
     // seen transactions
-    const seenTransactions = db.collection({
+    await Database.instance.collection({
       name: 'seentransactions',
       schema: schemas.seenTransactions,
       migrationStrategies: migrations.seenTransactions,
-    }).then((collection) => {
-      return collection
-        .find()
-        .$.subscribe(seenTransactionsChanged.bind(null, store));
     });
-    
-    return db;
-  });
-}
+    await Database.instance.collections.seentransactions
+        .find()
+        .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
+  }
 
-export default {
-    init,
+  static startSync({ userId, budgetIds = [] }) {
+    console.info('syncyng started')
+    if (Database.isSyncing) {
+      Database.stopSync();
+    }
+    Database.budgetsSync = Database.instance.collections.budgets.sync({
+      remote: `${dbUrl}/budgets`,
+      options: {
+        live: true,
+        retry: true,
+        filter: doc => some(doc.users, user => user.id === userId),
+      }  
+    });
+    //TODO: сделать пооптимальней
+    Database.transactionsSync = Database.instance.transactions.sync({
+      remote: `${dbUrl}/transactions`,
+      options: {
+        live: true,
+        retry: true,
+        filter: doc => budgetIds.includes(doc.budgetId),
+      },
+    });
+    Database.isSyncing = true;
+  }
+
+  static async stopSync() {
+    console.info('syncyng stopped')
+    let sync = await Database.budgetsSync;
+    sync.cancel();
+    sync = await Database.transactionsSync;
+    sync.cancel();
+    sync = await Database.usersSync;
+    sync.cancel();
+    Database.isSyncing = false;
+  }
 }
-export {
-    database,
-};

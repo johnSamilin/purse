@@ -7,6 +7,7 @@ import module from './index';
 // ------------------------------------
 const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN';
 const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT';
+const AUTH_USER_DISPATCHED = 'AUTH_USER_DISPATCHED';
 
 // ------------------------------------
 // Actions
@@ -29,12 +30,22 @@ function doLogout() {
 	};
 }
 
+function dispatch(userInfo) {
+	return {
+		type: AUTH_USER_DISPATCHED,
+		payload: {
+			userInfo,
+		},
+	};
+}
+
 function login(token) {
 	module.setToken(token);
 	return doLogin();
 }
 
 function logout() {
+	module.setToken('');
 	return doLogout();
 }
 
@@ -49,6 +60,7 @@ export const actions = {
   login,
   logout,
   getToken,
+  dispatch,
 }
 
 // ------------------------------------
@@ -56,10 +68,13 @@ export const actions = {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [AUTH_LOGGED_IN]: (state, action) => {
-  	return { ...state, data: action.payload };
+  	return { ...state, data: { ...state.data, ...action.payload } };
   },
   [AUTH_LOGGED_OUT]: (state, action) => {
-  	return { ...state, data: action.payload };
+  	return { ...state, data: { ...state.data, ...action.payload } };
+  },
+  [AUTH_USER_DISPATCHED]: (state, action) => {
+	  return { ...state, data: { ...state.data, ...action.payload } };
   },
 }
 

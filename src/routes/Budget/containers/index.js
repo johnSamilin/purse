@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
 import { push } from 'react-router-redux';
 import { get, sortBy } from 'lodash';
-import { database } from 'database';
+import { Database } from 'database';
 import { actions } from '../modules/actions';
 import presenter from '../components';
 import select from '../modules/selectors';
@@ -46,7 +46,7 @@ class Budget extends Component {
   }
 
   loadBudget(id) {
-    const budgetsQuery = database.budgets.findOne(id);
+    const budgetsQuery = Database.instance.budgets.findOne(id);
     budgetsQuery.exec()
       .then((b) => {        
         this.isLoaded = true;
@@ -56,7 +56,7 @@ class Budget extends Component {
         }
         this.budgetSub = b.$.subscribe(this.onBudgetUpdated);
 
-        this.transactionsQuery = database.transactions
+        this.transactionsQuery = Database.instance.transactions
           .find()
           .where({ budgetId: id });
         this.transactionsSub = this.transactionsQuery.$.subscribe((transactions) => {
@@ -174,12 +174,12 @@ class Budget extends Component {
   }
 
   updateSeenTransactions(count) {
-    const query = database.seentransactions
+    const query = Database.instance.seentransactions
       .findOne(this.props.id);
     query.exec()
       .then((budget) => {
         if (budget === null) {
-          database.seentransactions.insert({
+          Database.instance.seentransactions.insert({
             budgetId: this.props.id,
             transactions: count,
           });
@@ -217,7 +217,7 @@ const mapStateToProps = (state, ownProps) => {
   const budget = select.budget(state);
   const transactions = select.transactions(state);
   const usersList = select.users(state);
-  const currentUserId = get(state, 'auth.data.id', -1);
+  const currentUserId = get(state, 'auth.data.userInfo.id', -1);
   let status = 'none';  
   const isOwner = budget.ownerId === currentUserId;
   if (isOwner) {

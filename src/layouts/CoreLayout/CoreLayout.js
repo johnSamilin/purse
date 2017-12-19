@@ -35,10 +35,6 @@ export const CoreLayout = ({ children, isLoggedIn }) => {
 	)
 }
 
-CoreLayout.propTypes = {
-  children : React.PropTypes.element.isRequired
-}
-
 function mapStateToProps(state) {
 	return {
 		isLoggedIn: state.auth.data.loggedIn,

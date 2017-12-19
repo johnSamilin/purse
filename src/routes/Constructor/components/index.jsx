@@ -93,7 +93,4 @@ export const Construct = (props) => {
   )
 }
 
-Construct.propTypes = {
-}
-
 export default Construct

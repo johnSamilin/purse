@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import { replace } from 'react-router-redux';
 import { reduxForm, reset } from 'redux-form';
 import { get } from 'lodash';
-import { database } from 'database';
+import { Database } from 'database';
 import { notify } from 'services/helpers';
 import { actions } from '../modules/actions';
 import presenter from '../components';
@@ -45,7 +45,7 @@ class Construct extends Component {
     });
 
     const id = Date.now().toString();
-    database.budgets.insert({
+    Database.instance.budgets.insert({
       id,
       ownerId: this.props.userId.toString(),
       state: "opened",
@@ -76,7 +76,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const userId = get(state, 'auth.data.id', '-1').toString();
+  const userId = get(state, 'auth.data.userInfo.id', '-1');
   const users = get(state, 'users.data', []) || [];
   const title = get(state, 'form.constructor.values.title', '') || '';
   const canCreate = title.trim().length;
