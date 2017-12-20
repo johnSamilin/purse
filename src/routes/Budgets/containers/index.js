@@ -17,7 +17,7 @@ class Budgets extends Component {
 		this.getUserInfo(authModule.getToken());
 	}
 
-	componentWillReceiveProps(nextProps) {
+	async componentWillReceiveProps(nextProps) {
 		if (this.props.isLoading === false && nextProps.isLoading === true) {
 			this.props.loadBudgets();
 		}
@@ -25,6 +25,9 @@ class Budgets extends Component {
 			(this.props.userInfo.id !== nextProps.userInfo.id) ||
 			(this.props.availableBudgets !== nextProps.availableBudgets)
 		) {
+			if (Database.isSyncing) {
+				await Database.stopSync();
+			}
 			Database.startSync({
 				userId: nextProps.userInfo.id,
 				budgetIds: nextProps.availableBudgets,
@@ -42,7 +45,9 @@ class Budgets extends Component {
 			.find()
 			.where({ token })
 			.exec();
-		this.props.dispatchUser(users[0]);
+		users[0]
+		? this.props.dispatchUser(users[0])
+		: this.props.logout();
 	}
 
 	render() {
