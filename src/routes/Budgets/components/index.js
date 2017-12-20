@@ -19,7 +19,7 @@ export const Budgets = (props) => {
 		openBudget,
 		userInfo,
 		isLoading,
-		exit,
+		logout,
 	} = props;
 	return (
 	  <div
@@ -31,7 +31,7 @@ export const Budgets = (props) => {
 						element: 'exit',
 						extra: 'mi mi-power-settings-new',
 					})}
-					onClick={exit}
+					onClick={logout}
 				></span>
 				<span {...classes('name')}>{userInfo.name}</span>
 			</div>
