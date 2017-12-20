@@ -46,7 +46,7 @@ class Budgets extends Component {
 			.where({ token })
 			.exec();
 		users[0]
-		? this.props.dispatchUser()
+		? this.props.dispatchUser(users[0])
 		: this.props.logout();
 	}
 
