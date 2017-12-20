@@ -127,12 +127,14 @@ export class Database {
 
   static async stopSync() {
     console.info('syncyng stopped')
-    let sync = await Database.budgetsSync;
-    sync.cancel();
-    sync = await Database.transactionsSync;
-    sync.cancel();
-    sync = await Database.usersSync;
-    sync.cancel();
-    Database.isSyncing = false;
+    try {
+      let sync = await Database.budgetsSync;
+      sync.cancel();
+      sync = await Database.transactionsSync;
+      sync.cancel();
+      sync = await Database.usersSync;
+      sync.cancel();
+      Database.isSyncing = false;
+    } catch(er) {}
   }
 }
