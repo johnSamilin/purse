@@ -5,6 +5,7 @@ import ListItem from './ListItem';
 import UserInfo from './UserInfo';
 import Select from './Select';
 import Input from './Input';
+import LoadingPanel from './LoadingPanel';
 
 export {
 	Button,
@@ -14,4 +15,5 @@ export {
 	ListItem,
 	Select,
 	Input,
+	LoadingPanel,
 };

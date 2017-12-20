@@ -5,6 +5,7 @@ import {
   Button,
   Select,
   Input,
+  LoadingPanel,
 } from 'components';
 import { Field } from 'redux-form';
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
@@ -46,6 +47,7 @@ export const Login = (props) => {
     onSubmit,
     onTabChange,
     activeTab,
+    isLoading,
   } = props;
   const classes = new BEMHelper('login');
   let pageClasses = new BEMHelper('page');
@@ -126,6 +128,7 @@ export const Login = (props) => {
             Войти
         </Button>
       </div>
+      <LoadingPanel isActive={isLoading} />
     </form>
   )
 }

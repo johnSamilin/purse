@@ -21,6 +21,7 @@ class Login extends Component {
     super();
     this.state = {
       activeTab: tabs.SMS,
+      isLoading: false,
     };
     this.onTabChange = this.onTabChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -32,6 +33,12 @@ class Login extends Component {
   onTabChange(index) {
     this.setState({
       activeTab: index === 0 ? tabs.SMS : tabs.EMAIL,
+    });
+  }
+
+  setIsLoading(isLoading = false) {
+    this.setState({
+      isLoading,
     });
   }
 
@@ -59,6 +66,7 @@ class Login extends Component {
   }
 
   accountKitLogin(params) {
+    this.setIsLoading(true);
     AccountKit.login(
       this.state.activeTab,
       params, // will use default values if not specified
@@ -71,19 +79,23 @@ class Login extends Component {
             csrf,
           }).then((res) => {
             this.props.login(res.access_token);
+            this.setIsLoading(false);
           })
           .catch((er) => {
             notify('Попытка входа не удалась');
             console.error(er);
+            this.setIsLoading(false);
           });
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure
             notify('Попытка входа не удалась');
+            this.setIsLoading(false);
         }
         else if (response.status === "BAD_PARAMS") {
           // handle bad parameters
             notify('Попытка входа не удалась');
+            this.setIsLoading(false);
         }
       },
     );
