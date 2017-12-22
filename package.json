@@ -58,7 +58,7 @@
       }
     },
     "test": {
-      "command": "node ./node_modules/karma/bin/karma start config/karma.config",
+      "command": "npm run clean && npm run compile",
       "env": {
         "NODE_ENV": "test",
         "DEBUG": "app:*"
@@ -156,6 +156,7 @@
     "redbox-react": "^1.5.0",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.14.0",
+    "webpack-bundle-analyzer": "^2.9.1",
     "webpack-dev-middleware": "^1.12.2",
     "webpack-hot-middleware": "^2.21.0"
   }

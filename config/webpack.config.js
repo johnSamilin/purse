@@ -7,6 +7,7 @@ const project = require('./project.config');
 const debug = require('debug')('app:config:webpack');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const __DEV__ = project.globals.__DEV__;
 const __PROD__ = project.globals.__PROD__;
@@ -40,18 +41,19 @@ webpackConfig.entry = {
 // Bundle Output
 // ------------------------------------
 webpackConfig.output = {
-  filename   : `[name].js`,
+  filename   : 'js/[name]-[hash].js',
   path       : project.paths.dist(),
-  publicPath : project.compiler_public_path
-}
+  publicPath : project.compiler_public_path,
+  chunkFilename: 'js/[name]/[hash].js',  
+};
 
 // ------------------------------------
 // Externals
 // ------------------------------------
-webpackConfig.externals = {}
-webpackConfig.externals['react/lib/ExecutionEnvironment'] = true
-webpackConfig.externals['react/lib/ReactContext'] = true
-webpackConfig.externals['react/addons'] = true
+webpackConfig.externals = {};
+webpackConfig.externals['react/lib/ExecutionEnvironment'] = true;
+webpackConfig.externals['react/lib/ReactContext'] = true;
+webpackConfig.externals['react/addons'] = true;
 
 // ------------------------------------
 // Plugins
@@ -60,19 +62,29 @@ webpackConfig.plugins = [
   new webpack.DefinePlugin(project.globals),
   new HtmlWebpackPlugin({
     template : project.paths.client('index.html'),
-    hash     : false,
+    hash     : true,
     favicon  : project.paths.public('favicon.ico'),
     filename : 'index.html',
     inject   : 'body',
     minify   : {
-      collapseWhitespace : true
-    }
+      collapseWhitespace : true,
+    },
   }),
-  new CopyWebpackPlugin([{
-    from: project.paths.client('services/serviceWorker.js'),
-    to: project.paths.dist('serviceWorker.js'),
-  }]),
-]
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    filename: 'js/vendor/[hash].js',
+    minChunks(module) {
+      return module.context && module.context.indexOf('node_modules') !== -1;
+    },
+  }),
+  new webpack.optimize.CommonsChunkPlugin({
+    async: 'commons',
+    minChunks(module, count) {
+      return count >= 2;
+    },
+  }),
+  new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/),
+];
 
 // Ensure that the compiler exits on errors during testing so that
 // they do not get skipped and misreported.
@@ -87,7 +99,12 @@ if (__TEST__ && !argv.watch) {
         )
       }
     })
-  })
+  });
+  webpackConfig.plugins.push(
+  	new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+    })
+  );
 }
 
 if (__DEV__) {
@@ -96,8 +113,8 @@ if (__DEV__) {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
   )
-} else if (__PROD__) {
-  /*debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
+} else if (__PROD__ || __TEST__) {
+  debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
@@ -112,16 +129,7 @@ if (__DEV__) {
       },
     }),
     new webpack.optimize.AggressiveMergingPlugin()
-  )*/
-}
-
-// Don't split bundles during testing, since we only want import one bundle
-if (!__TEST__) {
-  webpackConfig.plugins.push(
-    new webpack.optimize.CommonsChunkPlugin({
-      names : ['vendor']
-    })
-  );
+  )
 }
 
 // ------------------------------------

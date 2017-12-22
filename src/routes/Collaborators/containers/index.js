@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { Database } from 'database';
 import { notify } from 'services/helpers';
 import { actions } from '../modules/actions';

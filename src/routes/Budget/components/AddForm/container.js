@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { reduxForm, reset } from 'redux-form';
 import { actions } from '../../modules/actions';
 import { forms } from '../../const';

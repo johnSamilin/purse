@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 const getRawBudget = (state) => get(state, 'budget.data', {});
 const getRawTransactions = (state) => get(state, 'transactions.data', []) || [];

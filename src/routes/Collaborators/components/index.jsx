@@ -9,7 +9,7 @@ import {
 } from 'components';
 import { statusesMap } from 'routes/Budget/const';
 import { paths } from 'routes/Collaborators/const';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import './style.scss';
 
 export default function Collaborators(props) {

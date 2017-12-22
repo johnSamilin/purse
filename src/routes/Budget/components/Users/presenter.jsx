@@ -3,7 +3,7 @@ import BEMHelper from 'react-bem-helper';
 import numeral from 'numeral';
 import { EmptyState, Button, UserInfo } from 'components';
 import { statusesMap } from 'routes/Budget/const';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import './style.scss';
 
 function Users(props) {
