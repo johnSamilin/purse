@@ -1,4 +1,4 @@
-function registerServiceWorker() {
+export function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
 	  navigator.serviceWorker.register('/serviceWorker.js', { scope: '/' }).then(function(reg) {
 	    // регистрация сработала
@@ -10,7 +10,7 @@ function registerServiceWorker() {
 	};
 }
 
-function notify(text) {
+export function notify(text) {
   // Проверка поддерживаемости браузером уведомлений
   if (!("Notification" in window)) {
     return false;
@@ -39,7 +39,7 @@ function notify(text) {
   // по этому поводу .
 }
 
-function mapTransactionsToBudgets(transactions) {
+export function mapTransactionsToBudgets(transactions) {
   const map = {};
   if (transactions !== null) {
     transactions.forEach((transaction) => {
@@ -52,9 +52,3 @@ function mapTransactionsToBudgets(transactions) {
 
   return map;
 }
-
-export {
-	registerServiceWorker,
-  notify,
-  mapTransactionsToBudgets,
-};
