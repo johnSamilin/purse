@@ -12,8 +12,7 @@ RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
-const syncEnabled = true;
-const dbUrl = 'https://couchdb-224842.smileupps.com';
+const dbUrl = 'https://purse.smileupps.com';
 
 export class Database {
   static instance;
