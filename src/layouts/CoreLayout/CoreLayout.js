@@ -72,7 +72,7 @@ function mapStateToProps(state) {
 
 	return {
 		isLoggedIn: state.auth.data.loggedIn,
-		userId; id,
+		userId: id,
 		budgetIds,
 	};
 }
