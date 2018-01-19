@@ -17,12 +17,11 @@ class Budgets extends Component {
 		const token = authModule.getToken();
 		// когда только что залогинились
 		const changeEvent = Database.usersSync.change$;
+		const completeEvent = Database.usersSync.complete$;
 		changeEvent.subscribe(() => this.getUserInfo(token));
 
 		// и еще обрабатываем ситуацию, когда токен уже есть
-		if (token) {
-			this.getUserInfo(token);
-		}
+		completeEvent.subscribe(() => this.getUserInfo(token));
 	}
 
 	async componentWillReceiveProps(nextProps) {
