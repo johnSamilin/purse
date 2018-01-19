@@ -11,6 +11,10 @@
 		width: 100%;
 		transition: filter 0.3s ease;
 		overflow: hidden;
+		
+		&--offline {
+			filter: grayscale(75%);
+		}
 
 		& .page {
 			background: #fff;
@@ -52,10 +56,6 @@
 					transform: translateX(100%);
 				}
 			}
-		}
-
-		&--offline {
-			filter: grayscale(75%);
 		}
 	}
 }

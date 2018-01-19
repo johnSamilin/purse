@@ -22,7 +22,11 @@ const webpackConfig = {
     extensions : ['', '.js', '.jsx', '.json'],
     modules: [ path.resolve(__dirname, 'src'), 'node_modules' ]
   },
-  module : {}
+  module : {},
+  eslint: {
+    configFile: '.eslintrc',
+    fix: true,
+  },
 }
 // ------------------------------------
 // Entry Points
@@ -68,10 +72,6 @@ webpackConfig.plugins = [
       collapseWhitespace : true
     }
   }),
-  new CopyWebpackPlugin([{
-    from: project.paths.client('services/serviceWorker.js'),
-    to: project.paths.dist('serviceWorker.js'),
-  }]),
 ]
 
 // Ensure that the compiler exits on errors during testing so that
@@ -163,6 +163,11 @@ webpackConfig.module.loaders.push({
     'postcss'
   ]
 })
+webpackConfig.module.preloaders = [{
+  test: /\.js$/,
+  exclude: /(node_modules)/,
+  loader: 'eslint-loader',
+}];
 
 webpackConfig.sassLoader = {
   includePaths : project.paths.client('styles')
