@@ -67,12 +67,12 @@ export class CoreLayout extends Component {
 }
 
 function mapStateToProps(state) {
-	const userId = selectors.userInfo(state);
+	const { id } = selectors.userInfo(state);
 	const budgetIds = selectors.availableBudgets(state);
 
 	return {
 		isLoggedIn: state.auth.data.loggedIn,
-		userId,
+		userId; id,
 		budgetIds,
 	};
 }
