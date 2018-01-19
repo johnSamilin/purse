@@ -14,7 +14,14 @@ class Budgets extends Component {
 	}
 
 	componentDidMount() {
-		this.getUserInfo(authModule.getToken());
+		const token = authModule.getToken();
+		// когда только что залогинились
+		const changeEvent = Database.usersSync.change$;
+		const completeEvent = Database.usersSync.complete$;
+		changeEvent.subscribe(() => this.getUserInfo(token));
+
+		// и еще обрабатываем ситуацию, когда токен уже есть
+		completeEvent.subscribe(() => this.getUserInfo(token));
 	}
 
 	async componentWillReceiveProps(nextProps) {
@@ -40,14 +47,13 @@ class Budgets extends Component {
 	}
 
 	async getUserInfo(token) {
-		await Database.usersSync.complete$;
 		const users = await Database.instance.users
-			.find()
-			.where({ token })
-			.exec();
-		users[0]
-		? this.props.dispatchUser(users[0])
-		: this.props.logout();
+				.find()
+				.where({ token })
+				.exec();
+			users[0]
+				? this.props.dispatchUser(users[0])
+				: this.props.logout();		
 	}
 
 	render() {

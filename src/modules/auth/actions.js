@@ -49,10 +49,15 @@ function logout() {
 	return doLogout();
 }
 
-function getToken({ code, csrf }) {
+function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
 	return dispatch => Api.doPost(
 		apiPaths.getToken(),
-		{ code, csrf }
+		{
+			code,
+			csrf,
+			phone: `${countryCode}${phoneNumber}`,
+			email: emailAddress
+		}
 	);
 }
 

@@ -77,6 +77,7 @@ class Login extends Component {
           this.props.getToken({
             code,
             csrf,
+            ...params,
           }).then((res) => {
             this.props.login(res.access_token);
             this.setIsLoading(false);

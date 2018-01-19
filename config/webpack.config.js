@@ -23,7 +23,11 @@ const webpackConfig = {
     extensions : ['', '.js', '.jsx', '.json'],
     modules: [ path.resolve(__dirname, 'src'), 'node_modules' ]
   },
-  module : {}
+  module : {},
+  eslint: {
+    configFile: '.eslintrc',
+    fix: true,
+  },
 }
 // ------------------------------------
 // Entry Points
@@ -171,6 +175,11 @@ webpackConfig.module.loaders.push({
     'postcss'
   ]
 })
+webpackConfig.module.preloaders = [{
+  test: /\.js$/,
+  exclude: /(node_modules)/,
+  loader: 'eslint-loader',
+}];
 
 webpackConfig.sassLoader = {
   includePaths : project.paths.client('styles')
