@@ -39,15 +39,17 @@ class Budgets extends Component {
 		Database.stopSync();
 	}
 
-	async getUserInfo(token) {
-		await Database.usersSync.complete$;
-		const users = await Database.instance.users
-			.find()
-			.where({ token })
-			.exec();
-		users[0]
-		? this.props.dispatchUser(users[0])
-		: this.props.logout();
+	getUserInfo(token) {
+		const changeEvent = Database.usersSync.change$;
+		changeEvent.subscribe(async () => {
+			const users = await Database.instance.users
+				.find()
+				.where({ token })
+				.exec();
+			users[0]
+			? this.props.dispatchUser(users[0])
+			: this.props.logout();
+		});		
 	}
 
 	render() {
