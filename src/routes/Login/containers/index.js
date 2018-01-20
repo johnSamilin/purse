@@ -70,23 +70,26 @@ class Login extends Component {
     AccountKit.login(
       this.state.activeTab,
       params, // will use default values if not specified
-      (response) => {
+      async (response) => {
         if (response.status === "PARTIALLY_AUTHENTICATED") {
           const code = response.code;
           const csrf = response.state;
-          this.props.getToken({
-            code,
-            csrf,
-            ...params,
-          }).then((res) => {
-            this.props.login(res.access_token);
-            this.setIsLoading(false);
-          })
-          .catch((er) => {
+          try {
+            const res = await this.props.getToken({
+              code,
+              csrf,
+              ...params,
+            });            
+            const changeEvent = Database.usersSync.change$;
+            changeEvent.subscribe(() => {
+              this.props.login(res.access_token);
+              this.setIsLoading(false);              
+            });
+          } catch(er) {
             notify('Попытка входа не удалась');
             console.error(er);
             this.setIsLoading(false);
-          });
+          };
         }
         else if (response.status === "NOT_AUTHENTICATED") {
           // handle authentication failure

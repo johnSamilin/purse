@@ -69,24 +69,6 @@ webpackConfig.plugins = [
       collapseWhitespace: true,
     },
   }),
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    minChunks(module) {
-      return module.context && module.context.indexOf('node_modules') !== -1;
-    },
-  }),
-  new webpack.optimize.CommonsChunkPlugin({
-    async: 'commons',
-    minChunks(module, count) {
-      return count >= 2;
-    },
-  }),
-  new webpack.HashedModuleIdsPlugin({
-    hashFunction: 'sha256',
-    hashDigest: 'hex',
-    hashDigestLength: 7,
-  }),
-  new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/),
 ];
 
 // Ensure that the compiler exits on errors during testing so that
@@ -131,8 +113,26 @@ if (__DEV__) {
         except: ['RxSchema', 'RxDatabase', 'autoMigrate']
       },
     }),
-    new webpack.optimize.AggressiveMergingPlugin()
-  )
+    new webpack.optimize.AggressiveMergingPlugin(),    
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks(module) {
+        return module.context && module.context.indexOf('node_modules') !== -1;
+      },
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      async: 'commons',
+      minChunks(module, count) {
+        return count >= 2;
+      },
+    }),
+    new webpack.HashedModuleIdsPlugin({
+      hashFunction: 'sha256',
+      hashDigest: 'hex',
+      hashDigestLength: 7,
+    }),
+    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/),
+  );
 }
 
 // ------------------------------------

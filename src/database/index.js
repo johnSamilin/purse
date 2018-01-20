@@ -7,7 +7,7 @@ import { actions as budgetsActions } from 'routes/Budgets/modules/actions';
 import { actions as transactionsActions } from 'routes/Budget/modules/actions';
 import { actions as usersActions } from 'modules/users/actions';
 import { mapTransactionsToBudgets } from 'services/helpers';
-RxDB.plugin(require('pouchdb-adapter-idb'));
+RxDB.plugin(require('pouchdb-adapter-websql'));
 // RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
@@ -55,7 +55,7 @@ export class Database {
     Database.budgetsRequested(store);
     Database.instance = await RxDB.create({
       name: 'purse',
-      adapter: 'idb',          // <- storage-adapter
+      adapter: 'websql',          // <- storage-adapter
       password: 'myPassword',     // <- password (optional)
       multiInstance: false,
     });
@@ -127,13 +127,14 @@ export class Database {
   static async stopSync() {
     console.info('syncyng stopped')
     try {
-      let sync = await Database.budgetsSync;
-      sync.cancel();
-      sync = await Database.transactionsSync;
-      sync.cancel();
-      sync = await Database.usersSync;
-      sync.cancel();
-      Database.isSyncing = false;
+      const promises = Promise.all([
+        (await Database.budgetsSync).cancel(),
+        (await Database.transactionsSync).cancel(),
+      ]);
+      promises.then(() => {
+        Database.isSyncing = false;
+      });
+      return promises;
     } catch(er) {}
   }
 }
