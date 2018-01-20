@@ -10,6 +10,7 @@ import {
 } from 'const';
 import { notify } from 'services/helpers';
 import Api from 'services/api';
+import { Database } from 'database';
 import { forms, tabs, countryCodes } from '../const';
 import presenter from '../components';
 
