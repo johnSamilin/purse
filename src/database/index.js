@@ -8,7 +8,7 @@ import { actions as transactionsActions } from 'routes/Budget/modules/actions';
 import { actions as usersActions } from 'modules/users/actions';
 import { mapTransactionsToBudgets } from 'services/helpers';
 RxDB.plugin(require('pouchdb-adapter-idb'));
-RxDB.plugin(require('pouchdb-replication')); //enable syncing
+// RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
