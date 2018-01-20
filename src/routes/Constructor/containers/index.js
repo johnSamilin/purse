@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { replace } from 'react-router-redux';
 import { reduxForm, reset } from 'redux-form';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { Database } from 'database';
 import { notify } from 'services/helpers';
 import { actions } from '../modules/actions';

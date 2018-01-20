@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Database } from 'database';
-import { get } from 'lodash'; 
+import get from 'lodash/get'; 
 import authModule from 'modules/auth';
 import { actions as authActions } from 'modules/auth/actions';
 import { actions } from '../modules/actions';

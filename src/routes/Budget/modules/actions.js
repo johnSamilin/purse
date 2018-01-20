@@ -1,5 +1,5 @@
 import api from 'services/api';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 import {
   apiPaths,

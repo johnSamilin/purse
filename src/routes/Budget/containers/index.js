@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
 import { push } from 'react-router-redux';
-import { get, sortBy } from 'lodash';
+import get from 'lodash/get';
+import sortBy from 'lodash/sortBy';
 import { Database } from 'database';
 import { actions } from '../modules/actions';
 import presenter from '../components';

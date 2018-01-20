@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { reduxForm } from 'redux-form';
 import { actions as authActions } from 'modules/auth/actions';
 import {
