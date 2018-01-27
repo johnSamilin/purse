@@ -10,7 +10,7 @@ import {
 } from 'const';
 import { notify } from 'services/helpers';
 import Api from 'services/api';
-import { Database } from 'database';
+import { Database, dbUrl } from 'database';
 import { forms, tabs, countryCodes } from '../const';
 import presenter from '../components';
 
@@ -28,7 +28,7 @@ class Login extends Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.accountKitLogin = this.accountKitLogin.bind(this);
     this.initAccountKit = this.initAccountKit.bind(this);
-    this.accountKitIsInitialized = false;
+    this.accountKitIsInitialized = __DEV__;
   }
 
   onTabChange(index) {
@@ -46,6 +46,7 @@ class Login extends Component {
   initAccountKit() {
     const promise = new Promise((resolve, reject) => {
       try {
+        this.accountKitIsInitialized = true;
         AccountKit.init(
           {
             appId: accountkitAppId, 
@@ -56,7 +57,6 @@ class Login extends Component {
             redirect: 'https://purse-back.herokuapp.com/auth/success',
           }
         );
-        this.accountKitIsInitialized = true;
         resolve();
       } catch(er) {
         reject(er);
@@ -66,47 +66,53 @@ class Login extends Component {
     return promise;
   }
 
+  async handleLoginResult(response, params) {
+    if (response.status === "PARTIALLY_AUTHENTICATED") {
+      const code = response.code;
+      const csrf = response.state;
+      try {
+        const res = await this.props.getToken({
+          code,
+          csrf,
+          ...params,
+        });
+        await Database.syncUsers();
+        const changeEvent = Database.usersSync.complete$;
+        changeEvent.subscribe(() => {
+          this.props.login(res.access_token);
+          this.setIsLoading(false);              
+        });
+      } catch(er) {
+        notify('Попытка входа не удалась');
+        console.error(er);
+        this.setIsLoading(false);
+      };
+    }
+    else if (response.status === "NOT_AUTHENTICATED") {
+      // handle authentication failure
+        notify('Попытка входа не удалась');
+        this.setIsLoading(false);
+    }
+    else if (response.status === "BAD_PARAMS") {
+      // handle bad parameters
+        notify('Попытка входа не удалась');
+        this.setIsLoading(false);
+    }
+  }
+
   accountKitLogin(params) {
     this.setIsLoading(true);
+    if (__DEV__) {
+      return this.handleLoginResult({ status: 'PARTIALLY_AUTHENTICATED', code: null }, { phoneNumber: '9675925934', countryCode: '+7' });
+    }
     AccountKit.login(
       this.state.activeTab,
       params, // will use default values if not specified
-      async (response) => {
-        if (response.status === "PARTIALLY_AUTHENTICATED") {
-          const code = response.code;
-          const csrf = response.state;
-          try {
-            const res = await this.props.getToken({
-              code,
-              csrf,
-              ...params,
-            });            
-            const changeEvent = Database.usersSync.change$;
-            changeEvent.subscribe(() => {
-              this.props.login(res.access_token);
-              this.setIsLoading(false);              
-            });
-          } catch(er) {
-            notify('Попытка входа не удалась');
-            console.error(er);
-            this.setIsLoading(false);
-          };
-        }
-        else if (response.status === "NOT_AUTHENTICATED") {
-          // handle authentication failure
-            notify('Попытка входа не удалась');
-            this.setIsLoading(false);
-        }
-        else if (response.status === "BAD_PARAMS") {
-          // handle bad parameters
-            notify('Попытка входа не удалась');
-            this.setIsLoading(false);
-        }
-      },
+      response => this.handleLoginResult(response, params)
     );
   }
   
-  onSubmit({ emailAddress, phoneNumber, countryCode }) {
+  async onSubmit({ emailAddress, phoneNumber, countryCode }) {
     let params = {};
     switch (this.state.activeTab) {
       case tabs.SMS:
@@ -122,12 +128,13 @@ class Login extends Component {
         break;
     }
     if (!this.accountKitIsInitialized) {
-      this.initAccountKit()
-        .then(() => this.accountKitLogin(params))
-        .catch((er) => {
-          console.error(er);
-          notify('Кажется, что-то пошло не так');
-        });
+      try {
+        await this.initAccountKit();
+        this.accountKitLogin(params);
+      } catch (er) {
+        console.error(er);
+        notify('Кажется, что-то пошло не так');
+      }
     } else {
       this.accountKitLogin(params);
     }    
@@ -144,7 +151,6 @@ class Login extends Component {
 }
 
 const mapStateToProps = (state) => {
-
   return {
     isActive: state.modules.active === 'login',
     initialValues: {

@@ -7,15 +7,15 @@ import { actions as budgetsActions } from 'routes/Budgets/modules/actions';
 import { actions as transactionsActions } from 'routes/Budget/modules/actions';
 import { actions as usersActions } from 'modules/users/actions';
 import { mapTransactionsToBudgets } from 'services/helpers';
-RxDB.plugin(require('pouchdb-adapter-websql'));
+RxDB.plugin(require('pouchdb-adapter-idb'));
 // RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
-const dbUrl = 'https://purse.smileupps.com';
+export const dbUrl = 'https://purse.smileupps.com';
 
 export class Database {
-  static instance;
+  static instance = null;
   static budgetsSync = null;
   static transactionsSync = null;
   static usersSync = null;
@@ -55,8 +55,8 @@ export class Database {
     Database.budgetsRequested(store);
     Database.instance = await RxDB.create({
       name: 'purse',
-      adapter: 'websql',          // <- storage-adapter
-      password: 'myPassword',     // <- password (optional)
+      adapter: 'idb',
+      password: 'myPassword',
       multiInstance: false,
     });
 
@@ -89,7 +89,7 @@ export class Database {
     await Database.instance.collections.users
       .find()
       .$.subscribe(Database.usersChanged.bind(null, store));
-    Database.usersSync = Database.instance.users.sync({ remote: `${dbUrl}/collaborators` });
+    Database.syncUsers();
 
     // seen transactions
     await Database.instance.collection({
@@ -102,8 +102,19 @@ export class Database {
         .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
   }
 
-  static startSync({ userId, budgetIds = [] }) {
-    console.info('syncyng started')
+  static syncUsers() {
+    Database.usersSync = Database.instance.users.sync({
+      remote: `${dbUrl}/collaborators`,
+      options: {
+        live: false,
+        retry: true,
+      },
+    });
+
+    return Database.usersSync;
+  }
+
+  static syncBudgets() {
     Database.budgetsSync = Database.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
@@ -112,6 +123,11 @@ export class Database {
         filter: doc => some(doc.users, user => user.id === userId),
       }  
     });
+
+    return Database.budgetsSync;
+  }
+
+  static syncTransactions() {
     //TODO: сделать пооптимальней
     Database.transactionsSync = Database.instance.transactions.sync({
       remote: `${dbUrl}/transactions`,
@@ -121,6 +137,15 @@ export class Database {
         filter: doc => budgetIds.includes(doc.budgetId),
       },
     });
+
+    return Database.transactionsSync;
+  }
+
+  static async startSync({ userId, budgetIds = [] }) {
+    console.info('syncyng started')
+    await Database.syncBudgets();
+    await Database.syncTransactions();
+    
     Database.isSyncing = true;
   }
 
