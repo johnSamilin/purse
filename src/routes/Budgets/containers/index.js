@@ -15,14 +15,7 @@ class Budgets extends Component {
     const token = __DEV__ ? null : authModule.getToken();
     // когда только что залогинились
     await Database.syncUsers();
-    const completeEvent = Database.usersSync.complete$;
-    // обрабатываем ситуацию, когда токен уже есть
-    completeEvent.subscribe((e) => {
-      console.log(e);
-      if (get(e, 'pull.status') === 'complete') {
-        this.getUserInfo(token);
-      }
-    });
+    Database.usersSync.complete$.subscribe(() => this.getUserInfo(token));
   }
 
   async componentWillReceiveProps(nextProps) {
