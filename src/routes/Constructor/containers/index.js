@@ -95,7 +95,7 @@ const mapStateToProps = (state, ownProps) => {
     canCreate,
     initialValues: {
       title: '',
-      currency: currencies[0].id,
+      currency: currencies[0].value,
       invitedUsers: [],
     },
   }
