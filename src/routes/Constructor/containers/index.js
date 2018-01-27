@@ -26,7 +26,7 @@ class Construct extends Component {
     }
   }
 
-  onSubmit({
+  async onSubmit({
     title,
     currency,
     invitedUsers,
@@ -35,30 +35,36 @@ class Construct extends Component {
       id: this.props.userId,
       status: 'active',
     }];
-    invitedUsers.forEach((user, id) => {
+    invitedUsers.forEach((user, index) => {
+      const id = this.props.users[index].id.toString();
+      if (id === '-1') {
+        return false;
+      }
       if (user) {
         users.push({
-          id: id.toString(),
+          id,
           status: 'invited',
         });
       }
     });
 
     const id = Date.now().toString();
-    Database.instance.budgets.insert({
-      id,
-      ownerId: this.props.userId.toString(),
-      state: "opened",
-      title: title,
-      currency: currencies[currency],
-      sharelink: "",
-      users,
-    }).then(this.props.create)
-      .then(() => this.props.showBudget(id))
-      .catch((er) => {
+    try {
+      const budget = await Database.instance.budgets.insert({
+        id,
+        ownerId: this.props.userId.toString(),
+        state: "opened",
+        title: title,
+        currency: currencies[currency],
+        sharelink: "",
+        users,
+      });
+      await this.props.create(budget);
+      this.props.showBudget(id);
+      } catch(er) {
         console.error(er);
         notify('Произошла ошибка');
-      });
+      }
   }
 
   render() {

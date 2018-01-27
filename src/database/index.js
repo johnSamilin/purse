@@ -89,7 +89,6 @@ export class Database {
     await Database.instance.collections.users
       .find()
       .$.subscribe(Database.usersChanged.bind(null, store));
-    Database.syncUsers();
 
     // seen transactions
     await Database.instance.collection({
@@ -106,7 +105,7 @@ export class Database {
     Database.usersSync = Database.instance.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
-        live: false,
+        live: true,
         retry: true,
       },
     });
@@ -114,7 +113,7 @@ export class Database {
     return Database.usersSync;
   }
 
-  static syncBudgets() {
+  static syncBudgets(userId) {
     Database.budgetsSync = Database.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
@@ -127,7 +126,7 @@ export class Database {
     return Database.budgetsSync;
   }
 
-  static syncTransactions() {
+  static syncTransactions(budgetIds) {
     //TODO: сделать пооптимальней
     Database.transactionsSync = Database.instance.transactions.sync({
       remote: `${dbUrl}/transactions`,
@@ -143,8 +142,8 @@ export class Database {
 
   static async startSync({ userId, budgetIds = [] }) {
     console.info('syncyng started')
-    await Database.syncBudgets();
-    await Database.syncTransactions();
+    await Database.syncBudgets(userId);
+    await Database.syncTransactions(budgetIds);
     
     Database.isSyncing = true;
   }

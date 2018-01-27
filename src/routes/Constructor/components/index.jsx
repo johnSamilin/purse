@@ -78,7 +78,7 @@ export const Construct = (props) => {
           <UserInfo {...user} />
           <Field
             component={Checkbox}            
-            name={`invitedUsers[${user.id}]`}
+            name={`invitedUsers[${k}]`}
           />
         </ListItem>)}
       </div>

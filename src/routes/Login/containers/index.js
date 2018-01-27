@@ -103,7 +103,7 @@ class Login extends Component {
   accountKitLogin(params) {
     this.setIsLoading(true);
     if (__DEV__) {
-      return this.handleLoginResult({ status: 'PARTIALLY_AUTHENTICATED', code: null }, { phoneNumber: '9675925934', countryCode: '+7' });
+      return this.handleLoginResult({ status: 'PARTIALLY_AUTHENTICATED', code: null }, { phoneNumber: 'test-user', countryCode: '+7' });
     }
     AccountKit.login(
       this.state.activeTab,
