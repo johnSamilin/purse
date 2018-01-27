@@ -105,7 +105,7 @@ export class Database {
     Database.usersSync = Database.instance.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
-        live: true,
+        live: false,
         retry: true,
       },
     });

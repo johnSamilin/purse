@@ -18,6 +18,7 @@ class Budgets extends Component {
     const completeEvent = Database.usersSync.complete$;
     // обрабатываем ситуацию, когда токен уже есть
     completeEvent.subscribe((e) => {
+      console.log(e);
       if (get(e, 'pull.status') === 'complete') {
         this.getUserInfo(token);
       }
