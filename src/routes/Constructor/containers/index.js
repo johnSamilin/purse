@@ -34,6 +34,7 @@ class Construct extends Component {
     const users = [{
       id: this.props.userId,
       status: 'active',
+      decision: 'pending',
     }];
     invitedUsers.forEach((user, index) => {
       const id = this.props.users[index].id.toString();
@@ -44,6 +45,7 @@ class Construct extends Component {
         users.push({
           id,
           status: 'invited',
+          decision: 'pending',
         });
       }
     });

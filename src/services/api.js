@@ -1,4 +1,3 @@
-import { tokenName } from 'modules/auth/index';
 import URI from 'urijs';
 import { apiPaths } from 'const';
 import { notify } from 'services/helpers';
@@ -143,7 +142,7 @@ class Api {
 
   // Websockets
 
-  /*initWS() {
+  /* initWS() {
     if (!this.initWsPromise) {
       this.initWsPromise = new Promise((resolve) => {
         this.socket = new SockJS('/arachne-websocket');

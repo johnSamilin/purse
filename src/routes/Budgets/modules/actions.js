@@ -1,68 +1,86 @@
 import api from 'services/api';
+import { budgetStates } from 'const';
 import {
-	apiPaths,
+  apiPaths,
 } from '../const';
 
 // ------------------------------------
 // Constants
 // ------------------------------------
-const BUDGETS_REQUESTED = 'BUDGETS_REQUESTED'
-const BUDGETS_UPDATED = 'BUDGETS_UPDATED'
-const BUDGETS_CREATE = 'BUDGETS_CREATE'
+const BUDGETS_REQUESTED = 'BUDGETS_REQUESTED';
+const REQUEST_FULFILLED = 'REQUEST_FULFILLED';
+const BUDGETS_UPDATED = 'BUDGETS_UPDATED';
+const BUDGETS_CREATING = 'BUDGETS_CREATING';
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-function request() {
-	return {
-		type: BUDGETS_REQUESTED,
-		payload: null,
-	};
+function requestStarted() {
+  return {
+    type: BUDGETS_REQUESTED,
+    payload: null,
+  };
+}
+
+function requestFulfilled() {
+  return {
+    type: REQUEST_FULFILLED,
+  };
 }
 
 function updated(budgets) {
-	return {
-		type: BUDGETS_UPDATED,
-		payload: {
-			budgets,
-		},
-	};
+  return {
+    type: BUDGETS_UPDATED,
+    payload: {
+      budgets,
+    },
+  };
 }
 
 function create() {
-	return {
-		type: BUDGETS_CREATE,
-		payload: {},
-	};
+  return {
+    type: BUDGETS_CREATING,
+    payload: {},
+  };
+}
+
+function requestClosing(id) {
+  return (dispatch) => {
+    dispatch(requestStarted());
+    return api.doPost(
+      apiPaths.budget(id),
+      {
+        status: budgetStates.closing,
+      },
+      () => dispatch(requestFulfilled())
+    );
+  };
 }
 
 export const actions = {
   updated,
   create,
-  request,
-}
+  requestStarted,
+  requestFulfilled,
+  requestClosing,
+};
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-	[BUDGETS_REQUESTED]: (state, action) => {
-		return { ...state, isLoading: true };
-	},
-	[BUDGETS_UPDATED]: (state, action) => {
-		return { ...state, data: action.payload, isLoading: false };
-	},
-	[BUDGETS_CREATE]: (state, action) => {
-		return { ...state, isLoading: true };
-	},
+  [BUDGETS_REQUESTED]: state => ({ ...state, isLoading: true }),
+  [REQUEST_FULFILLED]: state => ({ ...state, isLoading: false }),
+  [BUDGETS_UPDATED]: (state, action) => ({ ...state, data: action.payload, isLoading: false }),
+  [BUDGETS_CREATING]: state => ({ ...state, isLoading: true }),
 };
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = {};
-export default function counterReducer (state = initialState, action) {
-  const handler = ACTION_HANDLERS[action.type]
+export default function budgetsReducer(state = initialState, action) {
+  const handler = ACTION_HANDLERS[action.type];
 
-  return handler ? handler(state, action) : state
+  return handler ? handler(state, action) : state;
 }

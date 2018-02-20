@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { actions } from '../../modules/actions'
-import presenter from './presenter'
+import { actions } from '../../modules/actions';
+import presenter from './presenter';
 
 class Users extends Component {
   componentWillMount() {
@@ -17,13 +17,9 @@ class Users extends Component {
 }
 
 const mapDispatchToProps = {
-  
-}
 
-const mapStateToProps = (state, ownProps) => { 
+};
 
-  return {
-  }
-}
+const mapStateToProps = (state, ownProps) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(Users)
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

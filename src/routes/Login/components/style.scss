@@ -21,37 +21,6 @@
         font-weight: bold;
     }
 
-    &__tabs {
-        flex-grow: 1;
-    }
-
-    &__tabs-list {
-        display: flex;
-        list-style: none;
-    }
-
-    &__tab {
-        flex: 1;
-        border-bottom: 1px solid $secondary;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-
-        &--selected {
-            border-bottom-width: 2px;
-            padding-bottom: calc( 0.5rem - 1px );
-        }
-    }
-
-    &__tab-content {
-        padding: 2rem;
-        box-sizing: border-box;
-        display: none;
-
-        &--selected {
-            display: block;
-        }
-    }
-
     &__input {
         display: flex;
         padding: 1rem 0;
@@ -64,6 +33,12 @@
 
     &__phone {
         flex-grow: 1;
+    }
+
+    & .tabs {
+      &__tab-content {
+        padding: 2rem;
+      }
     }
 }
 

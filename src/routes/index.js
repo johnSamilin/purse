@@ -9,18 +9,18 @@ import CollaboratorsRoute from './Collaborators';
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
 
-export const createRoutes = (store) => ({
-  path        : '/',
-  component   : CoreLayout,
-  indexRoute  : BudgetsRoute(store),
-  childRoutes : [
+export const createRoutes = store => ({
+  path: '/',
+  component: CoreLayout,
+  indexRoute: BudgetsRoute(store),
+  childRoutes: [
     BudgetsRoute(store),
     BudgetRoute(store),
     LoginRoute(store),
     ConstructorRoute(store),
     CollaboratorsRoute(store),
   ],
-})
+});
 
 /*  Note: childRoutes can be chunked or otherwise loaded programmatically
     using getChildRoutes with the following signature:
@@ -40,4 +40,4 @@ export const createRoutes = (store) => ({
     when the route exists and matches.
 */
 
-export default createRoutes
+export default createRoutes;

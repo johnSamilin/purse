@@ -4,15 +4,17 @@ import { Database } from 'database';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import authModule from 'modules/auth';
+import { budgetStates } from 'const';
 import { actions as authActions } from 'modules/auth/actions';
 import { actions } from '../modules/actions';
 import presenter from '../components';
 import select from '../modules/selectors';
+import { logger, notify } from '../../../services/helpers';
 
 class Budgets extends Component {
 
   async componentDidMount() {
-    const token = __DEV__ ? null : authModule.getToken();
+    const token = authModule.getToken();
     // когда только что залогинились
     await Database.syncUsers();
     Database.usersSync.complete$.subscribe(() => this.getUserInfo(token));
@@ -20,7 +22,7 @@ class Budgets extends Component {
 
   async componentWillReceiveProps(nextProps) {
     if (this.props.isLoading === false && nextProps.isLoading === true) {
-      this.props.loadBudgets();
+      this.props.showLoader();
     }
     if ((this.props.userInfo.id !== nextProps.userInfo.id) ||
       !isEqual(this.props.availableBudgets, nextProps.availableBudgets)) {
@@ -51,18 +53,23 @@ class Budgets extends Component {
 }
 
 const mapDispatchToProps = {
-  loadBudgets: actions.load,
+  showLoader: actions.requestStarted,
+  hideLoader: actions.requestFulfilled,
   logout: authActions.logout,
   dispatchUser: authActions.dispatch,
+  requestClosing: actions.requestClosing,
 };
 
 function mapStateToProps(state) {
   const isLoading = get(state, 'budgets.isLoading', false);
   const userInfo = select.userInfo(state);
   const availableBudgets = select.availableBudgets(state);// for syncing
+  const activeList = select.listActive(state);
+  const pendingAttentionList = select.listClosing(state);
 
   return {
-    list: select.list(state),
+    activeList,
+    pendingAttentionList,
     activeId: select.active(state),
     isActive: state.modules.active === 'budgets',
     isNext: state.modules.next.includes('budgets'),
@@ -77,17 +84,20 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    closeBudget(id) {
-      const budgetQuery = Database.instance.budgets.findOne(id);
-      budgetQuery.exec().then((budget) => {
-        budget.state = 'closed';
-        budget.save();
+    requestClosing(id) {
+      const promise = dispatchProps.requestClosing(id);
+      promise.catch((error) => {
+        logger.error(error);
+        notify('Не удалось закрыть бюджет. Проверьте соединение с сетью');
+        dispatchProps.hideLoader();
       });
+
+      return promise;
     },
     openBudget(id) {
       const budgetQuery = Database.instance.budgets.findOne(id);
       budgetQuery.exec().then((budget) => {
-        budget.state = 'opened';
+        budget.state = budgetStates.opened;
         budget.save();
       });
     },

@@ -1,11 +1,36 @@
+/* eslint-disable */
 export default {
-    budgets: {},
-    transactions: {},
-    seenTransactions: {},
-    users: {
-        1: function (user) {
-            user.token = '';
-            return user;
-        },
+  budgets: {    
+    1: function(budget) {
+      return budget;
     },
+    2: function(budget) {
+      budget.isSynced = false;
+      return budget;
+    },
+    3: function(budget) {
+      budget.users = budget.users.map(user => ({
+        ...user,
+        decision: 'pending',
+      }));
+      return budget;
+    },
+  },
+  transactions: {
+    1: function(transaction) {
+      transaction.isSynced = false;
+      return transaction;
+    },
+  },
+  seenTransactions: {},
+  users: {
+    1: function (user) {
+      user.token = '';
+      return user;
+    },
+    2: function(user) {
+      user.isSynced = false;
+      return user;
+    },
+  },
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
-import { userStatuses } from 'routes/Budget/const';
+import { userStatusMessages } from 'routes/Budget/const';
 import { Button } from 'components';
 import './style.scss';
 
@@ -23,7 +23,7 @@ function Status(props) {
 				</Button>
 			</div>
 			: <Button mods={[status]} onClick={requestMembership}>
-				{userStatuses[status]}
+				{userStatusMessages[status]}
 			</Button>
 	);
 }

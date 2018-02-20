@@ -4,28 +4,28 @@ import reducer, { actions } from './actions';
 const tokenName = 'X-Auth-Token';
 
 function getToken() {
-	return localStorage.getItem(tokenName);
+  return localStorage.getItem(tokenName);
 }
 
 function setToken(token) {
-	return localStorage.setItem(tokenName, token);
+  return localStorage.setItem(tokenName, token);
 }
 
 function init(store) {
-	injectReducer(store, { key: 'auth', reducer } );
-	const token = getToken();
-	if (token) {
-		store.dispatch(actions.login(token));
-	} else {
-		store.dispatch(actions.logout());
-	}
+  injectReducer(store, { key: 'auth', reducer });
+  const token = getToken();
+  if (token) {
+    store.dispatch(actions.login(token));
+  } else {
+    store.dispatch(actions.logout());
+  }
 }
 
 export default {
-	init,
-	getToken,
-	setToken,
+  init,
+  getToken,
+  setToken,
 };
 export {
-	tokenName,
+  tokenName,
 };

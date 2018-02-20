@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import { Component } from 'react';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { push } from 'react-router-redux';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
+import isEqual from 'lodash/isEqual';
 import { Database } from 'database';
 import { actions } from '../modules/actions';
 import presenter from '../components';
 import select from '../modules/selectors';
-import { userStatuses, paths } from '../const';
+import { paths, userStatuses } from '../const';
 
 class Budget extends Component {
   constructor() {
@@ -24,12 +25,14 @@ class Budget extends Component {
     this.unload = this.unload.bind(this);
   }
 
-  componentWillUnmount() {
-    this.unload();
+  componentWillMount() {
+    if (this.props.id) {
+      this.loadBudget(this.props.id);
+    }
   }
 
   componentWillReceiveProps(newProps) {
-    if(this.props.id !== newProps.id) {
+    if (this.props.id !== newProps.id) {
       if (newProps.id) {
         this.loadBudget(newProps.id);
       } else {
@@ -46,46 +49,8 @@ class Budget extends Component {
     }
   }
 
-  loadBudget(id) {
-    const budgetsQuery = Database.instance.budgets.findOne(id);
-    budgetsQuery.exec()
-      .then((b) => {        
-        this.isLoaded = true;
-        this.budgetDocument = b;
-        if (this.budgetSub) {
-          this.budgetSub.unsubscribe();
-        }
-        this.budgetSub = b.$.subscribe(this.onBudgetUpdated);
-
-        this.transactionsQuery = Database.instance.transactions
-          .find()
-          .where({ budgetId: id });
-        this.transactionsSub = this.transactionsQuery.$.subscribe((transactions) => {
-          if (transactions) {
-            this.onTransactionsUpdated(transactions);
-            this.updateSeenTransactions(transactions.length);
-          }
-        });
-        this.transactionsQuery
-          .exec()
-          .then(this.onTransactionsUpdated);
-      });
-    budgetsQuery.$.subscribe((event) => {
-      if (Array.isArray(event)) {
-        this.onBudgetUpdated(event[0]);
-      }
-    });
-  }
-
-  unload() {
-    try {
-      this.budgetSub.unsubscribe();
-      this.transactionsSub.unsubscribe();
-    } catch(er) {
-      // ignore
-      console.error(er);
-    }
-    this.isLoaded = false;
+  componentWillUnmount() {
+    this.unload();
   }
 
   onBudgetUpdated(budget) {
@@ -97,16 +62,56 @@ class Budget extends Component {
     this.props.selectTransactions(transactionsSorted.reverse());
   }
 
+  async loadBudget(id) {
+    const budgetsQuery = Database.instance.budgets.findOne(id);
+    this.budgetDocument = await budgetsQuery.exec();
+    this.isLoaded = true;
+    if (this.budgetSub) {
+      this.budgetSub.unsubscribe();
+    }
+    this.budgetSub = this.budgetDocument.$.subscribe(this.onBudgetUpdated);
+
+    this.transactionsQuery = Database.instance.transactions
+      .find()
+      .where({ budgetId: id });
+    this.transactionsSub = this.transactionsQuery.$.subscribe((transactions) => {
+      if (transactions) {
+        this.onTransactionsUpdated(transactions);
+        this.updateSeenTransactions(transactions.length);
+      }
+    });
+    this.transactionsQuery
+      .exec()
+      .then(this.onTransactionsUpdated);
+
+    // отражаем изменения в бюджете
+    budgetsQuery.$.subscribe((event) => {
+      if (Array.isArray(event)) {
+        this.onBudgetUpdated(event[0]);
+      }
+    });
+  }
+
+  unload() {
+    try {
+      this.budgetSub.unsubscribe();
+      this.transactionsSub.unsubscribe();
+    } catch (er) {
+      // ignore
+    }
+    this.isLoaded = false;
+  }
+
   requestMembership() {
     if (this.props.id) {
       let found = false;
-      const users = this.budgetDocument.users.map((u, i) => {
+      const users = this.budgetDocument.users.map((u) => {
         if (u.id === this.props.currentUserId) {
           found = true;
           return {
             ...u,
-            status: 'pending',
-          }
+            status: userStatuses.pending,
+          };
         }
         return u;
       });
@@ -122,12 +127,12 @@ class Budget extends Component {
   }
 
   respondInvite(isAccepted = false) {
-    const users = this.budgetDocument.users.map((u, i) => {
+    const users = this.budgetDocument.users.map((u) => {
       if (u.id === this.props.currentUserId) {
         return {
           ...u,
-          status: isAccepted ? 'active' : 'removed',
-        }
+          status: isAccepted ? userStatuses.active : userStatuses.removed,
+        };
       }
       return u;
     });
@@ -137,7 +142,7 @@ class Budget extends Component {
 
   toggleTransactionState(id) {
     const transaction = this.props.transactions.filter(t => t.id === id)[0];
-    if (!transaction || transaction.ownerId != this.props.currentUserId || this.props.status !== 'active') {
+    if (!transaction || transaction.ownerId != this.props.currentUserId || this.props.status !== userStatuses.active) {
       return false;
     }
     if (transaction.cancelled || confirm('Удалить? Точно')) {
@@ -145,14 +150,14 @@ class Budget extends Component {
       transaction.save();
     }
   }
-  
+
   changeUserStatus(user, newStatus) {
     let updatedUsers = this.budgetDocument.users;
     if (newStatus === '') {
       // revoked invite
       updatedUsers = updatedUsers.filter(u => u.id !== user.id);
     }
-    updatedUsers = updatedUsers.map(u => {
+    updatedUsers = updatedUsers.map((u) => {
       if (u.id === user.id) {
         u.status = newStatus;
       }
@@ -171,6 +176,7 @@ class Budget extends Component {
       note,
       cancelled: false,
       ownerId: this.props.currentUserId,
+      isSynced: false,
     });
   }
 
@@ -208,21 +214,20 @@ const mapDispatchToProps = {
   update: actions.budget.update,
   loadTransactions: actions.transactions.load,
   selectTransactions: actions.transactions.select,
-  // loadBudget: actions.budget.load,
   clearTransactions: actions.transactions.clear,
   clearBudget: actions.budget.clear,
   redirect: push,
-}
+};
 
 const mapStateToProps = (state, ownProps) => {
   const budget = select.budget(state);
   const transactions = select.transactions(state);
   const usersList = select.users(state);
   const currentUserId = get(state, 'auth.data.userInfo.id', -1);
-  let status = 'none';  
+  let status = userStatuses.none;
   const isOwner = budget.ownerId === currentUserId;
   if (isOwner) {
-    status = 'active';
+    status = userStatuses.active;
   } else {
     budget.users && budget.users.forEach((user) => {
       if (user.id === currentUserId) {
@@ -231,7 +236,10 @@ const mapStateToProps = (state, ownProps) => {
     });
   }
   const budgetsLoading = get(state, 'budgets.isLoading', false);
-  const newUsersCount = usersList.filter(user => ['pending', 'invited'].includes(user.status)).length;
+  const newUsersCount = Object.values(usersList).filter(user => [
+    userStatuses.pending,
+    userStatuses.invited,
+  ].includes(user.status)).length;
 
   return {
     id: ownProps.params.id,
@@ -245,8 +253,8 @@ const mapStateToProps = (state, ownProps) => {
     isOwner,
     budgetsLoading,
     newUsersCount,
-  }
-}
+  };
+};
 
 function mergeProps(state, dispatch, own) {
   return {
@@ -259,4 +267,4 @@ function mergeProps(state, dispatch, own) {
   };
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Budget))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Budget));

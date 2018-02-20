@@ -1,6 +1,5 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
-import { userStatuses } from 'routes/Budget/const';
 import { Field } from 'redux-form';
 import {
 	Button,
