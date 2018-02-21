@@ -33,24 +33,24 @@ function updateTransactions(transactions) {
   transactions.forEach(transaction => ids.add(transaction.ownerId));
   const transactionsSorted = sortBy(transactions, transaction => moment(transaction.date).format('x'));
 
-	return {
-		type: TRANSACTIONS_SELECTED,
-		payload: transactionsSorted,
-	};
+  return {
+    type: TRANSACTIONS_SELECTED,
+    payload: transactionsSorted,
+  };
 }
 
 function updateTransactionsGlobal(map) {
   return {
-		type: TRANSACTIONS_UPDATED,
-		payload: map,
-	};
+    type: TRANSACTIONS_UPDATED,
+    payload: map,
+  };
 }
 
 function updateSeenTransactions(map) {
   return {
-		type: SEEN_TRANSACTIONS_CHANGED,
-		payload: map,
-	};
+    type: SEEN_TRANSACTIONS_CHANGED,
+    payload: map,
+  };
 }
 
 function clearBudget() {
@@ -79,19 +79,19 @@ function loadTransactions(budgetId) {
 
 export const actions = {
   budget: {
-  	select: selectBudget,
-  	update: updateBudget,
+    select: selectBudget,
+    update: updateBudget,
     load: loadBudget,
     clear: clearBudget,
   },
   transactions: {
-  	select: updateTransactions,
+    select: updateTransactions,
     load: loadTransactions,
     clear: clearTransactions,
     updated: updateTransactionsGlobal,
     seen: updateSeenTransactions,
   },
-}
+};
 
 // ------------------------------------
 // Action Handlers
@@ -99,30 +99,30 @@ export const actions = {
 const BUDGET_ACTION_HANDLERS = {
   [BUDGET_SELECTED]: (state, action) => ({ ...state, data: action.payload }),
   [BUDGET_UPDATED]: (state, action) => ({ ...state, data: action.payload }),
-}
+};
 const TRANSACTIONS_ACTION_HANDLERS = {
   [TRANSACTIONS_SELECTED]: (state, action) => ({ ...state, data: action.payload }),
   [TRANSACTIONS_UPDATED]: (state, action) => ({ ...state, list: action.payload }),
   [SEEN_TRANSACTIONS_CHANGED]: (state, action) => ({ ...state, seen: action.payload }),
-}
+};
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const binitialState = {}
-function budgetReducer (state = binitialState, action) {
-  const handler = BUDGET_ACTION_HANDLERS[action.type]
+const binitialState = {};
+function budgetReducer(state = binitialState, action) {
+  const handler = BUDGET_ACTION_HANDLERS[action.type];
 
-  return handler ? handler(state, action) : state
+  return handler ? handler(state, action) : state;
 }
 
-const tinitialState = {}
+const tinitialState = {};
 function transactionsReducer(state = tinitialState, action) {
-  const handler = TRANSACTIONS_ACTION_HANDLERS[action.type]
+  const handler = TRANSACTIONS_ACTION_HANDLERS[action.type];
 
-  return handler ? handler(state, action) : state
+  return handler ? handler(state, action) : state;
 }
 
 export default {
-	budgetReducer,
-	transactionsReducer,
-}
+  budgetReducer,
+  transactionsReducer,
+};

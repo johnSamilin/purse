@@ -1,0 +1,35 @@
+@import '~styles/core';
+
+.tabs {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  &__list {
+    display: flex;
+    list-style: none;
+  }
+
+  &__tab {
+    flex: 1;
+    border-bottom: 1px solid $secondary;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+
+    &--selected {
+        border-bottom-width: 2px;
+        padding-bottom: calc( 0.5rem - 1px );
+    }
+  }
+
+  &__tab-content {
+    box-sizing: border-box;
+    display: none;
+    flex: 1;
+    flex-direction: column;
+
+    &--selected {
+        display: flex;
+    }
+  }
+}

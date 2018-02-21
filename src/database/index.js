@@ -22,7 +22,7 @@ export class Database {
   static isSyncing = false;
 
   static budgetsRequested(store) {
-    store.dispatch(budgetsActions.request());
+    store.dispatch(budgetsActions.requestStarted());
   }
   
   static budgetsChanged(store, budgets) {
@@ -97,8 +97,8 @@ export class Database {
       migrationStrategies: migrations.seenTransactions,
     });
     await Database.instance.collections.seentransactions
-        .find()
-        .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
+      .find()
+      .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
   }
 
   static syncUsers() {

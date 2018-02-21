@@ -1,35 +1,35 @@
 const forms = {
-    login: 'login',
+  login: 'login',
 };
 
 const tabs = {
-    SMS: 'PHONE',
-    EMAIL: 'EMAIL',
+  SMS: 'PHONE',
+  EMAIL: 'EMAIL',
 };
 
 const countryCodes = [
-    {
-        value: '',
-        label: 'Code',
-    },
-    {
-        value: '+7',
-        label: 'Russia (+7)',
-    }
+  {
+    value: '',
+    label: 'Code',
+  },
+  {
+    value: '+7',
+    label: 'Russia (+7)',
+  },
 ];
 
 const apiPaths = {
-    getToken: () => `/auth/success`,
+  getToken: () => '/auth/success',
 };
 
-function getFormAction (apiVersion, type) {
-    switch(type) {
-        case tabs.SMS:
-            return `https://www.accountkit.com/${apiVersion}/basic/dialog/sms_login/`;
-        case tabs.EMAIL:
-            return `https://www.accountkit.com/${apiVersion}/basic/dialog/email_login/`;            
-    }
-};
+function getFormAction(apiVersion, type) {
+  switch (type) {
+    case tabs.SMS:
+      return `https://www.accountkit.com/${apiVersion}/basic/dialog/sms_login/`;
+    case tabs.EMAIL:
+      return `https://www.accountkit.com/${apiVersion}/basic/dialog/email_login/`;
+  }
+}
 
 export {
     apiPaths,

@@ -12,53 +12,53 @@ const AUTH_USER_DISPATCHED = 'AUTH_USER_DISPATCHED';
 // ------------------------------------
 // Actions
 // ------------------------------------
-function doLogin(userInfo) {
-	return {
-		type: AUTH_LOGGED_IN,
-		payload: {
-			loggedIn: true,
-		}
-	}
+function doLogin() {
+  return {
+    type: AUTH_LOGGED_IN,
+    payload: {
+      loggedIn: true,
+    },
+  };
 }
 
 function doLogout() {
-	return {
-		type: AUTH_LOGGED_OUT,
-		payload: {
-			loggedIn: false,
-		},
-	};
+  return {
+    type: AUTH_LOGGED_OUT,
+    payload: {
+      loggedIn: false,
+    },
+  };
 }
 
 function dispatch(userInfo) {
-	return {
-		type: AUTH_USER_DISPATCHED,
-		payload: {
-			userInfo,
-		},
-	};
+  return {
+    type: AUTH_USER_DISPATCHED,
+    payload: {
+      userInfo,
+    },
+  };
 }
 
 function login(token) {
-	module.setToken(token);
-	return doLogin();
+  module.setToken(token);
+  return doLogin();
 }
 
 function logout() {
-	module.setToken('');
-	return doLogout();
+  module.setToken('');
+  return doLogout();
 }
 
 function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
-	return dispatch => Api.doPost(
-		apiPaths.getToken(),
-		{
-			code,
-			csrf,
-			phone: `${countryCode}${phoneNumber}`,
-			email: emailAddress
-		}
-	);
+  return () => Api.doPost(
+    apiPaths.getToken(),
+    {
+      code,
+      csrf,
+      phone: `${countryCode}${phoneNumber}`,
+      email: emailAddress,
+    }
+  );
 }
 
 export const actions = {
@@ -66,29 +66,23 @@ export const actions = {
   logout,
   getToken,
   dispatch,
-}
+};
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [AUTH_LOGGED_IN]: (state, action) => {
-  	return { ...state, data: { ...state.data, ...action.payload } };
-  },
-  [AUTH_LOGGED_OUT]: (state, action) => {
-  	return { ...state, data: { ...state.data, ...action.payload } };
-  },
-  [AUTH_USER_DISPATCHED]: (state, action) => {
-	  return { ...state, data: { ...state.data, ...action.payload } };
-  },
-}
+  [AUTH_LOGGED_IN]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
+  [AUTH_LOGGED_OUT]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
+  [AUTH_USER_DISPATCHED]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
+};
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
 const initialState = {};
-export default function authReducer (state = initialState, action) {
-  const handler = ACTION_HANDLERS[action.type]
+export default function authReducer(state = initialState, action) {
+  const handler = ACTION_HANDLERS[action.type];
 
-  return handler ? handler(state, action) : state
+  return handler ? handler(state, action) : state;
 }

@@ -1,40 +1,38 @@
 const argv = require('yargs').argv;
 const webpack = require('webpack');
-const cssnano = require('cssnano');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const project = require('./project.config');
 const debug = require('debug')('app:config:webpack');
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const __DEV__ = project.globals.__DEV__;
 const __PROD__ = project.globals.__PROD__;
 const __TEST__ = project.globals.__TEST__;
 
-debug('Creating configuration.')
+debug('Creating configuration.');
 const webpackConfig = {
   name: 'client',
   target: 'web',
   devtool: 'source-map',
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
-    modules: [ project.paths.client(), path.resolve(__dirname, 'src'), 'node_modules' ],
+    modules: [project.paths.client(), path.resolve(__dirname, 'src'), 'node_modules'],
   },
   module: {},
-}
+};
 // ------------------------------------
 // Entry Points
 // ------------------------------------
-const APP_ENTRY = project.paths.client('main.js')
+const APP_ENTRY = project.paths.client('main.js');
 
 webpackConfig.entry = {
   app: __DEV__
     ? [APP_ENTRY].concat(`webpack-hot-middleware/client?path=${project.compiler_public_path}__webpack_hmr`)
     : [APP_ENTRY],
-  vendor: project.compiler_vendors
-}
+  vendor: project.compiler_vendors,
+};
 
 // ------------------------------------
 // Bundle Output
@@ -43,7 +41,7 @@ webpackConfig.output = {
   filename: 'js/[name]-[hash].js',
   path: project.paths.dist(),
   publicPath: project.compiler_public_path,
-  chunkFilename: 'js/[name]/[hash].js',  
+  chunkFilename: 'js/[name]/[hash].js',
 };
 
 // ------------------------------------
@@ -75,31 +73,31 @@ webpackConfig.plugins = [
 // they do not get skipped and misreported.
 if (__TEST__ && !argv.watch) {
   webpackConfig.plugins.push(function () {
-    this.plugin('done', function (stats) {
+    this.plugin('done', (stats) => {
       if (stats.compilation.errors.length) {
         // Pretend no assets were generated. This prevents the tests
         // from running making it clear that there were warnings.
         throw new Error(
           stats.compilation.errors.map(err => err.message || err)
-        )
+        );
       }
-    })
+    });
   });
   webpackConfig.plugins.push(
-  	new BundleAnalyzerPlugin({
+    new BundleAnalyzerPlugin({
       analyzerMode: 'static',
     })
   );
 }
 
 if (__DEV__) {
-  debug('Enabling plugins for live development (HMR, NoErrors).')
+  debug('Enabling plugins for live development (HMR, NoErrors).');
   webpackConfig.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin()
-  )
+  );
 } else if (__PROD__ || __TEST__) {
-  debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).')
+  debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
@@ -110,10 +108,10 @@ if (__DEV__) {
         warnings: false,
       },
       mangle: {
-        except: ['RxSchema', 'RxDatabase', 'autoMigrate']
+        except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
       },
     }),
-    new webpack.optimize.AggressiveMergingPlugin(),    
+    new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks(module) {
@@ -158,14 +156,14 @@ webpackConfig.module.rules = [{
   use: [{
     loader: 'json-loader',
   }],
-}]
+}];
 
 // ------------------------------------
 // Style Loaders
 // ------------------------------------
 // We use cssnano with the postcss loader, so we tell
 // css-loader not to duplicate minimization.
-const BASE_CSS_LOADER = 'css-loader?sourceMap&-minimize'
+const BASE_CSS_LOADER = 'css-loader?sourceMap&-minimize';
 
 webpackConfig.module.rules.push({
   test: /\.scss$/,
@@ -185,8 +183,8 @@ webpackConfig.module.rules.push({
         includePaths: project.paths.client('styles'),
       },
     },
-  ]
-})
+  ],
+});
 webpackConfig.module.rules.push({
   test: /\.css$/,
   use: [
@@ -199,7 +197,7 @@ webpackConfig.module.rules.push({
     {
       loader: 'postcss-loader',
     },
-]
+  ],
 });
 
 // File loaders

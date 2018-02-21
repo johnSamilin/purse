@@ -1,12 +1,12 @@
 const paths = {
-	budget: (id) => `/budgets/${id}`,
-	construct: () => '/create',
+  budget: id => `/budgets/${id}`,
+  construct: () => '/create',
 };
 const apiPaths = {
-	budgets: () => 'budgets',
+  budget: id => `/budgets/${id}`,
 };
 
 export {
-	apiPaths,
-	paths,
+  apiPaths,
+  paths,
 };

@@ -1,17 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
 import {
   Header,
   Button,
 } from 'components';
 import get from 'lodash/get';
+import { budgetStates } from 'const';
+import ModalClosing from './components/ModalClosing';
 import EmptyState from './EmptyState';
 import Summary from './Summary';
 import Transactions from './Transactions';
 import Status from './Status';
 import AddForm from './AddForm';
-import Users from './Users';
 import './style.scss';
 
 export const Budget = (props) => {
@@ -37,15 +37,16 @@ export const Budget = (props) => {
   pageClasses = pageClasses({ modifiers: { next: props.isNext, active: props.isActive } }).className;
 
   return (
-    <div
-      {...classes({ extra: pageClasses })}
-    >
-      <Header title={budget.title} backurl='/'>
-        <Button onClick={showCollaborators} {...classes({
-          element: 'collaborators',
-          extra: 'mi mi-tag-faces',
-        })}>
-          {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}          
+    <div {...classes({ extra: pageClasses })}>
+      <Header title={budget.title} backurl="/">
+        <Button
+          onClick={showCollaborators}
+          {...classes({
+            element: 'collaborators',
+            extra: 'mi mi-tag-faces',
+          })}
+        >
+          {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}
         </Button>
       </Header>
       <div {...classes('budget')}>
@@ -71,7 +72,7 @@ export const Budget = (props) => {
                 data={transactions}
                 users={usersList}
                 currency={get(budget, 'currency.key')}
-                onTransactionClick={toggleTransactionState}         
+                onTransactionClick={toggleTransactionState}
               />
             </div>,
             budget.state === 'opened'
@@ -81,13 +82,19 @@ export const Budget = (props) => {
                 requestMembership={requestMembership}
                 respondInvite={respondInvite}
               />
-              : null
+              : null,
           ]
           : <EmptyState />
         }
       </div>
+      {budget.state === budgetStates.closing &&
+        <ModalClosing
+          usersList={usersList}
+          currentUserId={currentUserId}
+        />
+      }
     </div>
-  )
-}
+  );
+};
 
-export default Budget
+export default Budget;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
 import moment from 'moment';
+import { budgetStates } from 'const';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import { paths } from '../../const';
 
@@ -14,14 +15,14 @@ function Info(props) {
 		title,
 		isActive,
 		state,
-		closeBudget,
+		requestClosing,
 		openBudget,
 		newTransactionsCount = 0,
 		transactionsCount = 0,
 		canManage = false,
 	} = props;
 	const classes = new BEMHelper('budget-list-item');
-	const isClosed = state === 'closed';
+	const isClosed = [budgetStates.closed, budgetStates.closing].includes(state);
 
 	let menuInstance = null;
 	return (
@@ -29,7 +30,10 @@ function Info(props) {
 			<div {...classes({ element: 'badge', modifiers: { green: newTransactionsCount > 0, closed: isClosed } })}>
 				<i {...classes({
 					element: 'badge-text',
-					extra: isClosed ? 'mi mi-lock-outline' : '',
+					extra: [
+            isClosed ? 'mi mi-lock-outline' : '',
+
+          ]
 				})}>
 					{!isClosed &&
 						`${newTransactionsCount > 0 ? '+'+newTransactionsCount : transactionsCount}`
@@ -52,11 +56,13 @@ function Info(props) {
 					</DropdownTrigger>
 					<DropdownContent>
 						<div {...classes('menu-item')} onClick={() => {
-							state === 'closed'
+							state === budgetStates.closed
 								? openBudget(id)
-								: closeBudget(id);
+								: requestClosing(id);
 							menuInstance.hide();
-						}}>{`${state === 'closed' ? 'Открыть' : 'Закрыть'}`}</div>
+						}}>
+              {`${state === budgetStates.closed ? 'Открыть' : 'Закрыть'}`}
+            </div>
 					</DropdownContent>
 				</Dropdown>
 				: null
