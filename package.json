@@ -95,6 +95,7 @@
     "node-sass": "^4.7.2",
     "normalize.css": "^5.0.0",
     "numeral": "^2.0.6",
+    "offline-plugin": "^4.9.0",
     "postcss-loader": "^1.1.0",
     "pouchdb-adapter-http": "^6.4.3",
     "pouchdb-adapter-idb": "^6.4.3",
