@@ -2,13 +2,34 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Database } from 'database';
 import api from 'services/api';
-import { registerServiceWorker } from 'services/helpers';
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import createStore from './store/createStore';
 import AppContainer from './containers/AppContainer';
 
 // SW
 if (!__DEV__) {
-  // registerServiceWorker();
+  OfflinePluginRuntime.install({
+    // responseStrategy: 'network-first',
+    onUpdating: () => {
+      console.log('SW Event:', 'onUpdating');
+    },
+    onUpdateReady: () => {
+      console.log('SW Event:', 'onUpdateReady');
+        // Tells to new SW to take control immediately
+      alert('Доступна новая версия Росплаты');
+      OfflinePluginRuntime.applyUpdate();
+    },
+    onUpdated: () => {
+      console.log('SW Event:', 'onUpdated');
+        // Reload the webpage to load into the new version
+      if (confirm('Доступна новая версия Росплаты. Запустить?')) {
+          window.location.reload();
+        }
+    },
+    onUpdateFailed: () => {
+      console.log('SW Event:', 'onUpdateFailed');
+    },
+  });
 }
 
 // ========================================================
