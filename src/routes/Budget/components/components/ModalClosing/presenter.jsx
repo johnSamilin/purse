@@ -31,6 +31,7 @@ export default function ModalClosing(props) {
     makeDecision,
   } = props;
   const currentUser = usersList.find(user => user.id === currentUserId) || {};
+  const canMakeDecision = currentUser.decision === decisions.pending && !currentUser.isOwner;
 
   return (
     <Modal title={'Ждем подтверждения от участников'}>
@@ -47,7 +48,7 @@ export default function ModalClosing(props) {
           })
         }
       </ul>
-      {currentUser.decision === decisions.pending &&
+      {canMakeDecision &&
         <div {...classes('buttons')}>
           <Button mods={['success']} onClick={() => makeDecision(decisions.approved)}>Да, закрыть</Button>
           <Button mods={['removed']} onClick={() => makeDecision(decisions.rejected)}>Нет, еще не все</Button>

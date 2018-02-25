@@ -8,6 +8,7 @@
   &__list {
     display: flex;
     list-style: none;
+    flex-shrink: 0;
   }
 
   &__tab {

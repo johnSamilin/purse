@@ -35,6 +35,10 @@ class ModalClosing extends Component {
     if (isRejected) {
       // TODO: в бэк отправить
       this.budgetDocument.state = budgetStates.opened;
+      this.budgetDocument.users = this.budgetDocument.users.map(user => ({
+        ...user,
+        decision: decisions.pending,
+      }));
     } else if (isApproved) {
       this.budgetDocument.state = budgetStates.closed;
     }
