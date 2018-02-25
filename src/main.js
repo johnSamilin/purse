@@ -77,5 +77,5 @@ if (__DEV__) {
 // ========================================================
 Database
   .init(store)
-  .then(render)
   .catch(er => console.error(er));
+render();

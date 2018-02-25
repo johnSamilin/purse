@@ -102,7 +102,7 @@ if (__DEV__) {
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
-    /* new webpack.optimize.UglifyJsPlugin({
+    new webpack.optimize.UglifyJsPlugin({
       compress: {
         unused: true,
         dead_code: true,
@@ -111,8 +111,8 @@ if (__DEV__) {
       mangle: {
         except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
       },
-    }),*/
-    /* new webpack.optimize.AggressiveMergingPlugin(),*/
+    }),
+    new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks(module) {
