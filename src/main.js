@@ -78,5 +78,4 @@ if (__DEV__) {
 Database
   .init(store)
   .then(render)
-  .then(() => console.log(Database.instance))
   .catch(er => console.error(er));
