@@ -57,6 +57,7 @@ webpackConfig.externals['react/addons'] = true;
 // ------------------------------------
 webpackConfig.plugins = [
   new webpack.DefinePlugin(project.globals),
+  new ExtractTextPlugin('[name].css'),
   new HtmlWebpackPlugin({
     template: project.paths.client('index.html'),
     hash: true,
@@ -101,7 +102,7 @@ if (__DEV__) {
   webpackConfig.plugins.push(
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
+    /* new webpack.optimize.UglifyJsPlugin({
       compress: {
         unused: true,
         dead_code: true,
@@ -110,8 +111,8 @@ if (__DEV__) {
       mangle: {
         except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
       },
-    }),
-    new webpack.optimize.AggressiveMergingPlugin(),
+    }),*/
+    /* new webpack.optimize.AggressiveMergingPlugin(),*/
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks(module) {
@@ -167,37 +168,37 @@ const BASE_CSS_LOADER = 'css-loader?sourceMap&-minimize';
 
 webpackConfig.module.rules.push({
   test: /\.scss$/,
-  use: [
-    {
-      loader: 'style-loader',
-    },
-    {
-      loader: BASE_CSS_LOADER,
-    },
-    {
-      loader: 'postcss-loader',
-    },
-    {
-      loader: 'sass-loader?sourceMap',
-      options: {
-        includePaths: project.paths.client('styles'),
+  use: ExtractTextPlugin.extract({
+    fallback: 'style-loader',
+    use: [
+      {
+        loader: BASE_CSS_LOADER,
       },
-    },
-  ],
+      {
+        loader: 'postcss-loader',
+      },
+      {
+        loader: 'sass-loader?sourceMap',
+        options: {
+          includePaths: project.paths.client('styles'),
+        },
+      },
+    ],
+  }),
 });
 webpackConfig.module.rules.push({
   test: /\.css$/,
-  use: [
-    {
-      loader: 'style-loader',
-    },
-    {
-      loader: BASE_CSS_LOADER,
-    },
-    {
-      loader: 'postcss-loader',
-    },
-  ],
+  use: ExtractTextPlugin.extract({
+    fallback: 'style-loader',
+    use: [
+      {
+        loader: BASE_CSS_LOADER,
+      },
+      {
+        loader: 'postcss-loader',
+      },
+    ],
+  }),
 });
 
 // File loaders
@@ -212,17 +213,5 @@ webpackConfig.module.rules.push(
   { test: /\.(png|jpg)$/,    use: [{ loader: 'url-loader?limit=8192'}] },
 )
 /* eslint-enable */
-
-// ------------------------------------
-// Finalize Configuration
-// ------------------------------------
-// when we don't know the public path (we know it only when HMR is enabled [in development]) we
-// need to use the extractTextPlugin to fix this issue:
-// http://stackoverflow.com/questions/34133808/webpack-ots-parsing-error-loading-fonts/34133809#34133809
-if (!__DEV__) {
-  webpackConfig.plugins.push(
-    new ExtractTextPlugin('[name].css')
-  );
-}
 
 module.exports = webpackConfig;
