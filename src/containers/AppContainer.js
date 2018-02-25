@@ -1,16 +1,16 @@
-import React, { Component } from 'react'
-import { browserHistory, Router } from 'react-router'
-import { Provider } from 'react-redux'
-import { syncHistoryWithStore } from 'react-router-redux'
+import React, { Component } from 'react';
+import { browserHistory, Router } from 'react-router';
+import { Provider } from 'react-redux';
+import { syncHistoryWithStore } from 'react-router-redux';
 
 class AppContainer extends Component {
 
-  shouldComponentUpdate () {
-    return false
+  shouldComponentUpdate() {
+    return false;
   }
 
-  render () {
-    const { routes, store } = this.props
+  render() {
+    const { routes, store } = this.props;
     const history = syncHistoryWithStore(browserHistory, store);
 
     return (
@@ -19,8 +19,8 @@ class AppContainer extends Component {
           <Router history={history} children={routes} />
         </div>
       </Provider>
-    )
+    );
   }
 }
 
-export default AppContainer
+export default AppContainer;

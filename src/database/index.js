@@ -48,11 +48,10 @@ export class Database {
     store.dispatch(transactionsActions.transactions.seen(map));
   }
 
-  static async init(store) {
+  static async init() {
     if (Database.instance) {
       return Database.instance;
     }
-    Database.budgetsRequested(store);
     Database.instance = await RxDB.create({
       name: 'purse',
       adapter: 'idb',
@@ -66,9 +65,6 @@ export class Database {
       schema: schemas.budgets,
       migrationStrategies: migrations.budgets,
     });
-    await Database.instance.collections.budgets
-      .find()
-      .$.subscribe(Database.budgetsChanged.bind(null, store));
 
     // transactions
     await Database.instance.collection({
@@ -76,9 +72,6 @@ export class Database {
       schema: schemas.transactions,
       migrationStrategies: migrations.transactions,
     });
-    await Database.instance.collections.transactions
-      .find()
-      .$.subscribe(Database.transactionsChanged.bind(null, store));
 
     // users
     await Database.instance.collection({
@@ -86,9 +79,6 @@ export class Database {
       schema: schemas.users,
       migrationStrategies: migrations.users,
     });
-    await Database.instance.collections.users
-      .find()
-      .$.subscribe(Database.usersChanged.bind(null, store));
 
     // seen transactions
     await Database.instance.collection({
@@ -96,12 +86,20 @@ export class Database {
       schema: schemas.seenTransactions,
       migrationStrategies: migrations.seenTransactions,
     });
-    await Database.instance.collections.seentransactions
-      .find()
-      .$.subscribe(Database.seenTransactionsChanged.bind(null, store));
+  }
+
+  static async bindToStore(store) {
+    Database.budgetsRequested(store);
+    await Database.instance.collections.budgets.find().$.subscribe(Database.budgetsChanged.bind(null, store));
+    await Database.instance.collections.transactions.find().$.subscribe(Database.transactionsChanged.bind(null, store));
+    await Database.instance.collections.users.find().$.subscribe(Database.usersChanged.bind(null, store));
+    await Database.instance.collections.seentransactions.find().$.subscribe(Database.seenTransactionsChanged.bind(null, store));
   }
 
   static syncUsers() {
+    if (!Database.instance) {
+      return new Promise((resolve, reject) => reject());
+    }
     Database.usersSync = Database.instance.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
@@ -114,6 +112,9 @@ export class Database {
   }
 
   static syncBudgets(userId) {
+    if (!Database.instance) {
+      return new Promise((resolve, reject) => reject());
+    }
     Database.budgetsSync = Database.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
@@ -127,6 +128,9 @@ export class Database {
   }
 
   static syncTransactions(budgetIds) {
+    if (!Database.instance) {
+      return new Promise((resolve, reject) => reject());
+    }
     //TODO: сделать пооптимальней
     Database.transactionsSync = Database.instance.transactions.sync({
       remote: `${dbUrl}/transactions`,
