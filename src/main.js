@@ -23,8 +23,8 @@ if (!__DEV__) {
       console.log('SW Event:', 'onUpdated');
         // Reload the webpage to load into the new version
       if (confirm('Доступна новая версия Росплаты. Запустить?')) {
-          window.location.reload();
-        }
+        window.location.reload();
+      }
     },
     onUpdateFailed: () => {
       console.log('SW Event:', 'onUpdateFailed');

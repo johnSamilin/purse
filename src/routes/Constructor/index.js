@@ -1,6 +1,7 @@
-import { injectReducer } from '../../store/reducers'
+import { injectReducer } from '../../store/reducers';
 import { setActiveModule } from 'store/modules';
-const Construct = require('./containers').default
+
+const Construct = require('./containers').default;
 
 export default (store) => {
   const {
@@ -9,19 +10,18 @@ export default (store) => {
   injectReducer(store, { key: 'constructor', reducer });
 
   return ({
-    path : 'create',
-    getComponent (nextState, cb) {
+    path: 'create',
+    getComponent(nextState, cb) {
       require.ensure([], (require) => {
-        cb(null, Construct)
-
-      }, 'constructor')
+        cb(null, Construct);
+      }, 'constructor');
     },
     onEnter: () => {
-      store.dispatch(setActiveModule('constructor', []))
+      store.dispatch(setActiveModule('constructor', []));
     },
-  })
-}
+  });
+};
 
 export {
   Construct,
-}
+};
