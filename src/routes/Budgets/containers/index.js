@@ -101,6 +101,12 @@ function mergeProps(stateProps, dispatchProps, ownProps) {
         budget.save();
       });
     },
+    deleteBudget(id) {
+      const budgetQuery = Database.instance.budgets.findOne(id);
+      budgetQuery.exec().then((budget) => {
+        budget.remove();
+      });
+    },
   };
 }
 

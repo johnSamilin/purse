@@ -52,9 +52,13 @@ export function mapTransactionsToBudgets(transactions) {
   if (transactions !== null) {
     transactions.forEach((transaction) => {
       if (!map[transaction.budgetId]) {
-        map[transaction.budgetId] = 0;
+        map[transaction.budgetId] = {
+          count: 0,
+          sum: 0,
+        };
       }
-      map[transaction.budgetId] += 1;
+      map[transaction.budgetId].count += 1;
+      map[transaction.budgetId].sum += transaction.amount;
     });
   }
 

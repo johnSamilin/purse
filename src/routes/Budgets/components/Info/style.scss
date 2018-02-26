@@ -60,19 +60,32 @@
 	}
 
 	&__date {
-		margin: 0.5rem 0 0;
+    margin: 0.5rem 0 0;
+    color: #999;
 	}
 
 	&__title {
-		font-size: 2rem;
 		margin: 0.5rem 0;
-	}
+  }
+  
+  &__subtitle {
+  }
+
+  &__sum {
+    font-size: 1.7rem;
+		margin-bottom: 0.5rem;
+  }
+
+  &__people {
+    color: #999;
+  }
 
 	&__menu {
 		align-self: center;
 		width: 3.5rem;
 		padding: 1rem;
-		cursor: pointer;
+    cursor: pointer;
+    z-index: 100;
 
 		&-trigger {
 			color: $black;

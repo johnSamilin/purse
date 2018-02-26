@@ -28,6 +28,7 @@ export const Budgets = (props) => {
     userInfo,
     isLoading,
     logout,
+    deleteBudget,
   } = props;
   const sections = [
     {
@@ -43,6 +44,7 @@ export const Budgets = (props) => {
                 isActive={activeId === budget.id}
                 requestClosing={requestClosing}
                 openBudget={openBudget}
+                deleteBudget={deleteBudget}
               />
             )}
         </ul>
@@ -61,6 +63,7 @@ export const Budgets = (props) => {
                 isActive={activeId === budget.id}
                 requestClosing={requestClosing}
                 openBudget={openBudget}
+                deleteBudget={deleteBudget}
               />
             )}
         </ul>

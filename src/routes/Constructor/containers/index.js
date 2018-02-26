@@ -60,6 +60,7 @@ class Construct extends Component {
         currency: currencies[currency],
         sharelink: "",
         users,
+        date: Date.now().toString(),
       });
       await this.props.create(budget);
       this.props.showBudget(id);

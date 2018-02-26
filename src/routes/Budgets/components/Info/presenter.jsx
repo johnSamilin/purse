@@ -4,6 +4,7 @@ import BEMHelper from 'react-bem-helper';
 import moment from 'moment';
 import { budgetStates } from 'const';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
+import pluralize from 'pluralize';
 import { paths } from '../../const';
 
 require('./style.scss');
@@ -15,11 +16,17 @@ function Info(props) {
 		title,
 		isActive,
 		state,
-		requestClosing,
-		openBudget,
+    sum = 0,
+    currency,
+    activeUsers,
+    users,
 		newTransactionsCount = 0,
 		transactionsCount = 0,
+
+		requestClosing,
+		openBudget,
 		canManage = false,
+    deleteBudget,
 	} = props;
 	const classes = new BEMHelper('budget-list-item');
 	const isClosed = [budgetStates.closed, budgetStates.closing].includes(state);
@@ -41,8 +48,12 @@ function Info(props) {
 				</i>
 			</div>
 			<Link to={paths.budget(id)} {...classes('wrapper')}>
-				<span {...classes('date')}>{moment(date).format('DD.MM.Y')}</span>
+				<span {...classes('date')}>{moment(date, 'x').format('DD.MM.Y')}</span>
 				<span {...classes('title')}>{title}</span>
+        <span {...classes('sum')}>{sum} {currency.key}</span>
+        <span {...classes('people')}>
+          {`${activeUsers} ${activeUsers < users.length ? `из ${users.length}` : ''}`} {pluralize('участник', activeUsers)}
+        </span>
 			</Link>
 			{canManage
 				? <Dropdown {...classes('menu')} ref={(element) => {
@@ -63,6 +74,11 @@ function Info(props) {
 						}}>
               {`${state === budgetStates.closed ? 'Открыть' : 'Закрыть'}`}
             </div>
+            {__DEV__ &&
+              <div {...classes('menu-item')} onClick={() => deleteBudget(id)}>
+                Удалить
+              </div>
+            }
 					</DropdownContent>
 				</Dropdown>
 				: null

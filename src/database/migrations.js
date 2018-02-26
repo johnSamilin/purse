@@ -15,6 +15,10 @@ export default {
       }));
       return budget;
     },
+    4: function(budget) {
+      budget.date = (new Date()).toString();
+      return budget;
+    },
   },
   transactions: {
     1: function(transaction) {

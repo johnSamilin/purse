@@ -1,7 +1,7 @@
 const schemas = {
   budgets: {
     title: 'budgets',
-    version: 3,
+    version: 4,
     description: 'budgets',
     type: 'object',
     disableKeyCompression: true,
@@ -9,6 +9,9 @@ const schemas = {
       id: {
         type: 'string',
         primary: true,
+      },
+      date: {
+        type: 'string',
       },
       ownerId: {
         type: 'string',
