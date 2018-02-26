@@ -1,6 +1,7 @@
-import { injectReducer } from '../../store/reducers'
+import { injectReducer } from '../../store/reducers';
 import { setActiveModule } from 'store/modules';
-const Collaborators = require('./containers').default
+
+const Collaborators = require('./containers').default;
 
 export default (store) => {
   const {
@@ -9,19 +10,18 @@ export default (store) => {
   injectReducer(store, { key: 'collaborators', reducer });
 
   return ({
-    path : 'budgets/:id/collaborators',
-    getComponent (nextState, cb) {
+    path: 'budgets/:id/collaborators',
+    getComponent(nextState, cb) {
       require.ensure([], (require) => {
-        cb(null, Collaborators)
-
-      }, 'collaborators')
+        cb(null, Collaborators);
+      }, 'collaborators');
     },
     onEnter: () => {
-      store.dispatch(setActiveModule('collaborators', ['budgets']))
+      store.dispatch(setActiveModule('collaborators', ['budgets']));
     },
-  })
-}
+  });
+};
 
 export {
     Collaborators,
-}
+};
