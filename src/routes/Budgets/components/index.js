@@ -3,6 +3,7 @@ import BEMHelper from 'react-bem-helper';
 import { Link } from 'react-router';
 import { paths } from 'routes/Budgets/const';
 import LoadingPanel from 'components/LoadingPanel';
+import EmptyState from 'components/EmptyState';
 import { budgetStates } from 'const';
 
 import Info from './Info';
@@ -32,40 +33,47 @@ export const Budgets = (props) => {
   } = props;
   const sections = [
     {
-      title: 'Активные бабайки',
+      title: 'Все бюджеты',
       content: (
-        <ul {...classes('list')}>
-          {activeList && activeList
-            .filter(b => b.state !== budgetStates.closing)
-            .map((budget, i) =>
-              <Info
-                key={i}
-                {...budget}
-                isActive={activeId === budget.id}
-                requestClosing={requestClosing}
-                openBudget={openBudget}
-                deleteBudget={deleteBudget}
-              />
-            )}
+        <ul {...classes('list', { empty: !activeList.length })}>
+          {activeList.length
+            ? activeList
+              .filter(b => b.state !== budgetStates.closing)
+              .map((budget, i) =>
+                <Info
+                  key={i}
+                  {...budget}
+                  isActive={activeId === budget.id}
+                  requestClosing={requestClosing}
+                  openBudget={openBudget}
+                  deleteBudget={deleteBudget}
+                />
+              )
+            : <EmptyState message={'Пока ни одного бюджета. Создайте или присоединитесь к существующему'} />
+            }
         </ul>
       ),
     },
     {
       title: 'Внимание',
+      badge: pendingAttentionList.length,
       content: (
-        <ul {...classes('list')}>
-          {pendingAttentionList && pendingAttentionList
-            .filter(b => b.state === budgetStates.closing)
-            .map((budget, i) =>
-              <Info
-                key={i}
-                {...budget}
-                isActive={activeId === budget.id}
-                requestClosing={requestClosing}
-                openBudget={openBudget}
-                deleteBudget={deleteBudget}
-              />
-            )}
+        <ul {...classes('list', { empty: !pendingAttentionList.length })}>
+          {pendingAttentionList.length
+            ? pendingAttentionList
+              .filter(b => b.state === budgetStates.closing)
+              .map((budget, i) =>
+                <Info
+                  key={i}
+                  {...budget}
+                  isActive={activeId === budget.id}
+                  requestClosing={requestClosing}
+                  openBudget={openBudget}
+                  deleteBudget={deleteBudget}
+                />
+              )
+            : <EmptyState message={'Нет бюджетов, требующих вашего внимания'} />
+            }
         </ul>
       ),
     },

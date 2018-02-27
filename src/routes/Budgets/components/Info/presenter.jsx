@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
 import moment from 'moment';
+import numeral from 'numeral';
 import { budgetStates } from 'const';
 import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import pluralize from 'pluralize';
@@ -48,12 +49,14 @@ function Info(props) {
 				</i>
 			</div>
 			<Link to={paths.budget(id)} {...classes('wrapper')}>
-				<span {...classes('date')}>{moment(date, 'x').format('DD.MM.Y')}</span>
 				<span {...classes('title')}>{title}</span>
-        <span {...classes('sum')}>{sum} {currency.key}</span>
-        <span {...classes('people')}>
-          {`${activeUsers} ${activeUsers < users.length ? `из ${users.length}` : ''}`} {pluralize('участник', activeUsers)}
-        </span>
+        <span {...classes('sum')}>{numeral(sum).format('0,[.]00')} {currency.key}</span>
+        <div {...classes('subtitle')}>
+          <span {...classes('people')}>
+            {`${activeUsers} ${activeUsers < users.length ? `из ${users.length}` : ''}`} {pluralize('участников', activeUsers)}
+          </span>
+				  <span {...classes('date')}>{moment(date, 'x').format('DD.MM.YYYY')}</span>
+        </div>
 			</Link>
 			{canManage
 				? <Dropdown {...classes('menu')} ref={(element) => {

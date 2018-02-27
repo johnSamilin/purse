@@ -1,11 +1,15 @@
-export function registerServiceWorker() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/serviceWorker.js', { scope: '/' }).then((reg) => {
-      // регистрация сработала
-      console.log(`Registration succeeded. Scope is ${reg.scope}`);
-    }).catch((error) => {
-      // регистрация прошла неудачно
-      console.log(`Registration failed with ${error}`);
+function showNotification(text) {
+  try {
+    const notification = new Notification(text);
+    return notification;
+  } catch (er) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification('Росплата', {
+        body: text,
+        /*icon: '../images/touch/chrome-touch-icon-192x192.png',
+        vibrate: [200, 100, 200, 100, 200, 100, 200],
+        tag: 'vibration-sample'*/
+      });
     });
   }
 }
@@ -19,8 +23,7 @@ export function notify(text) {
   // Проверка разрешения на отправку уведомлений
   else if (Notification.permission === 'granted') {
     // Если разрешено то создаем уведомлений
-    const notification = new Notification(text);
-    return true;
+    showNotification(text);
   }
 
   // В противном случает мы запрашиваем разрешение
@@ -28,11 +31,12 @@ export function notify(text) {
     Notification.requestPermission((permission) => {
       // Если пользователь разрешил, то создаем уведомление
       if (permission === 'granted') {
-        const notification = new Notification(text);
-        return true;
+        showNotification(text);
       }
     });
   }
+
+  return;
 
   // В конечном счете если пользователь отказался от получения
   // уведомлений, то стоит уважать его выбор и не беспокоить его

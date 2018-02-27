@@ -15,38 +15,40 @@ import { Field } from 'redux-form';
 import './style.scss';
 
 function Title({ input, className }) {
-  return <Input
-      className={className}
-      placeholder='Название'
-      value={input.value}
-      onChange={input.onChange}
-    />;
+  return (<Input
+    className={className}
+    placeholder="Название"
+    value={input.value}
+    onChange={input.onChange}
+  />);
 }
 
 function Currency({ input, className }) {
-  return <Select
-      className={className}
-      value={input.value}
-      onChange={input.onChange}
-      options={currencies}
-    />;
+  return (<Select
+    className={className}
+    value={input.value}
+    onChange={input.onChange}
+    options={currencies}
+  />);
 }
 
 function Checkbox({ input, className }) {
   const classes = new BEMHelper('construct');
-  return <div {...classes({
-      element: 'checkbox',
-      extra: 'mi mi-check',
-      modifiers: { checked: input.value }
-    })}>
-      <input
+  return (<div
+{...classes({
+    element: 'checkbox',
+    extra: 'mi mi-check',
+    modifiers: { checked: input.value },
+  })}
+  >
+    <input
         type="checkbox"
         value={input.value}
         onChange={input.onChange}
         id={input.name}
       />
-      <label htmlFor={input.name}></label>
-    </div>;
+    <label htmlFor={input.name} />
+  </div>);
 }
 
 export const Construct = (props) => {
@@ -66,7 +68,7 @@ export const Construct = (props) => {
       onSubmit={handleSubmit(onSubmit)}
       {...classes({ extra: pageClasses })}
     >
-      <Header title='Create new budget' backurl='/' />
+      <Header title="Create new budget" backurl="/" />
       <div {...classes('title')}>
         <Field component={Title} {...classes('title-input')} name={'title'} />
       </div>
@@ -77,20 +79,21 @@ export const Construct = (props) => {
         {users && users.map((user, k) => <ListItem index={k} {...classes('user')}>
           <UserInfo {...user} />
           <Field
-            component={Checkbox}            
+            component={Checkbox}
             name={`invitedUsers[${k}]`}
           />
         </ListItem>)}
       </div>
       <Button
+        {...classes('submit-btn')}
         mods={['success']}
-        type='submit'
+        type="submit"
         disabled={!canCreate}
       >
         Создать
       </Button>
     </form>
-  )
-}
+  );
+};
 
-export default Construct
+export default Construct;

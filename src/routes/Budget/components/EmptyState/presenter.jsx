@@ -8,7 +8,7 @@ function EmptyState() {
 	return (
 		<div {...classes()}>
 			<i {...classes({ element: 'icon', extra: 'mi mi-local-airport' })}></i>
-			<span>First choose a budget</span>
+			<span>Выберите бюджет</span>
 		</div>
 	);
 }

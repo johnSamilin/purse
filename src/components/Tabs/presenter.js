@@ -40,7 +40,16 @@ function Tabs(props) {
               },
             })}
           >
-            {section.title}
+            <div {...classes('tab-title')}>
+              <span {...classes('tab-label')}>
+                {section.title}
+              </span>
+              {section.badge > 0 &&
+                <span {...classes('badge')}>
+                  {section.badge}
+                </span>
+              }
+            </div>
           </ReactTab>
         )}
       </TabList>

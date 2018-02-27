@@ -21,7 +21,7 @@ function Summary(props) {
 		<div {...classes()}>
 			<div {...classes('sum', !showMyBalance ? 'wide' : '')}>
 				<span {...classes('sum-note')}>Всего</span>
-				<span {...classes('sum-text')}>{totalSum.format(format).replace(',', ' ')}</span>
+				<span {...classes('sum-text')}>{totalSum.format(format)}</span>
 				<span {...classes('sum-currency')}>{currency}</span>
 			</div>
 			{showMyBalance &&
@@ -34,7 +34,7 @@ function Summary(props) {
 								: '-'
 							}
 						</div>
-						<span>{mySum.format(format).replace(/[,\(\)]/gi, ' ')}</span>
+						<span>{mySum.format(format)}</span>
 					</div>
 					<span {...classes('sum-currency')}>{currency}</span>
 				</div>

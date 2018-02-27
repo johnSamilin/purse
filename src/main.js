@@ -3,8 +3,17 @@ import ReactDOM from 'react-dom';
 import { Database } from 'database';
 import api from 'services/api';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import moment from 'moment';
+import numeral from 'numeral';
+import 'numeral/locales/ru';
 import createStore from './store/createStore';
 import AppContainer from './containers/AppContainer';
+
+moment.locale('ru');
+numeral.locale('ru');
+if ('Notification' in window && !Notification.permission !== 'denied') {
+  Notification.requestPermission();
+}
 
 // SW
 if (!__DEV__) {

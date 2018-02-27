@@ -8,6 +8,10 @@
 		overflow: auto;
     height: 100%;
     flex: 1;
+
+    &--empty {
+      display: flex;
+    }
 	}
 
 	&__fab {

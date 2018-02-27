@@ -65,7 +65,7 @@ function Transactions(props) {
 						}
 						)}
 					</ul>
-					: <EmptyState message={'No transactions yet'} />
+					: <EmptyState message={'Еще ни одной транзакции'} />
 				)}
 		</div>
 	);

@@ -14,7 +14,8 @@
 	&__title {
 		background: $primary-light;
 		display: flex;
-		font-size: 3rem;
+    font-size: 3rem;
+    flex-shrink: 0;
 
 		&-input {
 			border-bottom: 1px solid $primary-dark;
@@ -26,7 +27,8 @@
 
 	&__subtitle {
 		background: lighten($primary-light, 10%);
-		display: flex;
+    display: flex;
+    flex-shrink: 0;
 	}
 
 	&__select {
@@ -69,8 +71,12 @@
 
 		&--checked {
 			color: $secondary;
-		}			
-	}
+		}
+  }
+  
+  &__submit-btn {
+    flex-shrink: 0;
+  }
 }
 
 .core-layout {

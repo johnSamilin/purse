@@ -60,7 +60,6 @@
 	}
 
 	&__date {
-    margin: 0.5rem 0 0;
     color: #999;
 	}
 
@@ -69,6 +68,10 @@
   }
   
   &__subtitle {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__sum {
@@ -86,6 +89,7 @@
 		padding: 1rem;
     cursor: pointer;
     z-index: 100;
+    position: absolute;
 
 		&-trigger {
 			color: $black;

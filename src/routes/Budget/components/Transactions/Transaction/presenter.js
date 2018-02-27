@@ -22,9 +22,8 @@ function Transaction(props) {
     <div {...classes({ modifiers: { cancelled } })} onClick={() => onClick(id)}>
       <div {...classes('mandatory-info')}>
         <UserInfo {...classes('info')} {...author} />
-        {!isSynced && 'Not synced yet'}
         <div {...classes('amount')}>
-          <span>{numeral(amount).format('0,[.]00').replace(/,/gi, ' ')} {currency}</span>
+          <span>{numeral(amount).format('0,[.]00')} {currency}</span>
         </div>
       </div>
       <div {...classes({ element: 'note', modifiers: { hidden: !note } })}>
