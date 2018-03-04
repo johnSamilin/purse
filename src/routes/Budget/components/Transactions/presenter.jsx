@@ -36,11 +36,11 @@ function Transactions(props) {
 					? <ul>
 						{data.map((transaction, i) => {
 							const nextDateBlock = moment(transaction.date, 'x').calendar(null, {
-						    sameDay: '[Сегодня]',
-						    nextDay: '[Завтра]',
+						    sameDay: 'dddd',
+						    nextDay: 'dddd',
 						    nextWeek: 'dddd',
-						    lastDay: '[Вчера]',
-						    lastWeek: '[В тот] dddd',
+						    lastDay: 'dddd',
+						    lastWeek: 'dddd',
 						    sameElse: 'MMMM Do YYYY'
 							});
 							if (dateBlock !== nextDateBlock) {

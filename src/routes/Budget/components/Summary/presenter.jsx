@@ -34,7 +34,7 @@ function Summary(props) {
 								: '-'
 							}
 						</div>
-						<span>{mySum.format(format)}</span>
+						<span>{mySum.format(format).replace(/[\(\)]*/g, '')}</span>
 					</div>
 					<span {...classes('sum-currency')}>{currency}</span>
 				</div>

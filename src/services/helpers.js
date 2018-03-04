@@ -62,7 +62,7 @@ export function mapTransactionsToBudgets(transactions) {
         };
       }
       map[transaction.budgetId].count += 1;
-      map[transaction.budgetId].sum += transaction.amount;
+      map[transaction.budgetId].sum += transaction.cancelled ? 0 : transaction.amount;
     });
   }
 

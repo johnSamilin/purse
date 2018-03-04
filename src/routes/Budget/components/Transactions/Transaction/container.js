@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { actions } from '../../../modules/actions'
-import presenter from './presenter'
+import { actions } from '../../../modules/actions';
+import presenter from './presenter';
 
 class Transaction extends Component {
   componentWillMount() {
@@ -17,14 +17,13 @@ class Transaction extends Component {
 }
 
 const mapDispatchToProps = {
-  
-}
 
-const mapStateToProps = (state, ownProps) => {
+};
 
+function mapStateToProps(state, ownProps) {
   return {
-    
-  }
+    isSynced: ownProps._synced$.getValue(),
+  };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Transaction)
+export default connect(mapStateToProps, mapDispatchToProps)(Transaction);

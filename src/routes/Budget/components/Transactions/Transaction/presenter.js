@@ -26,6 +26,7 @@ function Transaction(props) {
           <span>{numeral(amount).format('0,[.]00')} {currency}</span>
         </div>
       </div>
+      {!isSynced && <span>Not synced yet</span>}
       <div {...classes({ element: 'note', modifiers: { hidden: !note } })}>
         <span>{note}</span>
       </div>

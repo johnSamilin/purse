@@ -32,6 +32,7 @@ class Budget extends Component {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log(Database.instance.collections.transactions);
     if (this.props.id !== newProps.id) {
       if (newProps.id) {
         this.loadBudget(newProps.id);
@@ -141,8 +142,14 @@ class Budget extends Component {
   }
 
   toggleTransactionState(id) {
+    if (this.budgetDocument.state != 'opened') {
+      return false;
+    }
     const transaction = this.props.transactions.filter(t => t.id === id)[0];
-    if (!transaction || transaction.ownerId != this.props.currentUserId || this.props.status !== userStatuses.active) {
+    if (!transaction
+      || transaction.ownerId != this.props.currentUserId
+      || this.props.status !== userStatuses.active
+    ) {
       return false;
     }
     if (transaction.cancelled || confirm('Удалить? Точно')) {

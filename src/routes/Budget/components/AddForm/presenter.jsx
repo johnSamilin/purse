@@ -52,7 +52,7 @@ function AddForm(props) {
 				</Button>
 			</div>
 			<Field
-				component={Input}
+				component={FormInput}
 				{...classes({
 					element: 'input',
 					modifiers: { hidden: !isExpanded }

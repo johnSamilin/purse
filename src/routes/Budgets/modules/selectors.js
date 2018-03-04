@@ -11,7 +11,7 @@ const getTransactionsMap = state => get(state, 'transactions.list', {});
 const getSeenTransactionsMap = state => get(state, 'transactions.seen', {});
 
 function enchanceBudget(budget, userId, transactionsMap, seenTransactions) {
-  const transactionsList = transactionsMap[budget.id] || 0;
+  const transactionsList = transactionsMap[budget.id] || {};
   const seenTransactionsCount = get(seenTransactions, `${budget.id}`, 0);
   const activeUsers = budget.users.filter(user => user.status === userStatuses.active).length;
 
