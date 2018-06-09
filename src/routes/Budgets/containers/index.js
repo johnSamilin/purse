@@ -19,7 +19,7 @@ export class Budgets extends Page {
       userInfo: {},
       activeList: [],
       pendingAttentionList: [],
-      activeId: -1,
+      activeId: -1, // TODO: get from route
     };
     this.namespace = namespace;
 
@@ -78,7 +78,6 @@ export class Budgets extends Page {
     console.tlog('set budgets list started');    
     this.setState(getBudgets());
     console.tlog('set budgets list ended');
-
   }
 
   requestClosing(id) {

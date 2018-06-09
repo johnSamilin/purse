@@ -5,8 +5,8 @@ import schemas from './schema';
 import migrations from './migrations';
 import { GlobalStore } from '../store/globalStore';
 import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets } from '../services/helpers';
+import { Observable } from '../providers/Observable';
 RxDB.plugin(require('pouchdb-adapter-idb'));
-// RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 
@@ -28,13 +28,14 @@ class Model {
     this.transactionsSync = null;
     this.usersSync = null;
     this.isSyncing = false;
+    this.budgetIds = new Observable([]); // чтобы пересинхронизировать только если они изменились
 
     const promise = this.createUsersCollection();
     GlobalStore.modules.users.activeUser.subscribe(userInfo => this.onUserChanged(userInfo));
     GlobalStore.budgets.subscribe((budgets) => {
-      const budgetIds = budgets.map(budget => budget.id);
-      this.syncTransactions(budgetIds);
+      this.budgetIds.value = budgets.map(budget => budget.id);
     });
+    this.budgetIds.subscribe(budgetIds => this.syncTransactions(budgetIds));
 
     return promise;
   }
