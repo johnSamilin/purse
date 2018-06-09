@@ -1,17 +1,17 @@
 import { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { push } from 'react-router-redux';
+// import { push } from 'react-router-redux';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
-import isEqual from 'lodash/isEqual';
+// import isEqual from 'lodash/isEqual';
 import { Database } from 'database';
-import { actions } from '../modules/actions';
+// import { actions } from '../modules/actions';
 import presenter from '../components';
-import select from '../modules/selectors';
+// import select from '../modules/selectors';
 import { paths, userStatuses } from '../const';
 
-class Budget extends Component {
+export class Budget extends Component {
   constructor() {
     super();
     this.requestMembership = this.requestMembership.bind(this);
@@ -32,7 +32,7 @@ class Budget extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log(Database.instance.collections.transactions);
+    console.tlog(Database.instance.collections.transactions);
     if (this.props.id !== newProps.id) {
       if (newProps.id) {
         this.loadBudget(newProps.id);
@@ -216,62 +216,61 @@ class Budget extends Component {
   }
 }
 
-const mapDispatchToProps = {
-  selectBudget: actions.budget.select,
-  update: actions.budget.update,
-  loadTransactions: actions.transactions.load,
-  selectTransactions: actions.transactions.select,
-  clearTransactions: actions.transactions.clear,
-  clearBudget: actions.budget.clear,
-  redirect: push,
-};
+// const mapDispatchToProps = {
+//   selectBudget: actions.budget.select,
+//   update: actions.budget.update,
+//   loadTransactions: actions.transactions.load,
+//   selectTransactions: actions.transactions.select,
+//   clearTransactions: actions.transactions.clear,
+//   clearBudget: actions.budget.clear,
+//   redirect: push,
+// };
 
-const mapStateToProps = (state, ownProps) => {
-  const budget = select.budget(state);
-  const transactions = select.transactions(state);
-  const usersList = select.users(state);
-  const currentUserId = get(state, 'auth.data.userInfo.id', -1);
-  let status = userStatuses.none;
-  const isOwner = budget.ownerId === currentUserId;
-  if (isOwner) {
-    status = userStatuses.active;
-  } else {
-    budget.users && budget.users.forEach((user) => {
-      if (user.id === currentUserId) {
-        status = user.status;
-      }
-    });
-  }
-  const budgetsLoading = get(state, 'budgets.isLoading', false);
-  const newUsersCount = Object.values(usersList).filter(user => [
-    userStatuses.pending,
-    userStatuses.invited,
-  ].includes(user.status)).length;
+// const mapStateToProps = (state, ownProps) => {
+//   const budget = select.budget(state);
+//   const transactions = select.transactions(state);
+//   const usersList = select.users(state);
+//   const currentUserId = get(state, 'auth.data.userInfo.id', -1);
+//   let status = userStatuses.none;
+//   const isOwner = budget.ownerId === currentUserId;
+//   if (isOwner) {
+//     status = userStatuses.active;
+//   } else {
+//     budget.users && budget.users.forEach((user) => {
+//       if (user.id === currentUserId) {
+//         status = user.status;
+//       }
+//     });
+//   }
+//   const budgetsLoading = get(state, 'budgets.isLoading', false);
+//   const newUsersCount = Object.values(usersList).filter(user => [
+//     userStatuses.pending,
+//     userStatuses.invited,
+//   ].includes(user.status)).length;
 
-  return {
-    id: ownProps.params.id,
-    budget,
-    isActive: state.modules.active === 'budget',
-    isNext: state.modules.next.includes('budget'),
-    currentUserId,
-    transactions,
-    status,
-    usersList,
-    isOwner,
-    budgetsLoading,
-    newUsersCount,
-  };
-};
+//   return {
+//     id: ownProps.params.id,
+//     budget,
+//     isActive: state.modules.active === 'budget',
+//     isNext: state.modules.next.includes('budget'),
+//     currentUserId,
+//     transactions,
+//     status,
+//     usersList,
+//     isOwner,
+//     budgetsLoading,
+//     newUsersCount,
+//   };
+// };
 
-function mergeProps(state, dispatch, own) {
-  return {
-    ...state,
-    ...dispatch,
-    ...own,
-    showCollaborators() {
-      dispatch.redirect(paths.collaborators(state.id));
-    },
-  };
-}
+// function mergeProps(state, dispatch, own) {
+//   return {
+//     ...state,
+//     ...dispatch,
+//     ...own,
+//     showCollaborators() {
+//       dispatch.redirect(paths.collaborators(state.id));
+//     },
+//   };
+// }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Budget));

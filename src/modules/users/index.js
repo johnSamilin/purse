@@ -1,10 +1,8 @@
-import { injectReducer } from 'store/reducers';
-import reducer, { actions } from './actions';
-
-function init(store) {
-	injectReducer(store, { key: 'users', reducer } );
-}
+import { Observable } from "../../providers/Observable";
 
 export default {
-	init,
+  namespace: 'users',
+  state: {
+    activeUser: new Observable(),
+  },
 };

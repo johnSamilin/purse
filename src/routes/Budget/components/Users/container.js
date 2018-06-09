@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { actions } from '../../modules/actions';
+// import { actions } from '../../modules/actions';
 import presenter from './presenter';
 
-class Users extends Component {
+export class Users extends Component {
   componentWillMount() {
   }
 
@@ -15,11 +15,3 @@ class Users extends Component {
     return presenter(this.props);
   }
 }
-
-const mapDispatchToProps = {
-
-};
-
-const mapStateToProps = (state, ownProps) => ({});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Users);

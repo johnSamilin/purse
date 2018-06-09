@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { actions } from '../../../modules/actions';
+// import { actions } from '../../../modules/actions';
 import presenter from './presenter';
 
 class Transaction extends Component {
@@ -26,4 +26,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Transaction);
+export default Transaction;

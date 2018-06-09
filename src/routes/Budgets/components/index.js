@@ -12,14 +12,8 @@ import { Tabs } from '../../../components/Tabs/index';
 
 export const Budgets = (props) => {
   const classes = new BEMHelper('budget-list');
-  let pageClasses = new BEMHelper('page');
-  pageClasses = pageClasses({
-    modifiers: {
-      next: props.isNext,
-      active: props.isActive,
-    },
-  }).className;
   const {
+    getPageClasses,
     activeList,
     pendingAttentionList,
     activeId,
@@ -80,7 +74,7 @@ export const Budgets = (props) => {
   ];
 
   return (
-    <div {...classes({ extra: pageClasses })}>
+    <div {...classes({ extra: getPageClasses() })}>
       <div {...classes('username')}>
         <span
           {...classes({

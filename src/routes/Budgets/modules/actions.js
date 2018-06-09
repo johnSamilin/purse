@@ -45,23 +45,20 @@ function create() {
 }
 
 function requestClosing(id) {
-  return (dispatch) => {
-    dispatch(requestStarted());
-    return api.doPost(
-      apiPaths.budget(id),
-      {
-        status: budgetStates.closing,
-      },
-      () => dispatch(requestFulfilled())
-    );
-  };
+  return api.doPost(
+    apiPaths.budget(id),
+    {
+      status: budgetStates.closing,
+    }
+  );
 }
 
-export const actions = {
+export const budgetsActions = {
   updated,
   create,
   requestStarted,
   requestFulfilled,
+  
   requestClosing,
 };
 

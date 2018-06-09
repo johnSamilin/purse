@@ -6,64 +6,35 @@ import {
   Input,
   LoadingPanel,
 } from 'components';
-import { Field } from 'redux-form';
 import { countryCodes } from '../const';
 import './style.scss';
 import { Tabs } from '../../../components/Tabs/index';
 
-function CountryCode({ input, className }) {
-  return (<Select
-    value={input.value}
-    onChange={input.onChange}
-    options={countryCodes}
-    className={className}
-  />);
-}
-
-function Phone({ input, className }) {
-  return (<Input
-    className={className}
-    value={input.value}
-    onChange={input.onChange}
-    placeholder={'1234567'}
-    type={'tel'}
-  />);
-}
-
-function Email({ input, className }) {
-  return (<Input
-    className={className}
-    value={input.value}
-    onChange={input.onChange}
-    placeholder={'boss@acme.com'}
-  />);
-}
-
 export const Login = (props) => {
   const {
+    getPageClasses,
     isActive,
-    handleSubmit,
     onSubmit,
     isLoading,
     onTabChange,
+    onInputChange,
   } = props;
   const classes = new BEMHelper('login');
-  let pageClasses = new BEMHelper('page');
-  pageClasses = pageClasses({ modifiers: { next: props.isNext, active: isActive } }).className;
   const sections = [
     {
       title: 'По СМС',
       content: (
         <div {...classes('input')}>
-          <Field
+          <Select
             {...classes('country-code')}
-            component={CountryCode}
-            name={'countryCode'}
+            onChange={e => onInputChange('countryCode', e)}
+            options={countryCodes}
           />
-          <Field
+          <Input
             {...classes('phone')}
-            component={Phone}
-            name={'phoneNumber'}
+            onChange={e => onInputChange('phoneNumber', e)}
+            placeholder={'1234567'}
+            type={'tel'}
           />
         </div>
       ),
@@ -72,10 +43,10 @@ export const Login = (props) => {
       title: 'По Email',
       content: (
         <div {...classes('input')}>
-          <Field
+          <Input
             {...classes('email')}
-            component={Email}
-            name={'emailAddress'}
+            onChange={e => onInputChange('emailAddress', e)}
+            placeholder={'boss@acme.com'}
           />
         </div>
       ),
@@ -84,15 +55,16 @@ export const Login = (props) => {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
-      {...classes({ extra: pageClasses })}
+      onSubmit={onSubmit}
+      {...classes({ extra: getPageClasses() })}
     >
       <div {...classes('heading')}>
         <div {...classes('title')}>
           Росплата
         </div>
         <div {...classes('text')}>
-          Привет! Прежде, чем продолжить или начать пользоваться сервисом, нужно войти с помощью Email или SMS. Вы просто получите код, для этого не надо даже иметь аккаунт на Facebook.
+          Войдите используя номер телефона.<br/>
+          Мы используем AccountKit от Facebook, при этом абсолютно ничего не делаем с вашим аккаунтом. Вы вообще можете его не иметь
         </div>
       </div>
       <Tabs sections={sections} onChange={onTabChange} />
@@ -102,7 +74,7 @@ export const Login = (props) => {
           mods={['success']}
           type={'submit'}
         >
-            Войти
+          Войти
         </Button>
       </div>
       <LoadingPanel isActive={isLoading} />

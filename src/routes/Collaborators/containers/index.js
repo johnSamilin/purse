@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import get from 'lodash/get';
 import { Database } from 'database';
 import { notify } from 'services/helpers';
-import { actions } from '../modules/actions';
+// import { actions } from '../modules/actions';
 import presenter from '../components';
-import select from '../modules/selectors';
+// import select from '../modules/selectors';
 
-class Collaborators extends Component {
+export class Collaborators extends Component {
   constructor() {
     super();
     this.changeUserStatus = this.changeUserStatus.bind(this);
@@ -66,37 +66,37 @@ class Collaborators extends Component {
   }
 }
 
-const mapDispatchToProps = {
+// const mapDispatchToProps = {
 
-};
+// };
 
-const mapStateToProps = (state, ownProps) => {
-  const budget = get(state, 'budget.data');
-  const users = get(state, 'users.data') || [];
-  const userId = get(state, 'auth.data.userInfo.id', -1);
-  const ownerId = get(budget, 'ownerId');
-  const isOwner = ownerId === userId;
-  const canManage = isOwner && budget.state === 'opened';
+// const mapStateToProps = (state, ownProps) => {
+//   const budget = get(state, 'budget.data');
+//   const users = get(state, 'users.data') || [];
+//   const userId = get(state, 'auth.data.userInfo.id', -1);
+//   const ownerId = get(budget, 'ownerId');
+//   const isOwner = ownerId === userId;
+//   const canManage = isOwner && budget.state === 'opened';
 
-  return {
-    ...budget,
-    users: get(budget, 'users', []).map(user => ({
-      ...user,
-      ...users.filter(u => u.id === user.id)[0],
-    })),
-    isActive: state.modules.active === 'collaborators',
-    isNext: state.modules.next.includes('collaborators'),
-    ownerId,
-    canManage,
-  };
-};
+//   return {
+//     ...budget,
+//     users: get(budget, 'users', []).map(user => ({
+//       ...user,
+//       ...users.filter(u => u.id === user.id)[0],
+//     })),
+//     isActive: state.modules.active === 'collaborators',
+//     isNext: state.modules.next.includes('collaborators'),
+//     ownerId,
+//     canManage,
+//   };
+// };
 
-function mergeProps(state, dispatch, own) {
-  return {
-    ...state,
-    ...dispatch,
-    ...own,
-  };
-}
+// function mergeProps(state, dispatch, own) {
+//   return {
+//     ...state,
+//     ...dispatch,
+//     ...own,
+//   };
+// }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Collaborators));
+// export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Collaborators));

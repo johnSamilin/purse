@@ -10,7 +10,7 @@ import {
   Select,
   Input,
 } from 'components';
-import { Field } from 'redux-form';
+// import { Field } from 'redux-form';
 
 import './style.scss';
 
@@ -70,18 +70,18 @@ export const Construct = (props) => {
     >
       <Header title="Create new budget" backurl="/" />
       <div {...classes('title')}>
-        <Field component={Title} {...classes('title-input')} name={'title'} />
+        {/*<Field component={Title} {...classes('title-input')} name={'title'} />*/}
       </div>
       <div {...classes('subtitle')}>
-        <Field component={Currency} {...classes('select')} name={'currency'} />
+        {/*<Field component={Currency} {...classes('select')} name={'currency'} />*/}
       </div>
       <div {...classes('users')}>
         {users && users.map((user, k) => <ListItem index={k} {...classes('user')}>
           <UserInfo {...user} />
-          <Field
+          {/*<Field
             component={Checkbox}
             name={`invitedUsers[${k}]`}
-          />
+          />*/}
         </ListItem>)}
       </div>
       <Button

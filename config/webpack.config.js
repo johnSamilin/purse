@@ -1,4 +1,3 @@
-const argv = require('yargs').argv;
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -61,7 +60,7 @@ webpackConfig.plugins = [
   new ExtractTextPlugin('[name].css'),
   new HtmlWebpackPlugin({
     template: project.paths.client('index.html'),
-    hash: true,
+    hash: false,
     favicon: project.paths.public('favicon.ico'),
     filename: 'index.html',
     inject: 'body',
@@ -73,7 +72,7 @@ webpackConfig.plugins = [
 
 // Ensure that the compiler exits on errors during testing so that
 // they do not get skipped and misreported.
-if (__TEST__ && !argv.watch) {
+if (__TEST__) {
   webpackConfig.plugins.push(function () {
     this.plugin('done', (stats) => {
       if (stats.compilation.errors.length) {
@@ -94,56 +93,61 @@ if (__TEST__ && !argv.watch) {
 
 if (__DEV__) {
   debug('Enabling plugins for live development (HMR, NoErrors).');
-  webpackConfig.plugins.push(
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
-  );
+  webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+  webpackConfig.devServer = {
+    contentBase: project.paths.dist(),
+    historyApiFallback: true,
+    port: project.server_port,
+    hot: true,
+    stats: {
+      warnings: false,
+    },
+  };
 } else if (__PROD__ || __TEST__) {
   debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
-  webpackConfig.plugins.push(
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        unused: true,
-        dead_code: true,
-        warnings: false,
+  webpackConfig.devtool = 'none';
+  webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
+  webpackConfig.plugins.push(new webpack.optimize.DedupePlugin());
+  webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
+    compress: {
+      unused: true,
+      dead_code: true,
+      warnings: false,
+    },
+    mangle: {
+      except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
+    },
+  }));
+  webpackConfig.plugins.push(new webpack.optimize.AggressiveMergingPlugin());
+  webpackConfig.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    minChunks(module) {
+      return module.context && module.context.indexOf('node_modules') !== -1;
+    },
+  }));
+  webpackConfig.plugins.push(new webpack.optimize.CommonsChunkPlugin({
+    async: 'commons',
+    minChunks(module, count) {
+      return count >= 2;
+    },
+  }));
+  webpackConfig.plugins.push(new webpack.HashedModuleIdsPlugin({
+    hashFunction: 'sha256',
+    hashDigest: 'hex',
+    hashDigestLength: 7,
+  }));
+  webpackConfig.plugins.push(new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/));
+  webpackConfig.plugins.push(new OfflinePlugin({
+    externals: ['https://fonts.gstatic.com/s/materialicons/v22/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2'],
+    autoUpdate: true,
+    cacheMaps: [
+      {
+        match: /\/(login|create|budget(s)?(\/*)?)/gi,
+        to: '/',
+        requestTypes: ['navigate'],
       },
-      mangle: {
-        except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
-      },
-    }),
-    new webpack.optimize.AggressiveMergingPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks(module) {
-        return module.context && module.context.indexOf('node_modules') !== -1;
-      },
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      async: 'commons',
-      minChunks(module, count) {
-        return count >= 2;
-      },
-    }),
-    new webpack.HashedModuleIdsPlugin({
-      hashFunction: 'sha256',
-      hashDigest: 'hex',
-      hashDigestLength: 7,
-    }),
-    new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/),
-    new OfflinePlugin({
-      externals: ['https://fonts.gstatic.com/s/materialicons/v22/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2'],
-      autoUpdate: true,
-      cacheMaps: [
-        {
-          match: /\/(login|create|budget(s)?(\/*)?)/gi,
-          to: '/',
-          requestTypes: ['navigate'],
-        },
-      ],
-    }),
-  );
+    ],
+  }));
 }
 
 // ------------------------------------
@@ -192,7 +196,7 @@ webpackConfig.module.rules.push({
       {
         loader: 'sass-loader?sourceMap',
         options: {
-          includePaths: project.paths.client('styles'),
+          includePaths: [project.paths.client('styles')],
         },
       },
     ],
@@ -215,15 +219,13 @@ webpackConfig.module.rules.push({
 
 // File loaders
 /* eslint-disable */
-webpackConfig.module.rules.push(
-  { test: /\.woff(\?.*)?$/,  use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff'}] },
-  { test: /\.woff2(\?.*)?$/, use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2'}] },
-  { test: /\.otf(\?.*)?$/,   use: [{ loader: 'file-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=font/opentype'}] },
-  { test: /\.ttf(\?.*)?$/,   use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream'}] },
-  { test: /\.eot(\?.*)?$/,   use: [{ loader: 'file-loader?prefix=fonts/&name=[path][name].[ext]'}] },
-  { test: /\.svg(\?.*)?$/,   use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml'}] },
-  { test: /\.(png|jpg)$/,    use: [{ loader: 'url-loader?limit=8192'}] },
-)
+  webpackConfig.module.rules.push({ test: /\.woff(\?.*)?$/,  use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff'}] });
+  webpackConfig.module.rules.push({ test: /\.woff2(\?.*)?$/, use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/font-woff2'}] });
+  webpackConfig.module.rules.push({ test: /\.otf(\?.*)?$/,   use: [{ loader: 'file-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=font/opentype'}] });
+  webpackConfig.module.rules.push({ test: /\.ttf(\?.*)?$/,   use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=application/octet-stream'}] });
+  webpackConfig.module.rules.push({ test: /\.eot(\?.*)?$/,   use: [{ loader: 'file-loader?prefix=fonts/&name=[path][name].[ext]'}] });
+  webpackConfig.module.rules.push({ test: /\.svg(\?.*)?$/,   use: [{ loader: 'url-loader?prefix=fonts/&name=[path][name].[ext]&limit=10000&mimetype=image/svg+xml'}] });
+  webpackConfig.module.rules.push({ test: /\.(png|jpg)$/,    use: [{ loader: 'url-loader?limit=8192'}] });
 /* eslint-enable */
 
 module.exports = webpackConfig;

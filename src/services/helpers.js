@@ -68,3 +68,14 @@ export function mapTransactionsToBudgets(transactions) {
 
   return map;
 }
+
+export function mapSeenTransactionsToBudgets(transactions) {
+  const map = {};
+  if (transactions !== null) {
+    transactions.forEach((transaction) => {
+      map[transaction.budgetId] = transaction.transactions;
+    });
+  }
+
+  return map;
+}

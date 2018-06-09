@@ -1,3 +1,4 @@
+const namespace = 'budgets';
 const paths = {
   budget: id => `/budgets/${id}`,
   construct: () => '/create',
@@ -9,4 +10,5 @@ const apiPaths = {
 export {
   apiPaths,
   paths,
+  namespace,
 };

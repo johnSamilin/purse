@@ -3,10 +3,8 @@ import * as RxDB from 'rxdb';
 import some from 'lodash/some';
 import schemas from './schema';
 import migrations from './migrations';
-import { actions as budgetsActions } from 'routes/Budgets/modules/actions';
-import { actions as transactionsActions } from 'routes/Budget/modules/actions';
-import { actions as usersActions } from 'modules/users/actions';
-import { mapTransactionsToBudgets } from 'services/helpers';
+import { GlobalStore } from '../store/globalStore';
+import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets } from '../services/helpers';
 RxDB.plugin(require('pouchdb-adapter-idb'));
 // RxDB.plugin(require('pouchdb-replication')); //enable syncing
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
@@ -14,93 +12,111 @@ RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 
 export const dbUrl = 'https://purse.smileupps.com';
 
-export class Database {
-  static instance = null;
-  static budgetsSync = null;
-  static transactionsSync = null;
-  static usersSync = null;
-  static isSyncing = false;
-
-  static budgetsRequested(store) {
-    store.dispatch(budgetsActions.requestStarted());
-  }
-  
-  static budgetsChanged(store, budgets) {
-    store.dispatch(budgetsActions.updated(budgets));
-  }
-  
-  static usersChanged(store, users) {
-    store.dispatch(usersActions.updated(users));
-  }
-  
-  static transactionsChanged(store, transactions) {
-    const map = mapTransactionsToBudgets(transactions);
-    store.dispatch(transactionsActions.transactions.updated(map));
-  }
-  
-  static seenTransactionsChanged(store, transactions) {
-    const map = {};
-    if (transactions !== null) {
-      transactions.forEach((transaction) => {
-        map[transaction.budgetId] = transaction.transactions;
-      });
+class Model {
+  async init() {
+    if (this.instance) {
+      return this.instance;
     }
-    store.dispatch(transactionsActions.transactions.seen(map));
-  }
-
-  static async init() {
-    if (Database.instance) {
-      return Database.instance;
-    }
-    Database.instance = await RxDB.create({
+    this.instance = await RxDB.create({
       name: 'purse',
       adapter: 'idb',
       password: 'myPassword',
       multiInstance: false,
     });
 
-    // budgets
-    await Database.instance.collection({
-      name: 'budgets',
-      schema: schemas.budgets,
-      migrationStrategies: migrations.budgets,
+    this.budgetsSync = null;
+    this.transactionsSync = null;
+    this.usersSync = null;
+    this.isSyncing = false;
+
+    const promise = this.createUsersCollection();
+    GlobalStore.modules.users.activeUser.subscribe(userInfo => this.onUserChanged(userInfo));
+    GlobalStore.budgets.subscribe((budgets) => {
+      const budgetIds = budgets.map(budget => budget.id);
+      this.syncTransactions(budgetIds);
     });
 
-    // transactions
-    await Database.instance.collection({
-      name: 'transactions',
-      schema: schemas.transactions,
-      migrationStrategies: migrations.transactions,
-    });
+    return promise;
+  }
 
+  async createUsersCollection() {
     // users
-    await Database.instance.collection({
+    await this.instance.collection({
       name: 'users',
       schema: schemas.users,
       migrationStrategies: migrations.users,
     });
+  }
 
-    // seen transactions
-    await Database.instance.collection({
-      name: 'seentransactions',
-      schema: schemas.seenTransactions,
-      migrationStrategies: migrations.seenTransactions,
+  dropUserRelatedCollections() {
+    console.tlog('destroy user related collections')
+    const promises = Promise.all([
+      this.instance.collections.budgets.destroy(),
+      this.instance.collections.transactions.destroy(),
+      this.instance.collections.seentransactions.destroy(),
+    ]);
+    promises.catch(er => {});
+
+    return promises;
+  }
+
+  createUserRelatedCollections() {
+    console.tlog('create user related collections')
+    const promises = Promise.all([
+      // budgets
+      this.instance.collection({
+        name: 'budgets',
+        schema: schemas.budgets,
+        migrationStrategies: migrations.budgets,
+      }),
+      // transactions
+      this.instance.collection({
+        name: 'transactions',
+        schema: schemas.transactions,
+        migrationStrategies: migrations.transactions,
+      }),
+      // seen transactions
+      this.instance.collection({
+        name: 'seentransactions',
+        schema: schemas.seenTransactions,
+        migrationStrategies: migrations.seenTransactions,
+      }),
+    ]);
+    promises.then(() => this.mapCollectionsToStore()).catch(er => {});
+
+    return promises;
+  }
+
+  mapCollectionsToStore() {
+    this.instance.collections.users.find().$.subscribe((users) => {
+      GlobalStore.users.value = users;
+    });
+    this.instance.collections.budgets.find().$.subscribe((budgets) => {
+      GlobalStore.budgets.value = budgets;
+    });
+    this.instance.collections.transactions.find().$.subscribe((transactions) => {
+      GlobalStore.transactions.value = mapTransactionsToBudgets(transactions);
+    });
+    this.instance.collections.seentransactions.find().$.subscribe((seentransactions) => {
+      GlobalStore.seentransactions.value = mapSeenTransactionsToBudgets(seentransactions);
     });
   }
 
-  static async bindToStore(store) {
-    Database.budgetsRequested(store);
-    await Database.instance.collections.budgets.find().$.subscribe(Database.budgetsChanged.bind(null, store));
-    await Database.instance.collections.transactions.find().$.subscribe(Database.transactionsChanged.bind(null, store));
-    await Database.instance.collections.users.find().$.subscribe(Database.usersChanged.bind(null, store));
-    await Database.instance.collections.seentransactions.find().$.subscribe(Database.seenTransactionsChanged.bind(null, store));
+  async onUserChanged(newUser) {
+    console.tlog('user changed', newUser);
+    if (newUser) {
+      await this.createUserRelatedCollections();
+      this.syncBudgets(newUser.id); // will trigger syncTransactions via observable subscrition
+    } else {
+      this.dropUserRelatedCollections();
+    }
   }
 
-  static syncUsers() {
-    if (!Database.instance) {
-      return new Promise((resolve, reject) => reject());
+  syncUsers() {
+    if (!this.instance) {
+      return Promise.reject();
     }
-    Database.usersSync = Database.instance.users.sync({
+    this.usersSync = this.instance.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
         live: false,
@@ -108,31 +124,31 @@ export class Database {
       },
     });
 
-    return Database.usersSync;
+    return this.usersSync;
   }
 
-  static syncBudgets(userId) {
-    if (!Database.instance) {
-      return new Promise((resolve, reject) => reject());
+  syncBudgets(userId) {
+    if (!this.instance) {
+      return Promise.reject();
     }
-    Database.budgetsSync = Database.instance.collections.budgets.sync({
+    this.budgetsSync = this.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
         live: true,
         retry: true,
         filter: doc => some(doc.users, user => user.id === userId),
-      }  
+      },
     });
 
-    return Database.budgetsSync;
+    return this.budgetsSync;
   }
 
-  static syncTransactions(budgetIds) {
-    if (!Database.instance) {
-      return new Promise((resolve, reject) => reject());
+  syncTransactions(budgetIds) {
+    if (!this.instance) {
+      return Promise.reject();
     }
     //TODO: сделать пооптимальней
-    Database.transactionsSync = Database.instance.transactions.sync({
+    this.transactionsSync = this.instance.transactions.sync({
       remote: `${dbUrl}/transactions`,
       options: {
         live: true,
@@ -141,28 +157,32 @@ export class Database {
       },
     });
 
-    return Database.transactionsSync;
+    return this.transactionsSync;
   }
 
-  static async startSync({ userId, budgetIds = [] }) {
-    console.info('syncyng started')
-    await Database.syncBudgets(userId);
-    await Database.syncTransactions(budgetIds);
+  async startSync({ userId, budgetIds = [] }) {
+    console.tlog('syncyng started')
+    await this.syncBudgets(userId);
+    await this.syncTransactions(budgetIds);
     
-    Database.isSyncing = true;
+    this.isSyncing = true;
   }
 
-  static async stopSync() {
-    console.info('syncyng stopped')
+  async stopSync() {
+    console.tlog('syncyng stopped')
     try {
       const promises = Promise.all([
-        (await Database.budgetsSync).cancel(),
-        (await Database.transactionsSync).cancel(),
+        (await this.budgetsSync).cancel(),
+        (await this.transactionsSync).cancel(),
       ]);
       promises.then(() => {
-        Database.isSyncing = false;
+        this.isSyncing = false;
       });
       return promises;
-    } catch(er) {}
+    } catch(er) {
+      console.error(er);
+    }
   }
 }
+
+export const Database = new Model();

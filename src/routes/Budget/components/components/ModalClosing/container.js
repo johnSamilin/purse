@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import { Component } from 'react';
 import { decisions } from 'routes/Budget/const';
 import { budgetStates } from 'const';
@@ -6,8 +6,8 @@ import select from 'routes/Budget/modules/selectors';
 import { Database } from 'database';
 import presenter from './presenter';
 
-@connect(mapStateToProps)
-class ModalClosing extends Component {
+// @connect(mapStateToProps)
+export class ModalClosing extends Component {
   componentWillMount() {
     const budgetsQuery = Database.instance.budgets.findOne(this.props.id);
     this.budgetDocument = budgetsQuery
@@ -63,4 +63,3 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default ModalClosing;

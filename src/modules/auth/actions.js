@@ -1,53 +1,6 @@
 import Api from 'services/api';
 import { apiPaths } from 'routes/Login/const';
-import module from './index';
-
-// ------------------------------------
-// Constants
-// ------------------------------------
-const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN';
-const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT';
-const AUTH_USER_DISPATCHED = 'AUTH_USER_DISPATCHED';
-
-// ------------------------------------
-// Actions
-// ------------------------------------
-function doLogin() {
-  return {
-    type: AUTH_LOGGED_IN,
-    payload: {
-      loggedIn: true,
-    },
-  };
-}
-
-function doLogout() {
-  return {
-    type: AUTH_LOGGED_OUT,
-    payload: {
-      loggedIn: false,
-    },
-  };
-}
-
-function dispatch(userInfo) {
-  return {
-    type: AUTH_USER_DISPATCHED,
-    payload: {
-      userInfo,
-    },
-  };
-}
-
-function login(token) {
-  module.setToken(token);
-  return doLogin();
-}
-
-function logout() {
-  module.setToken('');
-  return doLogout();
-}
+import { GlobalStore } from '../../store/globalStore';
 
 function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
   return () => Api.doPost(
@@ -61,28 +14,18 @@ function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
   );
 }
 
+function login(token) {
+  GlobalStore.modules.auth.token.value = token;
+  GlobalStore.modules.auth.isLoggedIn.value = true;
+}
+
+function logout() {
+  GlobalStore.modules.auth.token.value = null;
+  GlobalStore.modules.auth.isLoggedIn.value = null;
+}
+
 export const actions = {
+  getToken,
   login,
   logout,
-  getToken,
-  dispatch,
 };
-
-// ------------------------------------
-// Action Handlers
-// ------------------------------------
-const ACTION_HANDLERS = {
-  [AUTH_LOGGED_IN]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
-  [AUTH_LOGGED_OUT]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
-  [AUTH_USER_DISPATCHED]: (state, action) => ({ ...state, data: { ...state.data, ...action.payload } }),
-};
-
-// ------------------------------------
-// Reducer
-// ------------------------------------
-const initialState = {};
-export default function authReducer(state = initialState, action) {
-  const handler = ACTION_HANDLERS[action.type];
-
-  return handler ? handler(state, action) : state;
-}
