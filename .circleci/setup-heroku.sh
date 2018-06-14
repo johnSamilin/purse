@@ -25,14 +25,3 @@ EOF
   cat >> dist/index.php << EOF
   <?php include_once('index.html'); ?>
 EOF
-
-  cat >> dist/.htaccess << EOF
-  <IfModule mod_rewrite.c>
-    #Options -MultiViews
-
-    RewriteEngine On
-    #RewriteBase /
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.html [QSA,L]
-  </IfModule>
-EOF
