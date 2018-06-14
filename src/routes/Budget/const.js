@@ -11,6 +11,7 @@ const apiPaths = {
 };
 
 const paths = {
+  budget: id => `/budgets/${id}`,
   collaborators: budgetId => `/budgets/${budgetId}/collaborators`,
 };
 
