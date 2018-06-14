@@ -68,7 +68,8 @@ class Budget extends Component {
     if (!this.budgetDocument) {
       const remote = await this.props.getBudgetFromServer(id);
       if (remote) {
-        Database.instance.budgets.insert(remote);
+        const doc = await Database.instance.budgets.insert(remote);
+        this.props.selectBudget(doc);
       }
 
       return;

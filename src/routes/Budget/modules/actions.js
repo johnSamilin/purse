@@ -74,8 +74,7 @@ function getBudgetFromServer(id) {
     dispatch(requestBudget(true));
     const request = api.doGet(
       apiPaths.budget(id),
-      {},
-      data => dispatch(selectBudget(data))
+      {}
     );
     request.finally(() => dispatch(requestBudget(false)));
   };
