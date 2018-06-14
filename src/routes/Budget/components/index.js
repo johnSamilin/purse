@@ -51,10 +51,10 @@ export const Budget = (props) => {
           {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}
         </Button>
         <Button
-          onClick={() => share('Присоединяйтесь к общему бюджету', budget.title, `${apiPaths.frontend()}${paths.budget(budget.id)}`)}
+          onClick={() => share('Присоединяйтесь к общему бюджету', budget.title, `${apiPaths.frontend}${paths.budget(budget.id)}`)}
           {...classes({
             element: 'share',
-            extra: 'mi mi-person_add',
+            extra: 'mi mi-person-add',
           })}
         >
         </Button>

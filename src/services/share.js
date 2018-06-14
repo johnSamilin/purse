@@ -5,11 +5,15 @@ export function share(title, text, url) {
     navigator.share({
       title,
       text,
-      url
+      url,
     });
   } else {
-    Clipboard.writeText(`${text}: ${url}`)
-      .then(() => notify('Текст скопирован в буфер обмена'))
-      .catch(() => alert(`${text}: ${url}`));
+    try {
+      Clipboard.writeText(`${title} ${text}: ${url}`)
+        .then(() => notify('Текст скопирован в буфер обмена'))
+        .catch(() => alert(`${text}: ${url}`));
+    } catch(er) {
+      alert(`${title} ${text}: ${url}`)
+    }
   }
 }
