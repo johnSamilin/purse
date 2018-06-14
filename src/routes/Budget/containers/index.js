@@ -65,6 +65,10 @@ class Budget extends Component {
   async loadBudget(id) {
     const budgetsQuery = Database.instance.budgets.findOne(id);
     this.budgetDocument = await budgetsQuery.exec();
+    if (!this.budgetDocument) {
+      this.props.getBudgetFromServer(id);
+      return;
+    }
     this.isLoaded = true;
     if (this.budgetSub) {
       this.budgetSub.unsubscribe();
@@ -223,6 +227,7 @@ const mapDispatchToProps = {
   clearTransactions: actions.transactions.clear,
   clearBudget: actions.budget.clear,
   redirect: push,
+  getBudgetFromServer: actions.budget.getBudgetFromServer,
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -242,6 +247,7 @@ const mapStateToProps = (state, ownProps) => {
     });
   }
   const budgetsLoading = get(state, 'budgets.isLoading', false);
+  const isLoading = budgetsLoading || get(state, 'budget.isLoading', false);
   const newUsersCount = Object.values(usersList).filter(user => [
     userStatuses.pending,
     userStatuses.invited,
@@ -259,6 +265,7 @@ const mapStateToProps = (state, ownProps) => {
     isOwner,
     budgetsLoading,
     newUsersCount,
+    isLoading,
   };
 };
 

@@ -12,6 +12,7 @@ export const BUDGET_UPDATED = 'BUDGET_UPDATED';
 export const TRANSACTIONS_SELECTED = 'TRANSACTIONS_SELECTED';
 export const TRANSACTIONS_UPDATED = 'TRANSACTIONS_UPDATED';
 export const SEEN_TRANSACTIONS_CHANGED = 'SEEN_TRANSACTIONS_CHANGED';
+export const BUDGET_REQUESTED = 'BUDGET_REQUESTED';
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -25,6 +26,13 @@ function updateBudget(budget) {
   return {
     type: BUDGET_UPDATED,
     payload: budget,
+  };
+}
+
+function requestBudget(isLoading = false) {
+  return {
+    type: BUDGET_REQUESTED,
+    payload: isLoading,
   };
 }
 
@@ -61,12 +69,16 @@ function clearTransactions() {
   return updateTransactions([]);
 }
 
-function loadBudget(id) {
-  return dispatch => api.doGet(
-    apiPaths.budget(id),
-    {},
-    res => dispatch(updateBudget(res))
-  );
+function getBudgetFromServer(id) {
+  return (dispatch) => {
+    dispatch(requestBudget(true));
+    const request = api.doGet(
+      apiPaths.budget(id),
+      {},
+      data => dispatch(selectBudget(data))
+    );
+    request.finally(() => dispatch(requestBudget(false)));
+  };
 }
 
 function loadTransactions(budgetId) {
@@ -81,8 +93,8 @@ export const actions = {
   budget: {
     select: selectBudget,
     update: updateBudget,
-    load: loadBudget,
     clear: clearBudget,
+    getBudgetFromServer,
   },
   transactions: {
     select: updateTransactions,
@@ -99,6 +111,7 @@ export const actions = {
 const BUDGET_ACTION_HANDLERS = {
   [BUDGET_SELECTED]: (state, action) => ({ ...state, data: action.payload }),
   [BUDGET_UPDATED]: (state, action) => ({ ...state, data: action.payload }),
+  [BUDGET_REQUESTED]: (state, action) => ({ ...state, isLoading: action.payload }),
 };
 const TRANSACTIONS_ACTION_HANDLERS = {
   [TRANSACTIONS_SELECTED]: (state, action) => ({ ...state, data: action.payload }),
