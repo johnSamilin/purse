@@ -5,6 +5,7 @@ jobs:
       only:
         - develop
         - master
+        - feature/web-share
     steps:
       - checkout
       - run: npm install
