@@ -78,9 +78,11 @@ class Login extends Component {
         });
         await Database.syncUsers();
         const changeEvent = Database.usersSync.complete$;
-        changeEvent.subscribe(() => {
-          this.props.login(res.access_token);
-          this.setIsLoading(false);              
+        changeEvent.subscribe((isComplete) => {
+          if (isComplete !== false) {
+            this.props.login(res.access_token);
+            this.setIsLoading(false);
+          }            
         });
       } catch(er) {
         notify('Попытка входа не удалась');

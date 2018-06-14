@@ -17,7 +17,11 @@ class Budgets extends Component {
     const token = authModule.getToken();
     // когда только что залогинились
     await Database.syncUsers();
-    Database.usersSync.complete$.subscribe(() => this.getUserInfo(token));
+    Database.usersSync.complete$.subscribe((isComplete) => {
+      if (isComplete !== false) {
+        this.getUserInfo(token)
+      }
+    });
   }
 
   async componentWillReceiveProps(nextProps) {

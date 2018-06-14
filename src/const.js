@@ -6,7 +6,7 @@ const apiPaths = {
     ? 'http://localhost/purse-back/index.php'
     : 'https://purse-back.herokuapp.com',
   frontend: __DEV__
-    ? 'http://localhost:3000/'
+    ? 'http://localhost:3000'
     : 'https://purseapp.herokuapp.com',
 };
 const accountkitRedirect = apiPaths.frontend;

@@ -26,6 +26,7 @@ jobs:
             git config user.name "Heroku"
             heroku git:remote -a purseapp
             git add ./*
+            git add ./.htaccess
             git commit -m "dist"
             git push heroku master --force
     docker:

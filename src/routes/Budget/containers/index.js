@@ -32,7 +32,6 @@ class Budget extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log(Database.instance.collections.transactions);
     if (this.props.id !== newProps.id) {
       if (newProps.id) {
         this.loadBudget(newProps.id);
