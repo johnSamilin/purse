@@ -48,9 +48,11 @@ export class Login extends Page {
   async login(token) {
     this.setIsLoading(true);
     await Database.syncUsers();
-    Database.usersSync.complete$.subscribe(() => {
-      actions.login(token);
-      this.setIsLoading(false);
+    Database.usersSync.complete$.subscribe((isComplete) => {
+      if (isComplete !== false) {
+        actions.login(token);
+        this.setIsLoading(false);
+      }
     });
   }
 

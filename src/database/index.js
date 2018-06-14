@@ -107,7 +107,7 @@ class Model {
     console.tlog('user changed', newUser);
     if (newUser) {
       await this.createUserRelatedCollections();
-      this.syncBudgets(newUser.id); // will trigger syncTransactions via observable subscrition
+      this.syncBudgets(); // will trigger syncTransactions via observable subscrition
     } else {
       this.dropUserRelatedCollections();
     }
@@ -128,7 +128,7 @@ class Model {
     return this.usersSync;
   }
 
-  syncBudgets(userId) {
+  syncBudgets() {
     if (!this.instance) {
       return Promise.reject();
     }
@@ -137,7 +137,7 @@ class Model {
       options: {
         live: true,
         retry: true,
-        filter: doc => some(doc.users, user => user.id === userId),
+        filter: doc => some(doc.users, user => user.id === GlobalStore.modules.user.activeUser.value.id),
       },
     });
 
@@ -161,10 +161,10 @@ class Model {
     return this.transactionsSync;
   }
 
-  async startSync({ userId, budgetIds = [] }) {
+  async startSync() {
     console.tlog('syncyng started')
-    await this.syncBudgets(userId);
-    await this.syncTransactions(budgetIds);
+    await this.syncBudgets();
+    await this.syncTransactions(this.budgetIds.value);
     
     this.isSyncing = true;
   }

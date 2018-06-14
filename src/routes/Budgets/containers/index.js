@@ -33,8 +33,8 @@ export class Budgets extends Page {
     const token = GlobalStore.modules.auth.token.value;
     // когда только что залогинились
     await Database.syncUsers();
-    Database.usersSync.complete$.subscribe(() => {
-      if (!this.state.userInfo.id) {
+    Database.usersSync.complete$.subscribe((isComplete) => {
+      if (isComplete !== false) {
         this.getUserInfo(token);
       }
     });
