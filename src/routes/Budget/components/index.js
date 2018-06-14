@@ -3,6 +3,7 @@ import BEMHelper from 'react-bem-helper';
 import {
   Header,
   Button,
+  LoadingPanel,
 } from 'components';
 import get from 'lodash/get';
 import { budgetStates, apiPaths } from 'const';
@@ -94,7 +95,7 @@ export const Budget = (props) => {
               />
               : null,
           ]
-          : <EmptyState />
+        : [<EmptyState />, <LoadingPanel isActive={isLoading} />]
         }
       </div>
       {budget.state === budgetStates.closing &&
