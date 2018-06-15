@@ -49,6 +49,11 @@ export const logger = {
       console.error(message);
     }
   },
+  log: (message) => {
+    if (__DEV__) {
+      console.log(message);
+    }
+  },
 };
 
 export function mapTransactionsToBudgets(transactions) {
