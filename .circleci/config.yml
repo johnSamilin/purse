@@ -8,7 +8,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm run deploy:dev
+      - run: npm run deploy:prod
       - run:
           name: Run setup script
           command: bash .circleci/setup-heroku.sh
