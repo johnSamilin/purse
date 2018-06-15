@@ -105,7 +105,7 @@ if (__DEV__) {
   };
 } else if (__PROD__ || __TEST__) {
   debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
-  webpackConfig.devtool = 'none';
+  // webpackConfig.devtool = 'none';
   webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
   webpackConfig.plugins.push(new webpack.optimize.DedupePlugin());
   webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
