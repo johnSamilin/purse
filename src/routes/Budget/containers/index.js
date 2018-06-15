@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { push } from 'react-router-redux';
+import * as RxDB from 'rxdb';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import isEqual from 'lodash/isEqual';
@@ -10,6 +11,7 @@ import { actions } from '../modules/actions';
 import presenter from '../components';
 import select from '../modules/selectors';
 import { paths, userStatuses } from '../const';
+import { logger } from '../../../services/helpers';
 
 class Budget extends Component {
   constructor() {
@@ -55,6 +57,10 @@ class Budget extends Component {
 
   onBudgetUpdated(budget) {
     this.props.selectBudget(budget);
+    // повторно выбираем бюджет, если он был загружен с сервера
+    if (!RxDB.isRxDocument(this.budgetDocument)) {
+      this.loadBudget(budget.id);
+    }
   }
 
   onTransactionsUpdated(transactions) {
@@ -64,17 +70,24 @@ class Budget extends Component {
 
   async loadBudget(id) {
     const budgetsQuery = Database.instance.budgets.findOne(id);
+    // отражаем изменения в бюджете
+    budgetsQuery.$.subscribe((event) => {
+      if (Array.isArray(event)) {
+        this.onBudgetUpdated(event[0]);
+      }
+    });
     this.budgetDocument = await budgetsQuery.exec();
     if (!this.budgetDocument) {
+      logger.log('Грузим бюджет с сервера');
       const remote = await this.props.getBudgetFromServer(id);
       if (remote) {
-        const doc = await Database.instance.budgets.insert(remote);
-        this.props.selectBudget(doc);
+        this.props.selectBudget(remote);
+        this.budgetDocument = remote;
       }
 
       return;
     }
-    this.isLoaded = true;
+    logger.log('Выбираем бюджет из базы');
     if (this.budgetSub) {
       this.budgetSub.unsubscribe();
     }
@@ -92,13 +105,6 @@ class Budget extends Component {
     this.transactionsQuery
       .exec()
       .then(this.onTransactionsUpdated);
-
-    // отражаем изменения в бюджете
-    budgetsQuery.$.subscribe((event) => {
-      if (Array.isArray(event)) {
-        this.onBudgetUpdated(event[0]);
-      }
-    });
   }
 
   unload() {
@@ -108,11 +114,10 @@ class Budget extends Component {
     } catch (er) {
       // ignore
     }
-    this.isLoaded = false;
   }
 
   requestMembership() {
-    if (this.props.id) {
+    if (RxDB.isRxDocument(this.budgetDocument)) {
       let found = false;
       const users = this.budgetDocument.users.map((u) => {
         if (u.id === this.props.currentUserId) {
@@ -132,6 +137,8 @@ class Budget extends Component {
       }
       this.budgetDocument.users = users;
       this.budgetDocument.save();
+    } else {
+      this.props.remoteRequestMembership(this.budgetDocument.id);
     }
   }
 
@@ -150,7 +157,7 @@ class Budget extends Component {
   }
 
   toggleTransactionState(id) {
-    if (this.budgetDocument.state != 'opened') {
+    if (this.budgetDocument.state != 'opened' || !RxDB.isRxDocument(this.budgetDocument)) {
       return false;
     }
     const transaction = this.props.transactions.filter(t => t.id === id)[0];
@@ -233,6 +240,7 @@ const mapDispatchToProps = {
   clearBudget: actions.budget.clear,
   redirect: push,
   getBudgetFromServer: actions.budget.getBudgetFromServer,
+  remoteRequestMembership: actions.budget.remoteRequestMembership,
 };
 
 const mapStateToProps = (state, ownProps) => {

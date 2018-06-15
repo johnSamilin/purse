@@ -72,10 +72,15 @@ function clearTransactions() {
 function getBudgetFromServer(id) {
   return (dispatch) => {
     dispatch(requestBudget(true));
-    const request = api.doGet(
-      apiPaths.budget(id),
-      {}
-    );
+    const request = api.doGet(apiPaths.budget(id), {});
+    request.finally(() => dispatch(requestBudget(false)));
+  };
+}
+
+function remoteRequestMembership(budgetId) {
+  return (dispatch) => {
+    dispatch(requestBudget(true));
+    const request = api.doPost(apiPaths.membership(budgetId), {});
     request.finally(() => dispatch(requestBudget(false)));
   };
 }
@@ -94,6 +99,7 @@ export const actions = {
     update: updateBudget,
     clear: clearBudget,
     getBudgetFromServer,
+    remoteRequestMembership,
   },
   transactions: {
     select: updateTransactions,

@@ -5,11 +5,10 @@ jobs:
       only:
         - develop
         - master
-        - feature/web-share
     steps:
       - checkout
       - run: npm install
-      - run: npm run deploy:prod
+      - run: npm run deploy:dev
       - run:
           name: Run setup script
           command: bash .circleci/setup-heroku.sh
