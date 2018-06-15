@@ -78,16 +78,17 @@ class Budget extends Component {
     });
     this.budgetDocument = await budgetsQuery.exec();
     if (!this.budgetDocument) {
-      logger.log('Грузим бюджет с сервера');
-      const remote = await this.props.getBudgetFromServer(id);
-      if (remote) {
-        this.props.selectBudget(remote);
-        this.budgetDocument = remote;
-      }
+      console.warn('Грузим бюджет с сервера');
+      const remote = await this.props.getBudgetFromServer(id, (remote) => {
+        if (remote) {
+          this.props.selectBudget(remote);
+          this.budgetDocument = remote;
+        }
+      });
 
       return;
     }
-    logger.log('Выбираем бюджет из базы');
+    console.warn('Выбираем бюджет из базы');
     if (this.budgetSub) {
       this.budgetSub.unsubscribe();
     }

@@ -69,10 +69,10 @@ function clearTransactions() {
   return updateTransactions([]);
 }
 
-function getBudgetFromServer(id) {
+function getBudgetFromServer(id, callback) {
   return (dispatch) => {
     dispatch(requestBudget(true));
-    const request = api.doGet(apiPaths.budget(id), {});
+    const request = api.doGet(apiPaths.budget(id), {}, callback);
     request.finally(() => dispatch(requestBudget(false)));
   };
 }
