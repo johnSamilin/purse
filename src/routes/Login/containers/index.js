@@ -89,11 +89,7 @@ export class Login extends Page {
           csrf,
           ...params,
         });
-        await Database.syncUsers();
-        const changeEvent = Database.usersSync.complete$;
-        changeEvent.subscribe(() => {
-          this.login(res.access_token);
-        });
+        this.login(res.access_token);
       } catch(er) {
         notify('Попытка входа не удалась');
         console.error(er);

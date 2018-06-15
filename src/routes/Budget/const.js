@@ -8,9 +8,11 @@ const userStatusMessages = {
 const apiPaths = {
   budget: id => `/budgets/${id}`,
   transactions: budgetId => `/transactions/${budgetId}`,
+  membership: id => `/budgets/${id}/membership`,
 };
 
 const paths = {
+  budget: id => `/budgets/${id}`,
   collaborators: budgetId => `/budgets/${budgetId}/collaborators`,
 };
 

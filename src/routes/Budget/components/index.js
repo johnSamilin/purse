@@ -3,9 +3,10 @@ import BEMHelper from 'react-bem-helper';
 import {
   Header,
   Button,
+  LoadingPanel,
 } from 'components';
 import get from 'lodash/get';
-import { budgetStates } from 'const';
+import { budgetStates, apiPaths } from 'const';
 import ModalClosing from './components/ModalClosing';
 import EmptyState from './EmptyState';
 import Summary from './Summary';
@@ -13,6 +14,8 @@ import Transactions from './Transactions';
 import Status from './Status';
 import AddForm from './AddForm';
 import './style.scss';
+import { share } from '../../../services/share';
+import { paths } from '../const';
 
 export const Budget = (props) => {
   const {
@@ -47,6 +50,14 @@ export const Budget = (props) => {
           })}
         >
           {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}
+        </Button>
+        <Button
+          onClick={() => share('Присоединяйтесь к общему бюджету', budget.title, `${apiPaths.frontend}${paths.budget(budget.id)}`)}
+          {...classes({
+            element: 'share',
+            extra: 'mi mi-person-add',
+          })}
+        >
         </Button>
       </Header>
       <div {...classes('budget')}>
@@ -84,7 +95,7 @@ export const Budget = (props) => {
               />
               : null,
           ]
-          : <EmptyState />
+        : [<EmptyState />, <LoadingPanel isActive={isLoading} />]
         }
       </div>
       {budget.state === budgetStates.closing &&
