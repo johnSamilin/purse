@@ -14,74 +14,62 @@ import {
 
 import './style.scss';
 
-function Title({ input, className }) {
-  return (<Input
-    className={className}
-    placeholder="Название"
-    value={input.value}
-    onChange={input.onChange}
-  />);
-}
-
-function Currency({ input, className }) {
-  return (<Select
-    className={className}
-    value={input.value}
-    onChange={input.onChange}
-    options={currencies}
-  />);
-}
-
-function Checkbox({ input, className }) {
-  const classes = new BEMHelper('construct');
-  return (<div
-{...classes({
-    element: 'checkbox',
-    extra: 'mi mi-check',
-    modifiers: { checked: input.value },
-  })}
-  >
-    <input
-        type="checkbox"
-        value={input.value}
-        onChange={input.onChange}
-        id={input.name}
-      />
-    <label htmlFor={input.name} />
-  </div>);
-}
-
 export const Construct = (props) => {
   const {
+    getPageClasses,
     canCreate,
     users,
+    onChangeTitle,
+    onChangeCurrency,
+    onChangeInvitedUsers,
     onSubmit,
-    handleSubmit,
+    values,
   } = props;
 
   const classes = new BEMHelper('construct');
-  let pageClasses = new BEMHelper('page');
-  pageClasses = pageClasses({ modifiers: { next: props.isNext, active: props.isActive } }).className;
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
-      {...classes({ extra: pageClasses })}
+      onSubmit={onSubmit}
+      {...classes({ extra: getPageClasses() })}
     >
       <Header title="Create new budget" backurl="/" />
       <div {...classes('title')}>
-        {/*<Field component={Title} {...classes('title-input')} name={'title'} />*/}
+        <Input
+          {...classes('title-input')}
+          name={'title'}
+          placeholder="Название"
+          value={values.title}
+          onChange={e => onChangeTitle(e.target.value)}
+        />
       </div>
       <div {...classes('subtitle')}>
-        {/*<Field component={Currency} {...classes('select')} name={'currency'} />*/}
+        <Select
+          name={'currency'}
+          {...classes('select')}
+          value={values.currency}
+          onChange={e => onChangeCurrency(e.target.value)}
+          options={currencies}
+        />
       </div>
       <div {...classes('users')}>
         {users && users.map((user, k) => <ListItem index={k} {...classes('user')}>
           <UserInfo {...user} />
-          {/*<Field
-            component={Checkbox}
-            name={`invitedUsers[${k}]`}
-          />*/}
+          <div
+            {...classes({
+              element: 'checkbox',
+              extra: 'mi mi-check',
+              modifiers: { checked: values.invitedUsers.has(user.id) },
+            })}
+          >
+            <input
+              type="checkbox"
+              value={values.invitedUsers.has(user.id)}
+              onChange={() => onChangeInvitedUsers(user.id)}
+              id={`invitedUsers[${k}]`}
+              />
+            <label htmlFor={`invitedUsers[${k}]`} />
+          </div>
         </ListItem>)}
       </div>
       <Button

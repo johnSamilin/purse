@@ -1,12 +1,13 @@
 import { Route } from '../../providers/Route';
 import { namespace } from './const';
+import { namespace as constructNamespace } from 'routes/Constructor/const';
 import { Budgets } from './containers';
 
 class BudgetsRoute extends Route {
   constructor() {
     super();
     this.path = namespace;
-    this.nextRoutes = ['budget', 'constructor'];
+    this.nextRoutes = ['budget', constructNamespace];
   }
 
   getContainer() {

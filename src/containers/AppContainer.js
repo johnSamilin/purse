@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { browserHistory, Router } from 'react-router';
-// import { Provider } from 'react-redux';
-// import { syncHistoryWithStore } from 'react-router-redux';
 
 class AppContainer extends Component {
 
@@ -11,7 +9,6 @@ class AppContainer extends Component {
 
   render() {
     const { routes } = this.props;
-    // const history = syncHistoryWithStore(browserHistory, store);
 
     return (
       <div style={{ height: '100%' }}>

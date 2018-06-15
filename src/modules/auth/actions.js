@@ -1,6 +1,8 @@
-import Api from 'services/api';
 import { apiPaths } from 'routes/Login/const';
+import Api from 'services/api';
 import { GlobalStore } from '../../store/globalStore';
+
+export const LS_TOKEN_KEY = 'purse-token';
 
 function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
   return () => Api.doPost(
@@ -14,18 +16,25 @@ function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
   );
 }
 
+function restoreToken() {
+  return localStorage.getItem(LS_TOKEN_KEY);
+}
+
 function login(token) {
   GlobalStore.modules.auth.token.value = token;
   GlobalStore.modules.auth.isLoggedIn.value = true;
+  localStorage.setItem(LS_TOKEN_KEY, token);
 }
 
 function logout() {
   GlobalStore.modules.auth.token.value = null;
   GlobalStore.modules.auth.isLoggedIn.value = null;
+  localStorage.removeItem(LS_TOKEN_KEY);
 }
 
 export const actions = {
   getToken,
   login,
   logout,
+  restoreToken,
 };

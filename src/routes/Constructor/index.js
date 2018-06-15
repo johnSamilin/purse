@@ -1,27 +1,19 @@
-import { injectReducer } from '../../store/reducers';
-import { setActiveModule } from 'store/modules';
+import { Route } from '../../providers/Route';
+import { namespace } from './const';
+import { namespace as budgetsNamespace } from 'routes/Budgets/const';
+import { Construct } from './containers';
 
-const Construct = require('./containers').default;
+class ConstructRoute extends Route {
+  constructor() {
+    super();
+    this.path = namespace;
+    this.nextRoutes = [];
+    this.prevRoutes = [budgetsNamespace];
+  }
 
-export default (store) => {
-  const {
-    reducer,
-  } = require('./modules/actions').default;
-  injectReducer(store, { key: 'constructor', reducer });
+  getContainer() {
+    return Construct;
+  }
+}
 
-  return ({
-    path: 'create',
-    getComponent(nextState, cb) {
-      require.ensure([], (require) => {
-        cb(null, Construct);
-      }, 'constructor');
-    },
-    onEnter: () => {
-      store.dispatch(setActiveModule('constructor', []));
-    },
-  });
-};
-
-export {
-  Construct,
-};
+export default new ConstructRoute();

@@ -8,7 +8,7 @@ import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdow
 import pluralize from 'pluralize';
 import { paths } from '../../const';
 
-require('./style.scss');
+import './style.scss';
 
 function Info(props) {
   const {
@@ -65,7 +65,7 @@ function Info(props) {
           }}
           >
           <DropdownTrigger>
-            <span {...classes('menu-trigger')}>...</span>
+            <span {...classes({ element: 'menu-trigger', extra: 'mi mi-settings' })}></span>
           </DropdownTrigger>
           <DropdownContent>
             <div {...classes('menu-item')} onClick={() => {

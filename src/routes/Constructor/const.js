@@ -1,3 +1,5 @@
+const namespace = 'create';
+
 // TODO: use database to store currencies
 const currencies = [
   {
@@ -26,12 +28,8 @@ const paths = {
   budget: id => `/budgets/${id}`,
 };
 
-const forms = {
-  constructor: 'constructor',
-};
-
 export {
+  namespace,
   currencies,
   paths,
-  forms,
 };

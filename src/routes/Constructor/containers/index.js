@@ -1,69 +1,129 @@
-import React, { Component } from 'react';
-// import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-// import { replace } from 'react-router-redux';
-// import { reduxForm, reset } from 'redux-form';
-import get from 'lodash/get';
+import { budgetStates } from 'const';
 import { Database } from 'database';
+import React from 'react';
+import { withRouter } from 'react-router';
 import { notify } from 'services/helpers';
-// import { actions } from '../modules/actions';
+import { Page } from '../../../providers/Page';
+import { GlobalStore } from '../../../store/globalStore';
 import presenter from '../components';
-// import select from '../modules/selectors';
-import { currencies, paths, forms } from '../const';
+import { currencies, namespace } from '../const';
 
-// @reduxForm({
-//   form: forms.constructor,
-// })
-export class Construct extends Component {
+@withRouter
+class Construct extends Page {
   constructor() {
     super();
+    this.state = {
+      values: {
+        title: '',
+        currency: currencies[0].value,
+        invitedUsers: new Set(),
+      },
+      canCreate: false,
+      users: [],
+    };
+    this.namespace = namespace;
+
+    this.onChangeTitle = this.onChangeTitle.bind(this);
+    this.onChangeCurrency = this.onChangeCurrency.bind(this);
+    this.onChangeInvitedUsers = this.onChangeInvitedUsers.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+
+    GlobalStore.routes.active.subscribe(route => {
+      if (route === this.namespace) {
+        this.flush();
+      }
+    });
+    GlobalStore.users.subscribe(users => {
+      this.setState({
+        users: users.filter(user => user.id !== GlobalStore.modules.users.activeUser.value.id),
+      });
+    });
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isActive === false && nextProps.isActive === true) {
-      this.props.flush();
+  flush() {
+    this.setState({
+      values: {
+        title: '',
+        currency: currencies[0].value,
+        invitedUsers: new Set(),
+      },
+      canCreate: false,
+    });
+  }
+
+  onChangeTitle(title) {
+    this.setState((state) => ({
+      ...state,
+      values: {
+        ...state.values,
+        title,
+      },
+      canCreate: title.trim().length > 0,
+    }));
+  }
+
+  onChangeCurrency(currency) {
+    this.setState((state) => ({
+      ...state,
+      values: {
+        ...state.values,
+        currency,
+      },
+    }));
+  }
+
+  onChangeInvitedUsers(userId) {
+    const isInvited = !this.state.values.invitedUsers.has(userId);
+    const invitedUsers = this.state.values.invitedUsers;
+    isInvited
+      ? invitedUsers.add(userId)
+      : invitedUsers.delete(userId)
+    this.setState((state) => ({
+      ...state,
+      values: {
+        ...state.values,
+        invitedUsers,
+      },
+    }));
+  }
+
+  async onSubmit(e) {
+    e.preventDefault();
+    if (!this.state.canCreate) {
+      return false;
     }
-  }
-
-  async onSubmit({
-    title,
-    currency,
-    invitedUsers,
-  }) {
     const users = [{
-      id: this.props.userId,
+      id: GlobalStore.modules.users.activeUser.value.id,
       status: 'active',
       decision: 'pending',
     }];
-    invitedUsers.forEach((user, index) => {
-      const id = this.props.users[index].id.toString();
-      if (id === '-1') {
-        return false;
-      }
-      if (user) {
-        users.push({
-          id,
-          status: 'invited',
-          decision: 'pending',
-        });
-      }
-    });
+    const iterator = this.state.values.invitedUsers.entries();
+    let { done, value: userId } = iterator.next();
+    while (!done && userId) {
+      users.push({
+        id: userId,
+        status: 'invited',
+        decision: 'pending',
+      });      
+      const next = iterator.next();
+      done = next.done;
+      userId = next.value;
+    }
 
     const id = Date.now().toString();
     try {
       const budget = await Database.instance.budgets.insert({
         id,
-        ownerId: this.props.userId.toString(),
-        state: "opened",
+        ownerId: GlobalStore.modules.users.activeUser.value.id,
+        state: budgetStates.opened,
         title: title,
         currency: currencies[currency],
         sharelink: "",
         users,
         date: Date.now().toString(),
       });
-      await this.props.create(budget);
-      this.props.showBudget(id);
+      await this.create(budget);
+      this.showBudget(id);
       } catch(er) {
         console.error(er);
         notify('Произошла ошибка');
@@ -73,6 +133,11 @@ export class Construct extends Component {
   render() {
     return presenter({
       ...this.props,
+      ...this.state,
+      getPageClasses: this.getPageClasses,
+      onChangeTitle: this.onChangeTitle,
+      onChangeCurrency: this.onChangeCurrency,
+      onChangeInvitedUsers: this.onChangeInvitedUsers,
       onSubmit: this.onSubmit,
     });
   }
@@ -113,3 +178,7 @@ export class Construct extends Component {
 // }
 
 // export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Construct))
+
+export {
+  Construct,
+};

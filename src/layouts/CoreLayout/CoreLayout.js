@@ -4,7 +4,7 @@ import BEMHelper from 'react-bem-helper';
 
 // import { Budget } from 'routes/Budget/containers';
 import { Budgets } from 'routes/Budgets/containers';
-// import { Construct } from 'routes/Constructor/containers';
+import { Construct } from 'routes/Constructor/containers';
 import { Login } from 'routes/Login/containers';
 // import { Collaborators } from 'routes/Collaborators/containers';
 import { notify } from 'services/helpers';
@@ -20,7 +20,7 @@ export class CoreLayout extends Component {
     super();
     this.state = {
       isOffline: false,
-      isLoggedIn: false,
+      isLoggedIn: GlobalStore.modules.auth.isLoggedIn.value,
     };
     GlobalStore.modules.auth.isLoggedIn.subscribe(isLoggedIn => this.onLoginChanged(isLoggedIn));
   }
@@ -60,8 +60,8 @@ export class CoreLayout extends Component {
           {isLoggedIn === true
             ? [
               /*<Collaborators />,
-              <Budget />,
-              <Construct />,*/
+              <Budget />,*/
+              <Construct />,
               <Budgets />,
             ]
             : <Login />
@@ -71,16 +71,5 @@ export class CoreLayout extends Component {
     );
   }
 }
-
-// function mapStateToProps(state) {
-//   const { id } = selectors.userInfo(state);
-//   const budgetIds = selectors.availableBudgets(state);
-
-//   return {
-//     isLoggedIn: state.auth.data.loggedIn,
-//     userId: id,
-//     budgetIds,
-//   };
-// }
 
 export default CoreLayout;

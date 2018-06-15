@@ -20,6 +20,14 @@ export class Page extends Component {
     this.getPageClasses = this.getPageClasses.bind(this);
   }
 
+  componentWillMount() {
+    this.setState({
+      isActive: GlobalStore.routes.active.value === this.namespace,
+      isNext: GlobalStore.routes.next.value.includes(this.namespace),
+      isPrev: GlobalStore.routes.prev.value.includes(this.namespace),
+    });
+  }
+
   onActiveRouteChange(route) {
     this.setState({
       isActive: route === this.namespace,
@@ -27,20 +35,16 @@ export class Page extends Component {
   }
 
   onNextRoutesChange(nextRoutes) {
-    if (nextRoutes.includes(this.namespace)) {
       this.setState({
-        isNext: true,
+      isNext: nextRoutes.includes(this.namespace),
       });
     }
-  }
 
   onPrevRoutesChange(prevRoutes) {
-    if (prevRoutes.includes(this.namespace)) {
       this.setState({
-        isPrev: true,
+      isPrev: prevRoutes.includes(this.namespace),
       });
     }
-  }
 
   getPageClasses() {
     return this.bemHelper({
