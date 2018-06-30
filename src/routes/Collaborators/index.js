@@ -1,27 +1,20 @@
-import { injectReducer } from '../../store/reducers';
-import { setActiveModule } from 'store/modules';
+// @ts-check
+import { Route } from '../../providers/Route';
+import { path } from './const';
+import { path as budgetpath } from '../../routes/Budget/const';
+import { Collaborators } from './containers';
 
-const Collaborators = require('./containers').default;
+class CollaboratorsRoute extends Route {
+  constructor() {
+    super();
+    this.route = path;
+    this.nextRoutes = [];
+    this.prevRoutes = [budgetpath];
+  }
 
-export default (store) => {
-  const {
-    reducer,
-  } = require('./modules/actions').default;
-  injectReducer(store, { key: 'collaborators', reducer });
+  getContainer() {
+    return Collaborators;
+  }
+}
 
-  return ({
-    path: 'budgets/:id/collaborators',
-    getComponent(nextState, cb) {
-      require.ensure([], (require) => {
-        cb(null, Collaborators);
-      }, 'collaborators');
-    },
-    onEnter: () => {
-      store.dispatch(setActiveModule('collaborators', ['budgets']));
-    },
-  });
-};
-
-export {
-    Collaborators,
-};
+export default new CollaboratorsRoute();

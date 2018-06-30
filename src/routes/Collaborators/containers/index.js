@@ -1,43 +1,56 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router';
-import get from 'lodash/get';
-import { Database } from 'database';
-import { notify } from 'services/helpers';
+// @ts-check
 import presenter from '../components';
+import { Page } from '../../../providers/Page';
+import { path } from '../const';
+import { GlobalStore } from '../../../store/globalStore';
+import { budgetStates } from '../../../const';
+import get from 'lodash/get';
 
-export class Collaborators extends Component {
-  constructor() {
-    super();
+export class Collaborators extends Page {
+  constructor(params) {
+    super(params);
+    this.state = {
+      collaborators: [],
+      canManage: false,
+    };
+    this.path = path;
     this.changeUserStatus = this.changeUserStatus.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.id !== nextProps.id) {
-      if (nextProps.id) {
-        this.loadCollaborators(nextProps.id);
-      } else {
-        this.clearCollaborators();
-      }
-    }
+  componentWillMount() {
+    super.componentWillMount();
+    this.budgetSub = GlobalStore.modules.budgets.activeBudget.subscribe(
+      () => this.setCollaborators()
+    );
+    this.usersSub = GlobalStore.users.subscribe(() => this.setCollaborators());
   }
 
-  loadCollaborators(budgetId) {
-    const collaboratorsQuery = Database.instance
-        .collections
-        .budgets
-        .findOne(budgetId);
-    collaboratorsQuery.exec()
-        .then((budget) => {
-          this.budget = budget;
-          if (this.subscription) {
-            this.clearCollaborators();
-          }
-          this.subscription = budget.$.subscribe(budget => this.loadCollaborators(budget.id));
-        });
+  componentWillUnmount() {
+    GlobalStore.modules.budgets.activeBudget.unsubscribe(this.budgetSub);
+    GlobalStore.users.unsubscribe(this.usersSub);
+  }
+
+  setCollaborators() {
+    const budget = GlobalStore.modules.budgets.activeBudget.value;
+    let collaborators = [];
+    if (GlobalStore.modules.budgets.activeBudget.value) {
+      collaborators = GlobalStore.modules.budgets.activeBudget.value.users
+        .map(user => ({
+          ...user,
+          ...GlobalStore.users.value.get(user.id),
+        }));
+      }
+    const isOwner = budget.ownerId === get(GlobalStore.modules.users.activeUser.value, 'id');
+
+    this.setState({
+      collaborators,
+      canManage: isOwner && budget.state === budgetStates.opened,
+    });
   }
 
   changeUserStatus(user, nextStatus) {
-    this.budget.users = this.budget.users.map((u) => {
+    const budget = GlobalStore.modules.budgets.activeBudget.value;
+    const users = budget.users.map((u) => {
       if (u.id === user.id) {
         return {
           ...u,
@@ -48,52 +61,16 @@ export class Collaborators extends Component {
       return u;
     });
 
-    this.budget.save();
-  }
-
-  clearCollaborators() {
-    this.subscription.unsubscribe();
+    budget.users = users;
+    budget.save();
   }
 
   render() {
     return presenter({
       ...this.props,
+      ...this.state,
+      getPageClasses: this.getPageClasses,
       changeUserStatus: this.changeUserStatus,
     });
   }
 }
-
-// const mapDispatchToProps = {
-
-// };
-
-// const mapStateToProps = (state, ownProps) => {
-//   const budget = get(state, 'budget.data');
-//   const users = get(state, 'users.data') || [];
-//   const userId = get(state, 'auth.data.userInfo.id', -1);
-//   const ownerId = get(budget, 'ownerId');
-//   const isOwner = ownerId === userId;
-//   const canManage = isOwner && budget.state === 'opened';
-
-//   return {
-//     ...budget,
-//     users: get(budget, 'users', []).map(user => ({
-//       ...user,
-//       ...users.filter(u => u.id === user.id)[0],
-//     })),
-//     isActive: state.modules.active === 'collaborators',
-//     isNext: state.modules.next.includes('collaborators'),
-//     ownerId,
-//     canManage,
-//   };
-// };
-
-// function mergeProps(state, dispatch, own) {
-//   return {
-//     ...state,
-//     ...dispatch,
-//     ...own,
-//   };
-// }
-
-// export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Collaborators));
