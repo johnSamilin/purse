@@ -1,3 +1,3 @@
-import AddForm from './container';
+import { AddForm } from './container';
 
-export default AddForm;
+export { AddForm };

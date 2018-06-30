@@ -1,7 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router';
 import BEMHelper from 'react-bem-helper';
-import { currencies } from 'routes/Constructor/const';
+import { currencies } from '../../../routes/Constructor/const';
 import {
   Button,
   Header,
@@ -9,8 +8,7 @@ import {
   UserInfo,
   Select,
   Input,
-} from 'components';
-// import { Field } from 'redux-form';
+} from '../../../components';
 
 import './style.scss';
 
@@ -33,12 +31,12 @@ export const Construct = (props) => {
       onSubmit={onSubmit}
       {...classes({ extra: getPageClasses() })}
     >
-      <Header title="Create new budget" backurl="/" />
+      <Header title={'Create new budget'} backurl={'/'} />
       <div {...classes('title')}>
         <Input
           {...classes('title-input')}
           name={'title'}
-          placeholder="Название"
+          placeholder={'Название'}
           value={values.title}
           onChange={e => onChangeTitle(e.target.value)}
         />
@@ -53,7 +51,7 @@ export const Construct = (props) => {
         />
       </div>
       <div {...classes('users')}>
-        {users && users.map((user, k) => <ListItem index={k} {...classes('user')}>
+        {users && users.map((user, k) => <ListItem key={k} {...classes('user')}>
           <UserInfo {...user} />
           <div
             {...classes({
@@ -63,11 +61,11 @@ export const Construct = (props) => {
             })}
           >
             <input
-              type="checkbox"
+              type={'checkbox'}
               value={values.invitedUsers.has(user.id)}
               onChange={() => onChangeInvitedUsers(user.id)}
               id={`invitedUsers[${k}]`}
-              />
+            />
             <label htmlFor={`invitedUsers[${k}]`} />
           </div>
         </ListItem>)}
@@ -75,7 +73,7 @@ export const Construct = (props) => {
       <Button
         {...classes('submit-btn')}
         mods={['success']}
-        type="submit"
+        type={'submit'}
         disabled={!canCreate}
       >
         Создать

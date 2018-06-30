@@ -1,29 +1,22 @@
-import { injectReducer } from '../../store/reducers'
-import { setActiveModule } from 'store/modules';
-const Budget = require('./containers').default
+// @ts-check
+import { Route } from '../../providers/Route';
+import { path } from './const';
+import { path as budgetspath } from '../../routes/Budgets/const';
+import { path as collaboratorspath } from '../../routes/Collaborators/const';
+import { Budget } from './containers';
 
-export default (store) => {
-  const {
-    budgetReducer,
-    transactionsReducer,
-  } = require('./modules/actions').default;
-  injectReducer(store, { key: 'budget', reducer: budgetReducer });
-  injectReducer(store, { key: 'transactions', reducer: transactionsReducer });
+class BudgetRoute extends Route {
+  constructor() {
+    super();
+    this.route = path;
+    this.exact = false;
+    this.nextRoutes = [collaboratorspath];
+    this.prevRoutes = [budgetspath];
+  }
 
-  return ({
-    path : 'budgets/:id',
-    getComponent (nextState, cb) {
-      require.ensure([], (require) => {
-        cb(null, Budget)
-
-      }, 'budgets')
-    },
-    onEnter: () => {
-      store.dispatch(setActiveModule('budget', ['collaborators']))
-    },
-  })
+  getContainer() {
+    return Budget;
+  }
 }
 
-export {
-  Budget,
-}
+export default new BudgetRoute();

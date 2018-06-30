@@ -1,21 +1,29 @@
-import React from 'react';
-import { Link } from 'react-router';
-import BEMHelper from 'react-bem-helper';
+// @ts-check
 import moment from 'moment';
 import numeral from 'numeral';
-import { budgetStates } from 'const';
-import Dropdown, { DropdownTrigger, DropdownContent } from 'react-simple-dropdown';
 import pluralize from 'pluralize';
+import React from 'react';
+import BEMHelper from 'react-bem-helper';
+import { Link } from 'react-router';
+import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown';
+import { budgetStates } from '../../../../const';
 import { paths } from '../../const';
-
 import './style.scss';
 
+
 function Info(props) {
+  const {
+    budget,
+    requestClosing,
+    openBudget,
+    deleteBudget,
+    selectBudget,
+    isActive,
+  } = props;
   const {
     id,
     date,
     title,
-    isActive,
     state,
     sum = 0,
     currency,
@@ -23,12 +31,8 @@ function Info(props) {
     users,
     newTransactionsCount = 0,
     transactionsCount = 0,
-
-    requestClosing,
-    openBudget,
     canManage = false,
-    deleteBudget,
-  } = props;
+  } = budget;
   const classes = new BEMHelper('budget-list-item');
   const isClosed = [budgetStates.closed, budgetStates.closing].includes(state);
 
@@ -47,7 +51,7 @@ function Info(props) {
           }
         </i>
       </div>
-      <Link to={paths.budget(id)} {...classes('wrapper')}>
+      <Link to={paths.budget(id)} {...classes('wrapper')} onClick={() => selectBudget(budget)}>
         <span {...classes('title')}>{title}</span>
         <span {...classes('sum')}>{numeral(sum).format('0,[.]00')} {currency.key}</span>
         <div {...classes('subtitle')}>
@@ -58,26 +62,29 @@ function Info(props) {
         </div>
       </Link>
       {canManage
-        ? <Dropdown {...classes('menu')} ref={(element) => {
+        ? <Dropdown
+          {...classes('menu')}
+          ref={(element) => {
             if (element && !menuInstance) {
               menuInstance = element;
             }
-          }}
-          >
+          }
+        }
+        >
           <DropdownTrigger>
-            <span {...classes({ element: 'menu-trigger', extra: 'mi mi-settings' })}></span>
+            <span {...classes({ element: 'menu-trigger', extra: 'mi mi-settings' })} />
           </DropdownTrigger>
           <DropdownContent>
             <div {...classes('menu-item')} onClick={() => {
               state === budgetStates.closed
-                ? openBudget(id)
+                ? openBudget(budget)
                 : requestClosing(id);
               menuInstance.hide();
             }}>
               {`${state === budgetStates.closed ? 'Открыть' : 'Закрыть'}`}
             </div>
             {__DEV__ &&
-              <div {...classes('menu-item')} onClick={() => deleteBudget(id)}>
+              <div {...classes('menu-item')} onClick={() => deleteBudget(budget)}>
                 Удалить
               </div>
             }

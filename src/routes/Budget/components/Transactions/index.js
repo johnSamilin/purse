@@ -1,3 +1,3 @@
-import Transactions from './container';
+import { Transactions } from './container';
 
-export default Transactions;
+export { Transactions };

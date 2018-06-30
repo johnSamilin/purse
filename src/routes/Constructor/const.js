@@ -1,4 +1,4 @@
-const namespace = 'create';
+const path = '/create';
 
 // TODO: use database to store currencies
 const currencies = [
@@ -29,7 +29,7 @@ const paths = {
 };
 
 export {
-  namespace,
+  path,
   currencies,
   paths,
 };

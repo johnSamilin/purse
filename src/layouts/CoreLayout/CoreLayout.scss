@@ -1,6 +1,17 @@
 @import '~styles/core.scss';
 
 .core-layout {
+	filter: opacity(50%);
+		
+	display: flex;
+	align-items: stretch;
+	align-content: stretch;
+	height: 100%;
+	min-height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+
 	&__viewport {   
 		align-content: stretch;
 		align-items: stretch;

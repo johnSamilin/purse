@@ -1,7 +1,14 @@
+// @ts-check
 import isEqual from 'lodash/isEqual';
+import { isRxDocument, isRxCollection } from 'rxdb';
 
 export class Observable {
   constructor(value) {
+  /**
+   * @type {any}
+   */
+    this.value = null;
+
     this.target = {
       value,
     };
@@ -11,7 +18,12 @@ export class Observable {
     this.unsubscribe = this.unsubscribe.bind(this);
     this.onChange = this.onChange.bind(this);
 
-    return new Proxy(
+    // @ts-ignore
+    return this.getProxy();
+  }
+
+  getProxy() {
+    const target = new Proxy(
       this.target,
       {
         get: (obj, prop) => {
@@ -20,27 +32,52 @@ export class Observable {
           }
           return this[prop];
         },
-        set: this.onChange,
-        subscribe: this.subscribe,
-        unsubscribe: this.unsubscribe,
+        set: (obj, prop, val) => {
+          this.onChange(obj, prop, val);
+          return true;
+        },
       }
     );
+    target.subscribe = this.subscribe;
+    target.unsubscribe = this.unsubscribe;
+
+    return target;
   }
 
-  async onChange(obj, prop, value) {
-    if (prop === 'value' && !isEqual(this.target.value, value)) {
-      this.target.value = value;
-      const iterator = this.subscribers.entries();
-      let { done, value: subscriber } = iterator.next();
-      while (!done && subscriber) {
-        await subscriber[1](value);
-        const next = iterator.next();
-        done = next.done;
-        subscriber = next.value;
+  // onChange(obj, prop, value) {
+  //   if (prop === 'value' && !isEqual(this.target.value, value)) {
+  //     this.notify(value);
+  //   }
+  // }
+  onChange(obj, prop, value) {
+    if (prop === 'value') {
+      if (this.isRx(value)) {
+        this.target.value = value;
+
+        // TODO: fix possible memory leak
+        this.target.value.$.subscribe(newValue => this.notify(newValue));
+      } else {
+        if (!isEqual(this.target.value, value)) {
+          this.target.value = value;
+          this.notify(value);
+        }
       }
     }
+  }
 
-    return true;
+  isRx(target) {
+    return isRxDocument(target) || isRxCollection(target);
+  }
+
+  async notify(value) {
+    const iterator = this.subscribers.entries();
+    let { done, value: subscriber } = iterator.next();
+    while (!done && subscriber) {
+      await subscriber[1](value);
+      const next = iterator.next();
+      done = next.done;
+      subscriber = next.value;
+    }
   }
 
   subscribe(clbk) {
@@ -52,5 +89,12 @@ export class Observable {
 
   unsubscribe(id) {
     this.subscribers.delete(id);
+  }
+
+  once(clbk) {
+    const subscribeId = this.subscribe((data) => {
+      clbk(data);
+      this.unsubscribe(subscribeId);
+    });
   }
 }

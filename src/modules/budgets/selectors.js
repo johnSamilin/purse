@@ -1,7 +1,8 @@
-import { GlobalStore } from "../../../store/globalStore";
-import { userStatuses } from '../../Budget/const';
-import { budgetStates } from 'const';
+// @ts-check
 import get from 'lodash/get';
+import { budgetStates } from '../../const';
+import { userStatuses } from '../../routes/Budget/const';
+import { GlobalStore } from '../../store/globalStore';
 
 export function getBudgets() {
   let budgetsList = GlobalStore.budgets.value;
@@ -13,20 +14,18 @@ export function getBudgets() {
     const activeUsers = budget.users.filter(user => user.status === userStatuses.active).length;
     const seenTransactionsCount = get(seentransactionsList, `${budget.id}`, 0);
     const transactions = get(transactionsList, budget.id, { count: 0, sum: 0 });
+    budget.canManage = budget.ownerId === userId;
+    budget.transactionsCount = transactions.count;
+    budget.sum = transactions.sum;
+    budget.newTransactionsCount = transactions.count - seenTransactionsCount;
+    budget.activeUsers = activeUsers;
 
-    return {
-      ...budget,
-      canManage: budget.ownerId === userId,
-      transactionsCount: transactions.count,
-      sum: transactions.sum,
-      newTransactionsCount: transactions.count - seenTransactionsCount,
-      activeUsers,
-    };
+    return budget;
   });
 
   const activeList = budgetsList.filter(budget => budget.state !== budgetStates.closing);
   const pendingAttentionList = budgetsList.filter(budget => budget.state === budgetStates.closing);
-  
+
   return {
     activeList,
     pendingAttentionList,

@@ -1,11 +1,11 @@
 import { Route } from '../../providers/Route';
-import { namespace } from './const';
+import { path } from './const';
 import { Login } from './containers';
 
 class LoginRoute extends Route {
   constructor() {
     super();
-    this.path = namespace;
+    this.route = path;
   }
 
   getContainer() {

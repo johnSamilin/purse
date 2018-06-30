@@ -1,27 +1,28 @@
-import { Database } from 'database';
-import { budgetStates } from 'const';
-import presenter from '../components';
+// @ts-check
+import { budgetStates } from '../../../const';
+import { Database } from '../../../database';
+import { actions } from '../../../modules/auth/actions';
+import { budgetsActions } from '../../../modules/budgets/actions';
+import { getBudgets } from '../../../modules/budgets/selectors';
+import { usersActions } from '../../../modules/users/actions';
 import { logger, notify } from '../../../services/helpers';
 import { GlobalStore } from '../../../store/globalStore';
-import { actions } from '../../../modules/auth/actions';
-import { usersActions } from '../../../modules/users/actions';
+import presenter from '../components';
+import { path } from '../const';
 import { Page } from '../../../providers/Page';
-import { namespace } from '../const';
-import { budgetsActions } from '../modules/actions';
-import { getBudgets } from '../modules/selectors';
 
 export class Budgets extends Page {
-  constructor() {
-    super();
+  constructor(params) {
+    super(params);
     this.state = {
       ...super.state,
       isLoading: false,
       userInfo: {},
       activeList: [],
       pendingAttentionList: [],
-      activeId: -1, // TODO: get from route
+      activeBudget: null,
     };
-    this.namespace = namespace;
+    this.path = path;
 
     this.requestClosing = this.requestClosing.bind(this);
     this.openBudget = this.openBudget.bind(this);
@@ -33,24 +34,31 @@ export class Budgets extends Page {
     const token = GlobalStore.modules.auth.token.value;
     // когда только что залогинились
     await Database.syncUsers();
+    let isUserInfoLoaded = false;
     Database.usersSync.complete$.subscribe((isComplete) => {
-      if (isComplete !== false) {
+      if (isComplete !== false && !isUserInfoLoaded) {
+        isUserInfoLoaded = true;
         this.getUserInfo(token);
       }
     });
 
     // TODO: fix possible memory leak
-    GlobalStore.modules.users.activeUser.subscribe((userInfo) => {
-      this.setActiveUser(userInfo);
-    });
+    GlobalStore.modules.users.activeUser.subscribe(userInfo => this.setActiveUser(userInfo));
     GlobalStore.budgets.subscribe(() => this.setBudgetsList());
     GlobalStore.transactions.subscribe(() => this.setBudgetsList());
     GlobalStore.seentransactions.subscribe(() => this.setBudgetsList());
+    GlobalStore.modules.budgets.activeBudget.subscribe(activeBudget => this.setActiveBudget(activeBudget));
   }
 
   setActiveUser(userInfo) {
     this.setState({
       userInfo,
+    });
+  }
+
+  setActiveBudget(activeBudget) {
+    this.setState({
+      activeBudget,
     });
   }
 
@@ -60,9 +68,15 @@ export class Budgets extends Page {
     });
   }
 
+  setBudgetsList() {
+    console.tlog('set budgets list started');    
+    this.setState(getBudgets());
+    console.tlog('set budgets list ended');
+  }
+
   async getUserInfo(token) {
-    const users = await Database.instance.users.find().where({ token }).exec();
     console.tlog('get user info', token, users)
+    const users = await Database.instance.collections.users.find().where({ token }).exec();
     this.setIsLoading(false);
     users[0]
         ? usersActions.setActiveUser(users[0])
@@ -72,12 +86,6 @@ export class Budgets extends Page {
   logout() {
     usersActions.setActiveUser(null);
     actions.logout();
-  }
-
-  setBudgetsList() {
-    console.tlog('set budgets list started');    
-    this.setState(getBudgets());
-    console.tlog('set budgets list ended');
   }
 
   requestClosing(id) {
@@ -92,19 +100,13 @@ export class Budgets extends Page {
     return promise;
   }
 
-  openBudget(id) {
-    const budgetQuery = Database.instance.budgets.findOne(id);
-    budgetQuery.exec().then((budget) => {
-      budget.state = budgetStates.opened;
-      budget.save();
-    });
+  openBudget(doc) {
+    doc.state = budgetStates.opened;
+    doc.save();
   }
 
-  deleteBudget(id) {
-    const budgetQuery = Database.instance.budgets.findOne(id);
-    budgetQuery.exec().then((budget) => {
-      budget.remove();
-    });
+  deleteBudget(doc) {
+    doc.remove();
   }
 
   render() {

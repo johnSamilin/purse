@@ -1,15 +1,13 @@
-import { budgetStates } from 'const';
-import { Database } from 'database';
-import React from 'react';
-import { withRouter } from 'react-router';
-import { notify } from 'services/helpers';
+// @ts-check
+import { budgetStates } from '../../../const';
+import { Database } from '../../../database';
+import { notify, logger } from '../../../services/helpers';
 import { Page } from '../../../providers/Page';
 import { GlobalStore } from '../../../store/globalStore';
 import presenter from '../components';
-import { currencies, namespace } from '../const';
+import { currencies, path } from '../const';
 
-@withRouter
-class Construct extends Page {
+export class Construct extends Page {
   constructor() {
     super();
     this.state = {
@@ -21,21 +19,23 @@ class Construct extends Page {
       canCreate: false,
       users: [],
     };
-    this.namespace = namespace;
+    this.path = path;
 
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeCurrency = this.onChangeCurrency.bind(this);
     this.onChangeInvitedUsers = this.onChangeInvitedUsers.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
-    GlobalStore.routes.active.subscribe(route => {
-      if (route === this.namespace) {
+    GlobalStore.routes.active.subscribe((route) => {
+      if (route === this.path) {
         this.flush();
       }
     });
-    GlobalStore.users.subscribe(users => {
+    GlobalStore.users.subscribe((users) => {
       this.setState({
-        users: users.filter(user => user.id !== GlobalStore.modules.users.activeUser.value.id),
+        users: Array.from(users)
+          .filter(([id, user]) => id !== GlobalStore.modules.users.activeUser.value.id)
+          .map(([id, user]) => user),
       });
     });
   }
@@ -63,7 +63,7 @@ class Construct extends Page {
   }
 
   onChangeCurrency(currency) {
-    this.setState((state) => ({
+    this.setState(state => ({
       ...state,
       values: {
         ...state.values,
@@ -112,22 +112,25 @@ class Construct extends Page {
 
     const id = Date.now().toString();
     try {
-      const budget = await Database.instance.budgets.insert({
+      const budget = await Database.instance.collections.budgets.insert({
         id,
         ownerId: GlobalStore.modules.users.activeUser.value.id,
         state: budgetStates.opened,
-        title: title,
-        currency: currencies[currency],
-        sharelink: "",
+        title: this.state.values.title,
+        currency: currencies[this.state.values.currency],
+        sharelink: '',
         users,
         date: Date.now().toString(),
       });
-      await this.create(budget);
-      this.showBudget(id);
-      } catch(er) {
-        console.error(er);
-        notify('Произошла ошибка');
-      }
+      this.showBudget(budget);
+    } catch (er) {
+      logger.error(er);
+      notify('Произошла ошибка');
+    }
+  }
+
+  showBudget(budget) {
+    GlobalStore.modules.budgets.activeBudget.value = budget;
   }
 
   render() {
@@ -142,43 +145,3 @@ class Construct extends Page {
     });
   }
 }
-
-// const mapDispatchToProps = {
-//   create: actions.create,
-//   showBudget: id => replace(paths.budget(id)),
-//   flush: () => reset(forms.constructor),
-// }
-
-// const mapStateToProps = (state, ownProps) => {
-//   const userId = get(state, 'auth.data.userInfo.id', '-1');
-//   const users = get(state, 'users.data', []) || [];
-//   const title = get(state, 'form.constructor.values.title', '') || '';
-//   const canCreate = title.trim().length;
-
-//   return {
-//     userId,
-//     isActive: state.modules.active === 'constructor',
-//     isNext: state.modules.next.includes('constructor'),
-//     users: users.filter(user => user.id !== userId),
-//     canCreate,
-//     initialValues: {
-//       title: '',
-//       currency: currencies[0].value,
-//       invitedUsers: [],
-//     },
-//   }
-// }
-
-// function mergeProps(state, dispatch, own) {
-//   return {
-//     ...state,
-//     ...dispatch,
-//     ...own,    
-//   };
-// }
-
-// export default withRouter(connect(mapStateToProps, mapDispatchToProps, mergeProps)(Construct))
-
-export {
-  Construct,
-};

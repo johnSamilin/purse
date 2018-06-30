@@ -1,276 +1,220 @@
+// @ts-check
 import { Component } from 'react';
-// import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-// import { push } from 'react-router-redux';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
-// import isEqual from 'lodash/isEqual';
-import { Database } from 'database';
-// import { actions } from '../modules/actions';
 import presenter from '../components';
-// import select from '../modules/selectors';
-import { paths, userStatuses } from '../const';
+import { paths, userStatuses, path } from '../const';
+import { Database } from '../../../database';
+import { GlobalStore } from '../../../store/globalStore';
+import { Page } from '../../../providers/Page';
+import { budgetsActions } from '../../../modules/budgets/actions';
+import { logger, notify } from '../../../services/helpers';
+import difference from 'lodash/difference';
 
-export class Budget extends Component {
-  constructor() {
-    super();
-    this.requestMembership = this.requestMembership.bind(this);
-    this.toggleTransactionState = this.toggleTransactionState.bind(this);
+@withRouter
+class Budget extends Page {
+  constructor(props) {
+    super(props);
+    this.state = {
+      budget: undefined,
+      transactions: [],
+      newUsersCount: 0,
+      currentUserStatus: userStatuses.none,
+      usersList: [],
+      isLoading: false,
+    };
+    this.path = path;
+    this.showCollaborators = this.showCollaborators.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
-    this.changeUserStatus = this.changeUserStatus.bind(this);
-    this.respondInvite = this.respondInvite.bind(this);
-
-    this.onTransactionsUpdated = this.onTransactionsUpdated.bind(this);
-    this.onBudgetUpdated = this.onBudgetUpdated.bind(this);
-    this.unload = this.unload.bind(this);
   }
-
+  
   componentWillMount() {
-    if (this.props.id) {
-      this.loadBudget(this.props.id);
+    super.componentWillMount();
+    this.usersSub = GlobalStore.users.subscribe(() => this.setUsersList());
+    this.budgetSub = GlobalStore.modules.budgets.activeBudget.subscribe((budget) => {
+      if (!budget) {
+        this.unload();
+        return false;
+      }
+      this.selectBudget(budget);
+      this.setUsersList();
+    });
+
+    if (this.props.router.params.id) {
+      Database.isReady.once((isReady) => {
+        if (isReady) {
+          this.loadBudget(this.props.router.params.id);
+        }
+      });
     }
   }
 
   componentWillReceiveProps(newProps) {
-    console.tlog(Database.instance.collections.transactions);
-    if (this.props.id !== newProps.id) {
-      if (newProps.id) {
-        this.loadBudget(newProps.id);
-      } else {
-        this.props.clearBudget();
-        this.props.clearTransactions();
-      }
-      return;
-    }
-
-    if (this.props.budgetsLoading === true && newProps.budgetsLoading === false) {
-      if (newProps.id) {
-        this.loadBudget(newProps.id);
-      }
+    console.log(difference(this.props, newProps))
+    if (this.props.router.params.id && !newProps.router.params.id) {
+      this.unload();
     }
   }
 
   componentWillUnmount() {
+    GlobalStore.modules.budgets.activeBudget.unsubscribe(this.budgetSub);
     this.unload();
   }
 
-  onBudgetUpdated(budget) {
-    this.props.selectBudget(budget);
-  }
-
-  onTransactionsUpdated(transactions) {
-    const transactionsSorted = sortBy(transactions, transaction => transaction.date);
-    this.props.selectTransactions(transactionsSorted.reverse());
-  }
-
-  async loadBudget(id) {
-    const budgetsQuery = Database.instance.budgets.findOne(id);
-    this.budgetDocument = await budgetsQuery.exec();
-    this.isLoaded = true;
-    if (this.budgetSub) {
-      this.budgetSub.unsubscribe();
+  unload() {
+    if (this.transactionsSubRx) {
+      this.transactionsSubRx.unsubscribe();
     }
-    this.budgetSub = this.budgetDocument.$.subscribe(this.onBudgetUpdated);
+    GlobalStore.users.unsubscribe(this.usersSub);
+    this.setState({
+      budget: undefined,
+    });
+  }
 
-    this.transactionsQuery = Database.instance.transactions
-      .find()
-      .where({ budgetId: id });
-    this.transactionsSub = this.transactionsQuery.$.subscribe((transactions) => {
+  setLoading(isLoading) {
+    this.setState({
+      isLoading,
+    });
+  }
+
+  setUsersList() {
+    const rawBudget = this.state.budget;
+    if (!rawBudget) {
+      return false;
+    }
+    const rawList = rawBudget.users ? rawBudget.users : [];
+    const usersList = rawList;
+
+    const newUsersCount = usersList.filter(user => [
+        userStatuses.pending,
+        userStatuses.invited,
+      ].includes(user.status)
+    ).length;
+
+    this.setState({
+      usersList,
+      newUsersCount,
+    });    
+  }
+
+  selectBudget(budget) {
+    const isOwner = budget.ownerId === GlobalStore.modules.users.activeUser.value.id;
+    let currentUserStatus = userStatuses.none;
+    if (isOwner) {
+      currentUserStatus = userStatuses.active;
+    } else {
+      const user = budget.users.find(user => user.id === GlobalStore.modules.users.activeUser.value.id);
+      if (user) {
+        currentUserStatus = user.status;
+      }
+    }
+    this.setState({
+      budget,
+      currentUserStatus,
+    });
+
+    this.transactionsQuery = Database.instance.collections.transactions.find().where({ budgetId: budget.id });
+    this.transactionsSubRx = this.transactionsQuery.$.subscribe((transactions) => {
       if (transactions) {
-        this.onTransactionsUpdated(transactions);
+        this.setTransactions(transactions);
         this.updateSeenTransactions(transactions.length);
       }
     });
     this.transactionsQuery
       .exec()
-      .then(this.onTransactionsUpdated);
+      .then(transactions => this.setTransactions(transactions));
+  }
 
-    // отражаем изменения в бюджете
-    budgetsQuery.$.subscribe((event) => {
-      if (Array.isArray(event)) {
-        this.onBudgetUpdated(event[0]);
-      }
+  setTransactions(transactions = []) {
+    const budgetId = get(this.state.budget, 'id', -1);
+    const transactionsSorted = sortBy(transactions, transaction => transaction.date);
+    this.setState({
+      transactions: transactionsSorted.reverse(),
     });
   }
 
-  unload() {
-    try {
-      this.budgetSub.unsubscribe();
-      this.transactionsSub.unsubscribe();
-    } catch (er) {
-      // ignore
-    }
-    this.isLoaded = false;
-  }
-
-  requestMembership() {
-    if (this.props.id) {
-      let found = false;
-      const users = this.budgetDocument.users.map((u) => {
-        if (u.id === this.props.currentUserId) {
-          found = true;
-          return {
-            ...u,
-            status: userStatuses.pending,
-          };
-        }
-        return u;
+  async updateSeenTransactions(count) {
+    const budget = await Database.instance.collections.seentransactions.findOne(this.state.budget.id).exec();
+    if (budget === null) {
+      Database.instance.collections.seentransactions.insert({
+        budgetId: this.state.budget.id,
+        transactions: count,
       });
-      if (!found) {
-        users.push({
-          id: this.props.currentUserId,
-          status: 'pending',
-        });
-      }
-      this.budgetDocument.users = users;
-      this.budgetDocument.save();
+    } else {
+      budget.transactions = count;
+      budget.save();
     }
   }
 
-  respondInvite(isAccepted = false) {
-    const users = this.budgetDocument.users.map((u) => {
-      if (u.id === this.props.currentUserId) {
-        return {
-          ...u,
-          status: isAccepted ? userStatuses.active : userStatuses.removed,
-        };
-      }
-      return u;
-    });
-    this.budgetDocument.users = users;
-    this.budgetDocument.save();
-  }
-
-  toggleTransactionState(id) {
-    if (this.budgetDocument.state != 'opened') {
-      return false;
-    }
-    const transaction = this.props.transactions.filter(t => t.id === id)[0];
-    if (!transaction
-      || transaction.ownerId != this.props.currentUserId
-      || this.props.status !== userStatuses.active
-    ) {
-      return false;
-    }
-    if (transaction.cancelled || confirm('Удалить? Точно')) {
-      transaction.cancelled = !transaction.cancelled;
-      transaction.save();
+  async loadBudget(id) {
+    this.setLoading(true);
+    const budgetsQuery = Database.instance.collections.budgets.findOne(id);
+    const budgetDocument = await budgetsQuery.exec();
+    if (budgetDocument) {
+      this.setLoading(false);
+      GlobalStore.modules.budgets.activeBudget.value = budgetDocument;
+    } else {
+      this.loadBudgetExternal(id);
     }
   }
 
-  changeUserStatus(user, newStatus) {
-    let updatedUsers = this.budgetDocument.users;
-    if (newStatus === '') {
-      // revoked invite
-      updatedUsers = updatedUsers.filter(u => u.id !== user.id);
+  async loadBudgetExternal(id) {
+    this.setLoading(true);
+    try {
+      const remoteBudget = await budgetsActions.getBudgetFromServer(id);
+      GlobalStore.modules.budgets.activeBudget.value = remoteBudget;
+    } catch (er) {
+      logger.error(er);
+      notify('Не удалось загрузить данные');
     }
-    updatedUsers = updatedUsers.map((u) => {
-      if (u.id === user.id) {
-        u.status = newStatus;
-      }
-      return u;
-    });
-    this.budgetDocument.users = updatedUsers;
-    this.budgetDocument.save();
+    this.setLoading(false);
   }
+  // changeUserStatus(user, newStatus) {
+  //   let updatedUsers = this.budgetDocument.users;
+  //   if (newStatus === '') {
+  //     // revoked invite
+  //     updatedUsers = updatedUsers.filter(u => u.id !== user.id);
+  //   }
+  //   updatedUsers = updatedUsers.map((u) => {
+  //     if (u.id === user.id) {
+  //       u.status = newStatus;
+  //     }
+  //     return u;
+  //   });
+  //   this.budgetDocument.users = updatedUsers;
+  //   this.budgetDocument.save();
+  // }
 
   addTransaction(amount, note) {
+    const currentUserId = GlobalStore.modules.users.activeUser.value.id;
     this.transactionsQuery.collection.insert({
-      id: `${this.props.currentUserId}_${Date.now().toString()}`,
-      budgetId: this.props.budget.id,
+      id: `${currentUserId}_${Date.now().toString()}`,
+      budgetId: this.state.budget.id,
       amount: parseFloat(amount),
       date: Date.now().toString(),
       note,
       cancelled: false,
-      ownerId: this.props.currentUserId,
+      ownerId: currentUserId,
       isSynced: false,
     });
   }
 
-  updateSeenTransactions(count) {
-    const query = Database.instance.seentransactions
-      .findOne(this.props.id);
-    query.exec()
-      .then((budget) => {
-        if (budget === null) {
-          Database.instance.seentransactions.insert({
-            budgetId: this.props.id,
-            transactions: count,
-          });
-          return;
-        }
-        budget.transactions = count;
-        budget.save();
-      });
+  showCollaborators() {
+    this.props.router.push(paths.collaborators(this.state.budget.id));
   }
 
   render() {
     return presenter({
       ...this.props,
-      requestMembership: this.requestMembership,
-      toggleTransactionState: this.toggleTransactionState,
+      ...this.state,
+      getPageClasses: this.getPageClasses,
+      showCollaborators: this.showCollaborators,
       addTransaction: this.addTransaction,
-      changeUserStatus: this.changeUserStatus,
-      respondInvite: this.respondInvite,
     });
   }
 }
 
-// const mapDispatchToProps = {
-//   selectBudget: actions.budget.select,
-//   update: actions.budget.update,
-//   loadTransactions: actions.transactions.load,
-//   selectTransactions: actions.transactions.select,
-//   clearTransactions: actions.transactions.clear,
-//   clearBudget: actions.budget.clear,
-//   redirect: push,
-// };
-
-// const mapStateToProps = (state, ownProps) => {
-//   const budget = select.budget(state);
-//   const transactions = select.transactions(state);
-//   const usersList = select.users(state);
-//   const currentUserId = get(state, 'auth.data.userInfo.id', -1);
-//   let status = userStatuses.none;
-//   const isOwner = budget.ownerId === currentUserId;
-//   if (isOwner) {
-//     status = userStatuses.active;
-//   } else {
-//     budget.users && budget.users.forEach((user) => {
-//       if (user.id === currentUserId) {
-//         status = user.status;
-//       }
-//     });
-//   }
-//   const budgetsLoading = get(state, 'budgets.isLoading', false);
-//   const newUsersCount = Object.values(usersList).filter(user => [
-//     userStatuses.pending,
-//     userStatuses.invited,
-//   ].includes(user.status)).length;
-
-//   return {
-//     id: ownProps.params.id,
-//     budget,
-//     isActive: state.modules.active === 'budget',
-//     isNext: state.modules.next.includes('budget'),
-//     currentUserId,
-//     transactions,
-//     status,
-//     usersList,
-//     isOwner,
-//     budgetsLoading,
-//     newUsersCount,
-//   };
-// };
-
-// function mergeProps(state, dispatch, own) {
-//   return {
-//     ...state,
-//     ...dispatch,
-//     ...own,
-//     showCollaborators() {
-//       dispatch.redirect(paths.collaborators(state.id));
-//     },
-//   };
-// }
-
+export {
+  Budget,
+};

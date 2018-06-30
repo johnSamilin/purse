@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Database } from 'database';
 import api from 'services/api';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import moment from 'moment';
@@ -9,7 +8,8 @@ import 'numeral/locales/ru';
 import AppContainer from './containers/AppContainer';
 import { notify } from './services/helpers';
 import { GlobalStore } from './store/globalStore';
-import routes from 'routes';
+import routes from './routes';
+import { Database } from './database';
 
 console.tlog = (...messages) => {
   console.timeEnd('delta');

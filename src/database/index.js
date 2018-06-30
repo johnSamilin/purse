@@ -1,14 +1,16 @@
+// @ts-check
 import 'babel-polyfill';
 import * as RxDB from 'rxdb';
 import some from 'lodash/some';
 import schemas from './schema';
 import migrations from './migrations';
 import { GlobalStore } from '../store/globalStore';
-import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets } from '../services/helpers';
+import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger } from '../services/helpers';
 import { Observable } from '../providers/Observable';
 RxDB.plugin(require('pouchdb-adapter-idb'));
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
+import isEqual from 'lodash/isEqual';
 
 export const dbUrl = 'https://purse.smileupps.com';
 
@@ -29,6 +31,7 @@ class Model {
     this.usersSync = null;
     this.isSyncing = false;
     this.budgetIds = new Observable([]); // чтобы пересинхронизировать только если они изменились
+    this.isReady = new Observable(false);
 
     const promise = this.createUsersCollection();
     GlobalStore.modules.users.activeUser.subscribe(userInfo => this.onUserChanged(userInfo));
@@ -51,6 +54,7 @@ class Model {
 
   dropUserRelatedCollections() {
     console.tlog('destroy user related collections')
+    this.isReady.value = false;
     const promises = Promise.all([
       this.instance.collections.budgets.destroy(),
       this.instance.collections.transactions.destroy(),
@@ -83,16 +87,27 @@ class Model {
         migrationStrategies: migrations.seenTransactions,
       }),
     ]);
-    promises.then(() => this.mapCollectionsToStore()).catch(er => {});
+    promises
+      .then(() => this.mapCollectionsToStore())
+      .then(() => {
+        this.isReady.value = true;
+      })
+      .catch(er => {
+        logger.error(er);
+        this.isReady.value = false;
+      });
 
     return promises;
   }
 
   mapCollectionsToStore() {
     this.instance.collections.users.find().$.subscribe((users) => {
-      GlobalStore.users.value = users;
+      const usersMap = new Map();
+      users.forEach(user => usersMap.set(user.id, user));
+      GlobalStore.users.value = usersMap;
     });
     this.instance.collections.budgets.find().$.subscribe((budgets) => {
+      console.warn('budgets query changed', isEqual(GlobalStore.budgets.value, budgets), GlobalStore.budgets.value, budgets)
       GlobalStore.budgets.value = budgets;
     });
     this.instance.collections.transactions.find().$.subscribe((transactions) => {
@@ -115,9 +130,9 @@ class Model {
 
   syncUsers() {
     if (!this.instance) {
-      return Promise.reject();
+      return Promise.reject(null);
     }
-    this.usersSync = this.instance.users.sync({
+    this.usersSync = this.instance.collections.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
         live: false,
@@ -130,7 +145,7 @@ class Model {
 
   syncBudgets() {
     if (!this.instance) {
-      return Promise.reject();
+      return Promise.reject(null);
     }
     this.budgetsSync = this.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
@@ -146,10 +161,10 @@ class Model {
 
   syncTransactions(budgetIds) {
     if (!this.instance) {
-      return Promise.reject();
+      return Promise.reject(null);
     }
     //TODO: сделать пооптимальней
-    this.transactionsSync = this.instance.transactions.sync({
+    this.transactionsSync = this.instance.collections.transactions.sync({
       remote: `${dbUrl}/transactions`,
       options: {
         live: true,

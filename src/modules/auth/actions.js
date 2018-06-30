@@ -1,3 +1,4 @@
+// @ts-check
 import { apiPaths } from 'routes/Login/const';
 import Api from 'services/api';
 import { GlobalStore } from '../../store/globalStore';

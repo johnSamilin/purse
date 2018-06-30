@@ -1,18 +1,46 @@
-// import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import get from 'lodash/get';
-import Transactions from './presenter';
+// @ts-check
+import { Component } from 'react';
+import presenter from './presenter';
+import { GlobalStore } from '../../../../store/globalStore';
 
-// const mapDispatchToProps = {
+export class Transactions extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: new Map(),
+    };
+    this.onTransactionClick = this.onTransactionClick.bind(this);
+  }
 
-// };
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.data) {
+      const users = new Map();
+      GlobalStore.users.value.forEach(user => users.set(user.id, user));
 
-// const mapStateToProps = (state) => {
-//   const isLoading = get(state, 'budget.isLoading');
+      this.setState({
+        users,
+      });
+    }
+  }
 
-//   return {
-//     isLoading,
-//   };
-// };
+  onTransactionClick(doc) {
+    if (
+      this.props.canBeDeleted
+      && doc.ownerId === GlobalStore.modules.users.activeUser.value.id
+    ) {
+      if (doc.cancelled || confirm('Удалить? Точно')) {
+        doc.cancelled = !doc.cancelled;
+        doc.save();
+      }
+    }
+  }
 
-export default Transactions;
+  render() {
+    return presenter({
+      ...this.props,
+      ...this.state,
+      onTransactionClick: this.onTransactionClick,
+    });
+  }
+}
+

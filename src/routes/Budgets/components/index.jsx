@@ -1,14 +1,16 @@
+// @ts-check
+import get from 'lodash/get';
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
 import { Link } from 'react-router';
-import { paths } from 'routes/Budgets/const';
-import LoadingPanel from 'components/LoadingPanel';
-import EmptyState from 'components/EmptyState';
-import { budgetStates } from 'const';
-
+import { budgetStates } from '../../../const';
+import { Tabs } from '../../../components/Tabs/index';
+import LoadingPanel from '../../../components/LoadingPanel';
+import EmptyState from '../../../components/EmptyState';
+import { paths } from '../../../routes/Budgets/const';
 import Info from './Info';
 import './style.scss';
-import { Tabs } from '../../../components/Tabs/index';
+
 
 export const Budgets = (props) => {
   const classes = new BEMHelper('budget-list');
@@ -16,8 +18,7 @@ export const Budgets = (props) => {
     getPageClasses,
     activeList,
     pendingAttentionList,
-    activeId,
-    load,
+    activeBudget,
     requestClosing,
     openBudget,
     userInfo,
@@ -36,8 +37,8 @@ export const Budgets = (props) => {
               .map((budget, i) =>
                 <Info
                   key={i}
-                  {...budget}
-                  isActive={activeId === budget.id}
+                  budget={budget}
+                  isActive={get(activeBudget, 'id') === budget.id}
                   requestClosing={requestClosing}
                   openBudget={openBudget}
                   deleteBudget={deleteBudget}
@@ -59,8 +60,8 @@ export const Budgets = (props) => {
               .map((budget, i) =>
                 <Info
                   key={i}
-                  {...budget}
-                  isActive={activeId === budget.id}
+                  budget={budget}
+                  isActive={get(activeBudget, 'id') === budget.id}
                   requestClosing={requestClosing}
                   openBudget={openBudget}
                   deleteBudget={deleteBudget}

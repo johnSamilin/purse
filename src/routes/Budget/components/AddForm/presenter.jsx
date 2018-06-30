@@ -1,67 +1,57 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
-// import { Field } from 'redux-form';
 import {
   Button,
   Input,
-} from 'components';
+} from '../../../../components';
 import './style.scss';
 
-function FormInput({ input, className, placeholder, type = 'text' }) {
-  return <Input
-    className={className}
-    value={input.value}
-    onChange={input.onChange}
-    placeholder={placeholder}
-    type={type}
-  />;
-}
-
-function AddForm(props) {
+export default function AddForm(props) {
   const {
-    isExpanded,
     currency = '$',
-    handleSubmit,
     onSubmit,
+    changeAmount,
+    changeNote,
+    amount = 0,
+    note = '',
   } = props;
   const classes = new BEMHelper('budget-add-form');
-  let refAmount;
+  const isExpanded = amount > 0;
   
   return (
     <form
       {...classes()}
-      {...props}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmit}
     >
       <div {...classes('amount')}>
-        {/*<Field
-          component={FormInput}
+        <Input
           {...classes('input')}
           name={'amount'}
           placeholder={`100 ${currency}`}
           type={'number'}
-        />*/}
+          value={amount}
+          onChange={changeAmount}
+        />
         <Button
-          type='submit'
+          type={'submit'}
           {...classes('check-btn')}
         >
           <i {...classes({
             element: 'check-btn-ico',
-            extra: 'mi mi-check'
+            extra: 'mi mi-check',
           })}></i>
         </Button>
       </div>
-      {/*<Field
-        component={FormInput}
+      <Input
         {...classes({
           element: 'input',
-          modifiers: { hidden: !isExpanded }
+          modifiers: { hidden: !isExpanded },
         })}
         name={'note'}
         placeholder={'Optional note'}
-      />*/}
+        value={note}
+        onChange={changeNote}
+      />
     </form>
   );
 }
-
-export default AddForm;

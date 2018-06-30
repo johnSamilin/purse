@@ -2,8 +2,8 @@
 import { Observable } from '../../providers/Observable';
 
 export default {
-  path: 'users',
+  path: 'budgets',
   state: {
-    activeUser: new Observable(),
+    activeBudget: new Observable(),
   },
 };

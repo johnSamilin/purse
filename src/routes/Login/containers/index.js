@@ -5,7 +5,7 @@ import {
 } from 'const';
 import { notify } from 'services/helpers';
 import { Database } from 'database';
-import { tabs, namespace } from '../const';
+import { tabs, path } from '../const';
 import presenter from '../components';
 import { Page } from '../../../providers/Page';
 import { actions } from '../../../modules/auth/actions';
@@ -18,7 +18,7 @@ export class Login extends Page {
       activeTab: tabs.SMS,
       isLoading: false,
     };
-    this.namespace = namespace;
+    this.path = path;
     this.values = {
       countryCode: null,
       phoneNumber: null,
@@ -80,7 +80,7 @@ export class Login extends Page {
   }
 
   async handleLoginResult(response, params) {
-    if (response.status === "PARTIALLY_AUTHENTICATED") {
+    if (response.status === 'PARTIALLY_AUTHENTICATED') {
       const code = response.code;
       const csrf = response.state;
       try {
@@ -95,11 +95,11 @@ export class Login extends Page {
         console.error(er);
       };
     }
-    else if (response.status === "NOT_AUTHENTICATED") {
+    else if (response.status === 'NOT_AUTHENTICATED') {
       // handle authentication failure
         notify('Попытка входа не удалась');
     }
-    else if (response.status === "BAD_PARAMS") {
+    else if (response.status === 'BAD_PARAMS') {
       // handle bad parameters
         notify('Попытка входа не удалась');
     }

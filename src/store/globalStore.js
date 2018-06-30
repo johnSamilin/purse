@@ -1,4 +1,4 @@
-import { Observable } from "../providers/Observable";
+import { Observable } from '../providers/Observable';
 
 class Store {
   constructor() {
@@ -8,14 +8,14 @@ class Store {
       next: new Observable([]),
       prev: new Observable([]),
     };
-    this.users = new Observable([]);
+    this.users = new Observable(new Map());
     this.budgets = new Observable([]);
     this.transactions = new Observable([]);
     this.seentransactions = new Observable([]);
   }
 
   registerModule(module) {
-    this.modules[module.namespace] = module.state;
+    this.modules[module.path] = module.state;
   }
 }
 

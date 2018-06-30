@@ -1,3 +1,4 @@
+// @ts-check
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -106,7 +107,8 @@ if (__DEV__) {
 } else if (__PROD__ || __TEST__) {
   debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
   webpackConfig.devtool = 'none';
-  webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
+  webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
+  // eslint-disable-line
   webpackConfig.plugins.push(new webpack.optimize.DedupePlugin());
   webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
     compress: {

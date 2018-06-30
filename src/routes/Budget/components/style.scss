@@ -1,6 +1,6 @@
 @import '~styles/colors.scss';
 
-.budget-details {
+.budget {
 	flex-grow: 1;
 
 	&__budget-transactions {
@@ -31,5 +31,25 @@
 		border-radius: 50%;
 		background-color: $negative;
 		color: $black;
+	}
+
+	&__empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		font-size: 6rem;
+		color: #eee;
+		height: 100%;
+		margin: auto;
+	
+		& span {
+			margin: 0 auto auto;
+		}
+	
+		&-icon {
+			margin: auto auto 0;
+			font-size: 20rem;
+		}
 	}
 }

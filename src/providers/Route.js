@@ -1,8 +1,16 @@
-import { GlobalStore } from "../store/globalStore";
+// @ts-check
+import pathToRegexp from 'path-to-regexp';
+import { GlobalStore } from '../store/globalStore';
 
 export class Route {
+  set route(newPath) {
+    this.path = newPath;
+    this.pathMatcher = pathToRegexp(newPath, [], {});
+  }
+
   constructor() {
     this.path = 'default';
+    this.pathMatcher = null;
     this.nextRoutes = [];
     this.prevRoutes = [];
   }

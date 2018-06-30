@@ -1,4 +1,4 @@
-const namespace = 'login';
+const path = '/login';
 
 const forms = {
   login: 'login',
@@ -34,7 +34,7 @@ function getFormAction(apiVersion, type) {
 }
 
 export {
-  namespace,
+  path,
   apiPaths,
   forms,
   tabs,
