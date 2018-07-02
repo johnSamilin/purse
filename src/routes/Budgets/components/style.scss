@@ -43,6 +43,12 @@
 		padding: 2rem;
 	}
 
+	&__version {
+		padding: 0;
+		font-size: 1rem;
+		text-align: center;
+	}
+
 	&__name {
 		margin-left: 1rem;
 		font-weight: bold;

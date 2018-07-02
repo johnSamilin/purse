@@ -2,6 +2,7 @@
 const path = require('path');
 const debug = require('debug')('app:config:project');
 const argv = require('yargs').argv;
+const appVersion = require('../package.json').version;
 
 debug('Creating default configuration.');
 // ========================================================
@@ -81,6 +82,7 @@ config.globals = {
   __TEST__     : config.env === 'test',
   __COVERAGE__ : !argv.watch && config.env === 'test',
   __BASENAME__ : JSON.stringify(process.env.BASENAME || ''),
+  __VERSION__  : JSON.stringify(appVersion),
 };
 
 // ------------------------------------

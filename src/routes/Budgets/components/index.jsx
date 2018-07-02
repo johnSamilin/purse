@@ -10,6 +10,7 @@ import EmptyState from '../../../components/EmptyState';
 import { paths } from '../../../routes/Budgets/const';
 import Info from './Info';
 import './style.scss';
+import { UserInfo } from '../../../components';
 
 
 export const Budgets = (props) => {
@@ -84,8 +85,9 @@ export const Budgets = (props) => {
           })}
           onClick={logout}
         />
-        <span {...classes('name')}>{userInfo.phone}</span>
+        <UserInfo {...userInfo} />
       </div>
+      <div {...classes('version')}>Версия {__VERSION__}</div>
       <Tabs sections={sections} />
       <Link to={paths.construct()} {...classes('fab')}>+</Link>
       <LoadingPanel isActive={isLoading} />
