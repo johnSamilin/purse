@@ -30,16 +30,22 @@
 		text-decoration: none;
     color:$black;
 
-		&:hover, &:active {
+		&:hover, &:active, &:focus {
       color: $black;
       text-decoration: none;
 		}
 	}
 
 	&__username {
-		width: 100%;
-		text-align: center;
+		display: flex;
+    align-items: center;
+    justify-content: center;
 		padding: 2rem;
+	}
+
+	&__name {
+		margin-left: 1rem;
+		font-weight: bold;
 	}
 
 	&__exit {

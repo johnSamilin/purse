@@ -1,3 +1,3 @@
-import Status from './presenter';
+import { Status } from './container';
 
-export default Status;
+export { Status };

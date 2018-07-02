@@ -9,35 +9,27 @@ import CollaboratorsRoute from './Collaborators';
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
 
-export const createRoutes = store => ({
+export const routes = {
   path: '/',
   component: CoreLayout,
-  indexRoute: BudgetsRoute(store),
-  childRoutes: [
-    BudgetsRoute(store),
-    BudgetRoute(store),
-    LoginRoute(store),
-    ConstructorRoute(store),
-    CollaboratorsRoute(store),
-  ],
-});
+  getIndexRoute(partialNextState, callback) {
+    BudgetsRoute.onEnter();
+    callback(null, BudgetsRoute);
+  },
+  getChildRoutes(partialNextState, callback) {
+    const childRoutes = [
+      BudgetsRoute,
+      BudgetRoute,
+      LoginRoute,
+      ConstructorRoute,
+      CollaboratorsRoute,
+    ];
+    
+    const path = partialNextState.location.pathname;
+    const activeRoute = childRoutes.find(route => route.pathMatcher.test(path));
+    activeRoute.onEnter();
+    callback(null, activeRoute);
+  },
+};
 
-/*  Note: childRoutes can be chunked or otherwise loaded programmatically
-    using getChildRoutes with the following signature:
-
-    getChildRoutes (location, cb) {
-      require.ensure([], (require) => {
-        cb(null, [
-          // Remove imports!
-          require('./Counter').default(store)
-        ])
-      })
-    }
-
-    However, this is not necessary for code-splitting! It simply provides
-    an API for async route definitions. Your code splitting should occur
-    inside the route `getComponent` function, since it is only invoked
-    when the route exists and matches.
-*/
-
-export default createRoutes;
+export default routes;

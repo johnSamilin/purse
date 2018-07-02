@@ -1,3 +1,3 @@
-import Summary from './container';
+import { Summary } from './container';
 
-export default Summary;
+export { Summary };

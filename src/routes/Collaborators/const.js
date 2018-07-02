@@ -1,7 +1,11 @@
+// @ts-check
+const path = '/budget/:id/collaborators';
+
 const paths = {
-    budget: (id) => `/budgets/${id}`,
+  budget: (id) => `/budget/${id}`,
 };
 
 export {
-    paths,
+  paths,
+  path,
 };

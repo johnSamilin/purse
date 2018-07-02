@@ -1,27 +1,28 @@
+// @ts-check
 import React, { Component } from 'react';
 import BEMHelper from 'react-bem-helper';
-import { connect } from 'react-redux';
 
-import { Budget } from 'routes/Budget';
-import { Budgets } from 'routes/Budgets';
-import { Construct } from 'routes/Constructor';
-import { Login } from 'routes/Login';
-import { Collaborators } from 'routes/Collaborators';
-import { notify } from 'services/helpers';
-import get from 'lodash/get';
+import { Budget } from '../../routes/Budget/containers';
+import { Budgets } from '../../routes/Budgets/containers';
+import { Construct } from '../../routes/Constructor/containers';
+import { Login } from '../../routes/Login/containers';
+import { Collaborators } from '../../routes/Collaborators/containers';
+import { notify } from '../../services/helpers';
 
 import './CoreLayout.scss';
 import { Database } from '../../database/index';
-import selectors from '../../routes/Budgets/modules/selectors';
+import { GlobalStore } from '../../store/globalStore';
 
 const MobileDetect = require('mobile-detect');
 
 export class CoreLayout extends Component {
-  constructor() {
-    super();
+  constructor(params) {
+    super(params);
     this.state = {
       isOffline: false,
+      isLoggedIn: GlobalStore.modules.auth.isLoggedIn.value,
     };
+    GlobalStore.modules.auth.isLoggedIn.subscribe(isLoggedIn => this.onLoginChanged(isLoggedIn));
   }
 
   componentDidMount() {
@@ -29,12 +30,18 @@ export class CoreLayout extends Component {
     window.addEventListener('online', () => this.setOfflineStatus(false));
   }
 
+  onLoginChanged(isLoggedIn) {
+    this.setState({
+      isLoggedIn,
+    });
+  }
+
   setOfflineStatus(isOffline) {
     notify(`${isOffline ? 'Я оффлайн' : 'Я снова онлайн'}`);
     if (isOffline) {
       Database.stopSync();
     } else {
-      Database.startSync({ userId: this.props.userId, budgetIds: this.props.budgetIds });
+      Database.startSync();
     }
     this.setState({
       isOffline,
@@ -42,23 +49,22 @@ export class CoreLayout extends Component {
   }
 
   render() {
-    const { children, isLoggedIn } = this.props;
     const classes = new BEMHelper('core-layout');
     const md = new MobileDetect(window.navigator.userAgent);
     const isMobile = md.mobile() && !md.tablet();
-    const { isOffline } = this.state;
+    const { isOffline, isLoggedIn } = this.state;
 
     return (
-      <div className="container">
+      <div {...classes()}>
         <div {...classes({ element: 'viewport', modifiers: { mobile: isMobile, offline: isOffline } })}>
           {isLoggedIn === true
             ? [
-              <Collaborators />,
-              <Budget />,
-              <Construct />,
-              <Budgets />,
+              <Collaborators key={1} />,
+              <Budget key={2} />,
+              <Construct key={3} />,
+              <Budgets key={4} />,
             ]
-            : <Login />
+            : <Login key={5} />
           }
         </div>
       </div>
@@ -66,15 +72,4 @@ export class CoreLayout extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  const { id } = selectors.userInfo(state);
-  const budgetIds = selectors.availableBudgets(state);
-
-  return {
-    isLoggedIn: state.auth.data.loggedIn,
-    userId: id,
-    budgetIds,
-  };
-}
-
-export default connect(mapStateToProps)(CoreLayout);
+export default CoreLayout;

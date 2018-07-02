@@ -1,33 +1,35 @@
-import { Component } from 'react';
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-import { reduxForm } from 'redux-form';
-import { actions as authActions } from 'modules/auth/actions';
 import {
   accountkitAppId,
   accountkitApiVersion,
   csrf,
 } from 'const';
 import { notify } from 'services/helpers';
-import Api from 'services/api';
-import { Database, dbUrl } from 'database';
-import { forms, tabs, countryCodes } from '../const';
+import { Database } from 'database';
+import { tabs, path } from '../const';
 import presenter from '../components';
+import { Page } from '../../../providers/Page';
+import { actions } from '../../../modules/auth/actions';
 
-@reduxForm({
-  form: forms.login,
-})
-class Login extends Component {
+export class Login extends Page {
   constructor() {
     super();
     this.state = {
+      ...super.state,
       activeTab: tabs.SMS,
       isLoading: false,
     };
+    this.path = path;
+    this.values = {
+      countryCode: null,
+      phoneNumber: null,
+      emailAddress: null,
+    };
+    
     this.onTabChange = this.onTabChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.accountKitLogin = this.accountKitLogin.bind(this);
     this.initAccountKit = this.initAccountKit.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
     this.accountKitIsInitialized = __DEV__;
   }
 
@@ -40,6 +42,17 @@ class Login extends Component {
   setIsLoading(isLoading = false) {
     this.setState({
       isLoading,
+    });
+  }
+
+  async login(token) {
+    this.setIsLoading(true);
+    await Database.syncUsers();
+    Database.usersSync.complete$.subscribe((isComplete) => {
+      if (isComplete !== false) {
+        actions.login(token);
+        this.setIsLoading(false);
+      }
     });
   }
 
@@ -67,39 +80,30 @@ class Login extends Component {
   }
 
   async handleLoginResult(response, params) {
-    if (response.status === "PARTIALLY_AUTHENTICATED") {
+    if (response.status === 'PARTIALLY_AUTHENTICATED') {
       const code = response.code;
       const csrf = response.state;
       try {
-        const res = await this.props.getToken({
+        const res = await actions.getToken({
           code,
           csrf,
           ...params,
         });
-        await Database.syncUsers();
-        const changeEvent = Database.usersSync.complete$;
-        changeEvent.subscribe((isComplete) => {
-          if (isComplete !== false) {
-            this.props.login(res.access_token);
-            this.setIsLoading(false);
-          }            
-        });
+        this.login(res.access_token);
       } catch(er) {
         notify('Попытка входа не удалась');
         console.error(er);
-        this.setIsLoading(false);
       };
     }
-    else if (response.status === "NOT_AUTHENTICATED") {
+    else if (response.status === 'NOT_AUTHENTICATED') {
       // handle authentication failure
         notify('Попытка входа не удалась');
-        this.setIsLoading(false);
     }
-    else if (response.status === "BAD_PARAMS") {
+    else if (response.status === 'BAD_PARAMS') {
       // handle bad parameters
         notify('Попытка входа не удалась');
-        this.setIsLoading(false);
     }
+    this.setIsLoading(false);
   }
 
   accountKitLogin(params) {
@@ -113,9 +117,17 @@ class Login extends Component {
       response => this.handleLoginResult(response, params)
     );
   }
-  
-  async onSubmit({ emailAddress, phoneNumber, countryCode }) {
+
+  async onSubmit(event) {
+    event.preventDefault();
+    if (__DEV__) {
+      this.login('testen');
+      return false;
+    }
+
+    
     let params = {};
+    const { emailAddress, phoneNumber, countryCode } = this.values;
     switch (this.state.activeTab) {
       case tabs.SMS:
         params = {
@@ -142,28 +154,18 @@ class Login extends Component {
     }    
   }
 
-  render() { 
+  onInputChange(field, event) {
+    this.values[field] = event.target.value;
+  }
+
+  render() {
     return presenter({
       ...this.props,
       ...this.state,
+      getPageClasses: this.getPageClasses,
       onTabChange: this.onTabChange,
       onSubmit: this.onSubmit,
+      onInputChange: this.onInputChange,
     });
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    isActive: state.modules.active === 'login',
-    initialValues: {
-      countryCode: countryCodes[0].value,
-    },
-  };
-};
-
-const mapDispatchToProps = {
-  login: authActions.login,
-  getToken: authActions.getToken,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Login)

@@ -1,16 +1,29 @@
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { push } from 'react-router-redux';
-import Header from './presenter';
+import { Component } from 'react';
+import presenter from './presenter';
 
-const mapDispatchToProps = {
-  goTo: url => push(url),
-}
+@withRouter
+class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.goTo = this.goTo.bind(this);
+  }
+  
 
-const mapStateToProps = (state) => {
+  goTo(path) {
+    if (!path) {
+      this.props.router.goBack();
+    } else {
+      this.props.router.replace(path);
+    }
+  }
 
-  return {
+  render() {
+    return presenter({
+      ...this.props,
+      goTo: this.goTo,
+    });
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default Header;

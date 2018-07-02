@@ -1,13 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Database } from 'database';
 import api from 'services/api';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import moment from 'moment';
 import numeral from 'numeral';
 import 'numeral/locales/ru';
-import createStore from './store/createStore';
 import AppContainer from './containers/AppContainer';
+import { notify } from './services/helpers';
+import { GlobalStore } from './store/globalStore';
+import routes from './routes';
+import { Database } from './database';
+
+console.tlog = (...messages) => {
+  console.timeEnd('delta');
+  console.time('delta');
+  console.info(...messages);
+}
 
 moment.locale('ru');
 numeral.locale('ru');
@@ -20,53 +28,41 @@ if (!__DEV__) {
   OfflinePluginRuntime.install({
     // responseStrategy: 'network-first',
     onUpdating: () => {
-      console.log('SW Event:', 'onUpdating');
+      console.tlog('SW Event:', 'onUpdating');
     },
     onUpdateReady: () => {
-      console.log('SW Event:', 'onUpdateReady');
+      console.tlog('SW Event:', 'onUpdateReady');
         // Tells to new SW to take control immediately
       alert('Доступна новая версия Росплаты');
       OfflinePluginRuntime.applyUpdate();
     },
     onUpdated: () => {
-      console.log('SW Event:', 'onUpdated');
+      console.tlog('SW Event:', 'onUpdated');
         // Reload the webpage to load into the new version
       if (confirm('Доступна новая версия Росплаты. Запустить?')) {
         window.location.reload();
       }
     },
     onUpdateFailed: () => {
-      console.log('SW Event:', 'onUpdateFailed');
+      console.tlog('SW Event:', 'onUpdateFailed');
     },
   });
 }
-
-// ========================================================
-// Store Instantiation
-// ========================================================
-const initialState = window.___INITIAL_STATE__;
-const store = createStore(initialState);
-
 // ========================================================
 // Modules Setup
 // ========================================================
 const modules = require('./modules/index').default;
+modules.forEach(module => GlobalStore.registerModule(module));
 
-modules.forEach(module => module.init(store));
-
-const authModule = require('./modules/auth').default;
-
-api.setUserTokenGetter(authModule.getToken);
+api.setUserTokenGetter(() => GlobalStore.modules.auth.token.value);
 // ========================================================
 // Render Setup
 // ========================================================
 const MOUNT_NODE = document.getElementById('root');
 
 let render = () => {
-  const routes = require('./routes/index').default(store);
-
   ReactDOM.render(
-    <AppContainer store={store} routes={routes} />,
+    <AppContainer routes={routes} />,
     MOUNT_NODE
   );
 };
@@ -108,5 +104,7 @@ if (__DEV__) {
 Database
   .init()
   .then(render)
-  .then(() => Database.bindToStore(store))
-  .catch(er => console.error(er));
+  .catch(er => {
+    console.error(er);
+    alert('Что-то пошло не так... ' + JSON.stringify(er));
+  });

@@ -1,66 +1,79 @@
-import { connect } from 'react-redux';
 import { Component } from 'react';
-import { decisions } from 'routes/Budget/const';
 import { budgetStates } from 'const';
-import select from 'routes/Budget/modules/selectors';
 import { Database } from 'database';
 import presenter from './presenter';
+import { GlobalStore } from '../../../../../store/globalStore';
+import { decisions, userStatuses } from '../../../const';
 
-@connect(mapStateToProps)
-class ModalClosing extends Component {
-  componentWillMount() {
-    const budgetsQuery = Database.instance.budgets.findOne(this.props.id);
-    this.budgetDocument = budgetsQuery
-      .exec()
-      .then(budget => this.budgetDocument = budget);
+export class ModalClosing extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: [],
+    };
+  }
+
+  componentWillMount() {   
     this.makeDecision = this.makeDecision.bind(this);
   }
 
-  updateDecision(decision, user) {
+  componentWillReceiveProps(nextProps) {
+    const globalUsers = GlobalStore.users.value;
+    const users = nextProps.usersList
+      .filter(user => user.status === userStatuses.active)
+      .map((user) => {
+        const userInfo = globalUsers.get(user.id) || {};
+        return {
+          ...user,
+          ...userInfo,
+        };
+      });
+    this.setState({
+      users,
+    });
+  }
+  
+  updateDecision(user, decision) {
     return {
       ...user,
-      decision: user.id === this.props.currentUserId ? decision : user.decision,
-    }
+      decision: user.id === GlobalStore.modules.users.activeUser.value.id
+        ? decision
+        : user.decision,
+    };
   }
 
   makeDecision(decision) {
-    // поменять в модели
-    this.budgetDocument.users = this.budgetDocument.users.map(this.updateDecision.bind(this, decision));
-    // поменять локально чтобы посмотреть какой ставить статус бюджету
-    const userList = this.props.usersList
-      .filter(user => !user.isOwner)
-      .map(this.updateDecision.bind(this, decision));
-    const isRejected = userList.find(user => user.decision === decisions.rejected);
-    const isApproved = userList.find(user => user.decision !== decisions.approved) === undefined;
+    const budget = GlobalStore.modules.budgets.activeBudget.value;
+    let users = budget.users.map(user => this.updateDecision(user, decision));
+    let isRejected = false;
+    let isApproved = true;
+    users.reduce((prev, next) => {
+      if (next.decision === decisions.rejected) {
+        isRejected = true;
+      }
+      if (next.decision !== decisions.approved) {
+        isApproved = false;
+      }
+    });
+
     if (isRejected) {
       // TODO: в бэк отправить
-      this.budgetDocument.state = budgetStates.opened;
-      this.budgetDocument.users = this.budgetDocument.users.map(user => ({
-        ...user,
-        decision: decisions.pending,
-      }));
+      budget.state = budgetStates.opened;
+      users = users.map(user => this.updateDecision(user, decisions.pending));
     } else if (isApproved) {
-      this.budgetDocument.state = budgetStates.closed;
+      budget.state = budgetStates.closed;
     }
 
-    this.budgetDocument.save();
+    budget.users = users;
+    budget.save();
   }
 
   render() {
     return presenter({
       ...this.props,
+      ...this.state,
       makeDecision: this.makeDecision,
     });
   }
 }
 
-function mapStateToProps(state, ownProps) {
-  const budget = select.budget(state);
-
-  return {
-    id: budget.id,
-    usersList: Object.values(ownProps.usersList),
-  };
-}
-
-export default ModalClosing;

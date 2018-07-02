@@ -1,5 +1,6 @@
+const path = '/budgets';
 const paths = {
-  budget: id => `/budgets/${id}`,
+  budget: id => `/budget/${id}`,
   construct: () => '/create',
 };
 const apiPaths = {
@@ -9,4 +10,5 @@ const apiPaths = {
 export {
   apiPaths,
   paths,
+  path,
 };

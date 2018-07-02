@@ -11,20 +11,13 @@ For example:
 @import './themes/default';
 */
 
-@import './bootstrap.min';
+@import './bootstrap.min'; // TODO: удалить зависимость
 
 html, body {
 	min-height: 1px;
 	height: 100%;
 }
 
-.container {
-	display: flex;
-	align-items: stretch;
-	align-content: stretch;
-	height: 100%;
-	min-height: 100%;
-  	width: 100%;
+h1, h2, h3, h4, h5 {
 	margin: 0;
-	padding: 0;
 }

@@ -1,3 +1,5 @@
+const path = '/login';
+
 const forms = {
   login: 'login',
 };
@@ -32,9 +34,10 @@ function getFormAction(apiVersion, type) {
 }
 
 export {
-    apiPaths,
-    forms,
-    tabs,
-    countryCodes,
-    getFormAction,
+  path,
+  apiPaths,
+  forms,
+  tabs,
+  countryCodes,
+  getFormAction,
 };

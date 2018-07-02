@@ -24,7 +24,7 @@ const config = {
   // Server Configuration
   // ----------------------------------
   server_host : 'localhost', // ip.address(), // use string 'localhost' to prevent exposure on local network
-  server_port : process.env.PORT || 3000,
+  server_port : process.env.PORT || 9000,
 
   // ----------------------------------
   // Compiler Configuration
@@ -46,9 +46,7 @@ const config = {
   },
   compiler_vendors : [
     'react',
-    'react-redux',
     'react-router',
-    'redux',
   ],
 
   // ----------------------------------

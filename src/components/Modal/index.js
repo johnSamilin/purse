@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import presenter from './presenter';
 
-export class Modal extends Component {
+export default class Modal extends Component {
   constructor(props) {
     super(props);
     this.state = {

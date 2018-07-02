@@ -1,37 +1,35 @@
 import React from 'react';
 import BEMHelper from 'react-bem-helper';
 import numeral from 'numeral';
-import { UserInfo } from 'components';
 import './style.scss';
+import { UserInfo } from '../../../../../components';
 
-function Transaction(props) {
+export function Transaction(props) {
   const {
-    id,
+    data,
+    author,
+    currency,
+    onClick,
+  } = props;
+  const {
     amount,
     date,
     note,
     cancelled,
-    author,
-    currency,
-    isSynced,
-    onClick,
-  } = props;
+  } = data;
   const classes = new BEMHelper('budget-transaction');
 
   return (
-    <div {...classes({ modifiers: { cancelled } })} onClick={() => onClick(id)}>
+    <div {...classes({ modifiers: { cancelled } })} onClick={() => onClick(data)}>
       <div {...classes('mandatory-info')}>
         <UserInfo {...classes('info')} {...author} />
         <div {...classes('amount')}>
           <span>{numeral(amount).format('0,[.]00')} {currency}</span>
         </div>
       </div>
-      {!isSynced && <span>Not synced yet</span>}
       <div {...classes({ element: 'note', modifiers: { hidden: !note } })}>
         <span>{note}</span>
       </div>
     </div>
   );
 }
-
-export default Transaction;

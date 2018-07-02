@@ -1,3 +1,4 @@
+// @ts-check
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -21,6 +22,29 @@ const webpackConfig = {
     modules: [project.paths.client(), path.resolve(__dirname, 'src'), 'node_modules'],
   },
   module: {},
+  optimization: {
+    minimize: false,
+    splitChunks: {
+      chunks: 'async',
+      minSize: 30000,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '~',
+      name: true,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
 };
 // ------------------------------------
 // Entry Points
@@ -105,32 +129,11 @@ if (__DEV__) {
   };
 } else if (__PROD__ || __TEST__) {
   debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
-  // webpackConfig.devtool = 'none';
-  webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin());
-  webpackConfig.plugins.push(new webpack.optimize.DedupePlugin());
-  webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      unused: true,
-      dead_code: true,
-      warnings: false,
-    },
-    mangle: {
-      except: ['RxSchema', 'RxDatabase', 'autoMigrate'],
-    },
-  }));
+  webpackConfig.devtool = 'none';
+  webpackConfig.optimization.minimize = true;
+  webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
+  webpackConfig.optimization.minimize = true;
   webpackConfig.plugins.push(new webpack.optimize.AggressiveMergingPlugin());
-  webpackConfig.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    minChunks(module) {
-      return module.context && module.context.indexOf('node_modules') !== -1;
-    },
-  }));
-  webpackConfig.plugins.push(new webpack.optimize.CommonsChunkPlugin({
-    async: 'commons',
-    minChunks(module, count) {
-      return count >= 2;
-    },
-  }));
   webpackConfig.plugins.push(new webpack.HashedModuleIdsPlugin({
     hashFunction: 'sha256',
     hashDigest: 'hex',

@@ -1,3 +1,3 @@
-import ModalClosing from './container';
+import { ModalClosing } from './container';
 
-export default ModalClosing;
+export { ModalClosing };

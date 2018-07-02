@@ -1,3 +1,3 @@
-import Info from './presenter';
+import Info from './container';
 
 export default Info;

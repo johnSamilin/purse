@@ -1,3 +1,6 @@
+// @ts-check
+const path = '/budget/:id';
+
 const userStatusMessages = {
   none: 'Присоединиться',
   active: 'Все ок',
@@ -12,8 +15,8 @@ const apiPaths = {
 };
 
 const paths = {
-  budget: id => `/budgets/${id}`,
-  collaborators: budgetId => `/budgets/${budgetId}/collaborators`,
+  budget: id => `/budget/${id}`,
+  collaborators: budgetId => `/budget/${budgetId}/collaborators`,
 };
 
 const userStatuses = {
@@ -21,6 +24,7 @@ const userStatuses = {
   active: 'active',
   pending: 'pending',
   removed: 'removed',
+  invited: 'invited',
 };
 
 const statusesMap = {
@@ -57,6 +61,7 @@ const decisions = {
 };
 
 export {
+  path,
   apiPaths,
   paths,
   userStatusMessages,

@@ -1,27 +1,16 @@
-import { setActiveModule } from 'store/modules';
+import { Route } from '../../providers/Route';
+import { path } from './const';
+import { Login } from './containers';
 
-const Login = require('./containers').default;
+class LoginRoute extends Route {
+  constructor() {
+    super();
+    this.route = path;
+  }
 
-import { injectReducer } from '../../store/reducers';
+  getContainer() {
+    return Login;
+  }
+}
 
-export default (store) => {
-  const loginReducer = require('./modules/actions').default;
-  injectReducer(store, { key: 'login', reducer: loginReducer });
-  // Account kit
-
-  return ({
-    path: 'login',
-    getComponent(nextState, cb) {
-      require.ensure([], (require) => {
-        cb(null, Login);
-      }, 'login');
-    },
-    onEnter: () => {
-      store.dispatch(setActiveModule('login', []));
-    },
-  });
-};
-
-export {
-  Login,
-};
+export default new LoginRoute();

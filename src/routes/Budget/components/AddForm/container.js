@@ -1,51 +1,55 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router';
-import get from 'lodash/get';
-import { reduxForm, reset } from 'redux-form';
-import { actions } from '../../modules/actions';
-import { forms } from '../../const';
+// @ts-check
+import { Component } from 'react';
 import presenter from './presenter';
 
-@reduxForm({
-	form: forms.transaction,
-})
-class AddForm extends Component {
-	render() {
-		return presenter(this.props);
-	}
-}
+export class AddForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      amount: '',
+      note: '',
+    };
+    this.changeAmount = this.changeAmount.bind(this);
+    this.changeNote = this.changeNote.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
 
-const mapDispatchToProps = {
-  flush: () => reset(forms.transaction),
-}
+  componentWillMount() {
+    this.flush();
+  }
 
-const mapStateToProps = (state, ownProps) => {
-	const formValues = get(state, 'form.transaction.values');
-	const amount = get(formValues, 'amount', '');
-	return {
-		isExpanded: amount ? amount.trim().length > 0 : false,
-		initialValues: {
-			amount: '',
-			note: '',
-		},
-	};
-}
+  onSubmit(e) {
+    e.preventDefault();
+    this.props.onAdd(this.state.amount, this.state.note);
+    this.flush();
+  }
 
-function mergeProps(stateProps, dispatchProps, ownProps) {
-	return {
-		...stateProps,
-		...dispatchProps,
-		...ownProps,
-		onSubmit: ({ amount, note }) => {
-			const sum = parseInt(amount.replace(/[\s\D]*/g, ''), 10);
-			if (!sum) {
-				return;
-			}
-			ownProps.onAdd(amount, note);
-			dispatchProps.flush();
-		}
-	}
-}
+  flush() {
+    this.setState({
+      amount: '',
+      note: '',
+    });
+  }
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(AddForm);
+  changeAmount(e) {
+    this.setState({
+      amount: parseFloat(e.target.value),
+    });
+  }
+
+  changeNote(e) {
+    this.setState({
+      note: e.target.value.trim(),
+    });
+  }
+
+  render() {
+    return presenter({
+      ...this.props,
+      ...this.state,
+      changeAmount: this.changeAmount,
+      changeNote: this.changeNote,
+      onSubmit: this.onSubmit,
+    });
+  }
+}
