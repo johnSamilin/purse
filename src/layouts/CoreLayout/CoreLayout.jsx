@@ -18,11 +18,11 @@ export class CoreLayout extends Component {
   constructor(params) {
     super(params);
     this.state = {
-      isOffline: GlobalStore.modules.state.isOffline.value,
+      isOffline: GlobalStore.modules.status.isOffline.value,
       isLoggedIn: GlobalStore.modules.auth.isLoggedIn.value,
     };
     GlobalStore.modules.auth.isLoggedIn.subscribe(isLoggedIn => this.onLoginChanged(isLoggedIn));
-    GlobalStore.modules.state.isOffline.subscribe(isOffline => this.setOfflineStatus(isOffline));
+    GlobalStore.modules.status.isOffline.subscribe(isOffline => this.setOfflineStatus(isOffline));
   }
 
   onLoginChanged(isLoggedIn) {
