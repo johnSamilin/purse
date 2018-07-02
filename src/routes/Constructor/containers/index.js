@@ -1,4 +1,5 @@
 // @ts-check
+import { withRouter } from 'react-router';
 import { budgetStates } from '../../../const';
 import { Database } from '../../../database';
 import { notify, logger } from '../../../services/helpers';
@@ -6,7 +7,9 @@ import { Page } from '../../../providers/Page';
 import { GlobalStore } from '../../../store/globalStore';
 import presenter from '../components';
 import { currencies, path } from '../const';
+import { paths } from '../../Budgets/const';
 
+@withRouter
 export class Construct extends Page {
   constructor() {
     super();
@@ -131,6 +134,7 @@ export class Construct extends Page {
 
   showBudget(budget) {
     GlobalStore.modules.budgets.activeBudget.value = budget;
+    this.props.router.replace(paths.budget(budget.id));
   }
 
   render() {

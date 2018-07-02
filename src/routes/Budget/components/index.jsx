@@ -18,7 +18,7 @@ const classes = new BEMHelper('budget');
 function BudgetEmptyState() {
   return (
     <div {...classes('empty-state')}>
-      <i {...classes({ element: 'empty-state-icon', extra: 'mi mi-local-airport' })}></i>
+      <i {...classes({ element: 'empty-state-icon', extra: 'material-icons mi-local-airport' })}></i>
       <span>Выберите бюджет</span>
     </div>
   );
@@ -99,7 +99,7 @@ export const Budget = (props) => {
           onClick={showCollaborators}
           {...classes({
             element: 'collaborators',
-            extra: 'mi mi-tag-faces',
+            extra: 'material-icons mi-tag-faces',
           })}
         >
           {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}
@@ -108,7 +108,7 @@ export const Budget = (props) => {
           onClick={() => share('Присоединяйтесь к общему бюджету', budget.title, `${apiPaths.frontend}${paths.budget(budget.id)}`)}
           {...classes({
             element: 'share',
-            extra: 'mi mi-person-add',
+            extra: 'material-icons mi-person-add',
           })}
         />
       </Header>

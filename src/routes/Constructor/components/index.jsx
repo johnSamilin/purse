@@ -56,7 +56,7 @@ export const Construct = (props) => {
           <div
             {...classes({
               element: 'checkbox',
-              extra: 'mi mi-check',
+              extra: 'material-icons mi-check',
               modifiers: { checked: values.invitedUsers.has(user.id) },
             })}
           >

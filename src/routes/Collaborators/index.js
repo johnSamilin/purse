@@ -2,6 +2,7 @@
 import { Route } from '../../providers/Route';
 import { path } from './const';
 import { path as budgetpath } from '../../routes/Budget/const';
+import { path as budgetspath } from '../../routes/Budgets/const';
 import { Collaborators } from './containers';
 
 class CollaboratorsRoute extends Route {
@@ -9,7 +10,7 @@ class CollaboratorsRoute extends Route {
     super();
     this.route = path;
     this.nextRoutes = [];
-    this.prevRoutes = [budgetpath];
+    this.prevRoutes = [budgetpath, budgetspath];
   }
 
   getContainer() {

@@ -80,7 +80,7 @@ export const Budgets = (props) => {
         <span
           {...classes({
             element: 'exit',
-            extra: 'mi mi-power-settings-new',
+            extra: 'material-icons mi-power-settings-new',
           })}
           onClick={logout}
         />

@@ -43,7 +43,7 @@ function Info(props) {
         <i {...classes({
           element: 'badge-text',
           extra: [
-            isClosed ? 'mi mi-lock-outline' : '',
+            isClosed ? 'material-icons mi-lock-outline' : '',
           ]
         })}>
           {!isClosed &&
@@ -72,7 +72,7 @@ function Info(props) {
         }
         >
           <DropdownTrigger>
-            <span {...classes({ element: 'menu-trigger', extra: 'mi mi-settings' })} />
+            <span {...classes({ element: 'menu-trigger', extra: 'material-icons mi-settings' })} />
           </DropdownTrigger>
           <DropdownContent>
             <div {...classes('menu-item')} onClick={() => {

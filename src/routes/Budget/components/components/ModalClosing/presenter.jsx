@@ -13,12 +13,12 @@ function Icon(props) {
   } = props;
   const icons = {
     [decisions.pending]: 'mi-timer',
-    [decisions.approved]: 'mi mi-check',
-    [decisions.rejected]: 'mi mi-close',
+    [decisions.approved]: 'material-icons mi-check',
+    [decisions.rejected]: 'material-icons mi-close',
   };
 
   return (
-    <div {...classes('icon', '', `mi ${icons[status]}`)} />
+    <div {...classes('icon', '', `material-icons ${icons[status]}`)} />
   );
 }
 

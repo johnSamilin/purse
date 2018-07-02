@@ -1,12 +1,12 @@
 // @ts-check
-import { apiPaths } from 'routes/Login/const';
-import Api from 'services/api';
+import { apiPaths } from '../../routes/Login/const';
+import Api from '../../services/api';
 import { GlobalStore } from '../../store/globalStore';
 
 export const LS_TOKEN_KEY = 'purse-token';
 
 function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
-  return () => Api.doPost(
+  return Api.doPost(
     apiPaths.getToken(),
     {
       code,

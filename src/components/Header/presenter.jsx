@@ -14,7 +14,7 @@ function Header(props) {
 
   return (
     <div {...classes()}>
-      <i onClick={() => goTo(backurl)} {...classes({ element: 'btn', extra: 'mi mi-arrow-back' })}></i>
+      <i onClick={() => goTo(backurl)} {...classes({ element: 'btn', extra: 'material-icons mi-arrow-back' })}></i>
       <h1 {...classes('title')}>{title}</h1>
       <div {...classes('buttons')}>
         {children}

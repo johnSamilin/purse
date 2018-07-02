@@ -32,6 +32,9 @@ export class Collaborators extends Page {
 
   setCollaborators() {
     const budget = GlobalStore.modules.budgets.activeBudget.value;
+    if (!budget) {
+      return false;
+    }
     let collaborators = [];
     if (GlobalStore.modules.budgets.activeBudget.value) {
       collaborators = GlobalStore.modules.budgets.activeBudget.value.users

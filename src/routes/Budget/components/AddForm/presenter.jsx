@@ -38,7 +38,7 @@ export default function AddForm(props) {
         >
           <i {...classes({
             element: 'check-btn-ico',
-            extra: 'mi mi-check',
+            extra: 'material-icons mi-check',
           })}></i>
         </Button>
       </div>
