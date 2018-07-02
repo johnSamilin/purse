@@ -68,6 +68,7 @@ export const Login = (props) => {
         </div>
       </div>
       <Tabs sections={sections} onChange={onTabChange} />
+      <div {...classes('version')}>Версия {__VERSION__}</div>
       <div {...classes('buttons')}>
         <Button
           {...classes('button')}
