@@ -136,7 +136,7 @@ class Model {
       remote: `${dbUrl}/collaborators`,
       options: {
         live: false,
-        retry: true,
+        retry: false,
       },
     });
 

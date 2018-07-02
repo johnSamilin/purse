@@ -13,21 +13,16 @@ import './CoreLayout.scss';
 import { Database } from '../../database/index';
 import { GlobalStore } from '../../store/globalStore';
 
-const MobileDetect = require('mobile-detect');
 
 export class CoreLayout extends Component {
   constructor(params) {
     super(params);
     this.state = {
-      isOffline: false,
+      isOffline: GlobalStore.modules.state.isOffline.value,
       isLoggedIn: GlobalStore.modules.auth.isLoggedIn.value,
     };
     GlobalStore.modules.auth.isLoggedIn.subscribe(isLoggedIn => this.onLoginChanged(isLoggedIn));
-  }
-
-  componentDidMount() {
-    window.addEventListener('offline', () => this.setOfflineStatus(true));
-    window.addEventListener('online', () => this.setOfflineStatus(false));
+    GlobalStore.modules.state.isOffline.subscribe(isOffline => this.setOfflineStatus(isOffline));
   }
 
   onLoginChanged(isLoggedIn) {
@@ -50,13 +45,18 @@ export class CoreLayout extends Component {
 
   render() {
     const classes = new BEMHelper('core-layout');
-    const md = new MobileDetect(window.navigator.userAgent);
-    const isMobile = md.mobile() && !md.tablet();
     const { isOffline, isLoggedIn } = this.state;
 
     return (
       <div {...classes()}>
-        <div {...classes({ element: 'viewport', modifiers: { mobile: isMobile, offline: isOffline } })}>
+        <div {...classes({
+          element: 'viewport',
+          modifiers: {
+            mobile: GlobalStore.modules.status.isMobile.value,
+            offline: isOffline,
+          },
+        })}
+        >
           {isLoggedIn === true
             ? [
               <Collaborators key={1} />,

@@ -39,7 +39,7 @@ export class AddForm extends Component {
 
   changeNote(e) {
     this.setState({
-      note: e.target.value.trim(),
+      note: e.target.value,
     });
   }
 
