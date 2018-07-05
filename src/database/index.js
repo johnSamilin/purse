@@ -1,5 +1,5 @@
 // @ts-check
-import 'babel-polyfill';
+// import 'babel-polyfill';
 import * as RxDB from 'rxdb';
 import some from 'lodash/some';
 import schemas from './schema';
@@ -7,7 +7,7 @@ import migrations from './migrations';
 import { GlobalStore } from '../store/globalStore';
 import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger } from '../services/helpers';
 import { Observable } from '../providers/Observable';
-RxDB.plugin(require('pouchdb-adapter-idb'));
+RxDB.plugin(require('pouchdb-adapter-websql'));
 RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
 // RxDB.plugin(require('pouchdb-auth'));
 import isEqual from 'lodash/isEqual';
@@ -21,7 +21,7 @@ class Model {
     }
     this.instance = await RxDB.create({
       name: 'purse',
-      adapter: 'idb',
+      adapter: 'websql',
       password: 'myPassword',
       multiInstance: false,
     });

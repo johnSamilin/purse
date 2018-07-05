@@ -14,6 +14,11 @@ export default function AddForm(props) {
     changeNote,
     amount = 0,
     note = '',
+    collaborators,
+    users = [],
+    
+    toggleUser,
+    toggleAllUsers,
   } = props;
   const classes = new BEMHelper('budget-add-form');
   const isExpanded = amount > 0;
@@ -52,6 +57,32 @@ export default function AddForm(props) {
         value={note}
         onChange={changeNote}
       />
+      <div {...classes({
+        element: 'collaborators',
+        modifiers: { hidden: !isExpanded },
+      })}>
+        <Button
+          {...classes('collaborator')}
+          type={'button'}
+          onClick={() => toggleAllUsers()}
+          mods={['inline', collaborators.size === 0 ? 'success' : '']}
+        >На всех</Button>        
+        <Button
+          {...classes('collaborator')}
+          type={'button'}
+          mods={['inline', collaborators.size !== 0 ? 'success' : '']}
+        >Я</Button>
+        {
+          users.map(user => 
+            <Button
+            {...classes('collaborator')}
+              type={'button'}
+              onClick={() => toggleUser(user)}
+              mods={['inline', collaborators.has(user.id) ? 'success' : '']}
+            >{user.phone || user.email}</Button>
+          )
+        }
+      </div>
     </form>
   );
 }

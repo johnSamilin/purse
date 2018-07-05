@@ -32,15 +32,19 @@ export class Budgets extends Page {
   async componentDidMount() {
     this.setIsLoading(true);
     const token = GlobalStore.modules.auth.token.value;
-    // когда только что залогинились
-    await Database.syncUsers();
-    let isUserInfoLoaded = false;
-    Database.usersSync.complete$.subscribe((isComplete) => {
-      if (isComplete !== false && !isUserInfoLoaded) {
-        isUserInfoLoaded = true;
-        this.getUserInfo(token);
-      }
-    });
+    if (GlobalStore.modules.status.isOffline.value) {
+      this.getUserInfo(token);
+    } else {
+      // когда только что залогинились
+      await Database.syncUsers();
+      let isUserInfoLoaded = false;
+      Database.usersSync.complete$.subscribe((isComplete) => {
+        if (isComplete !== false && !isUserInfoLoaded) {
+          isUserInfoLoaded = true;
+          this.getUserInfo(token);
+        }
+      });
+    }
 
     // TODO: fix possible memory leak
     GlobalStore.modules.users.activeUser.subscribe(userInfo => this.setActiveUser(userInfo));

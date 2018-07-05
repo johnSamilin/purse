@@ -61,7 +61,7 @@ const schemas = {
   },
   transactions: {
     title: 'transactions',
-    version: 1,
+    version: 2,
     description: 'transactions',
     type: 'object',
     disableKeyCompression: true,
@@ -90,6 +90,15 @@ const schemas = {
       },
       isSynced: {
         type: 'boolean',
+      },
+      isPaidByOwner: {
+        type: 'boolean',
+      },
+      collaborators: {
+        type: 'array',
+        properties: {
+          id: 'number',
+        },
       },
     },
   },

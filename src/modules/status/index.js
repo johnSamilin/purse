@@ -14,7 +14,7 @@ const status = {
   },
 };
 
-window.addEventListener('offline', () => status.isOffline.value = true);
-window.addEventListener('online', () => status.isOffline.value = false);
+window.addEventListener('offline', () => status.state.isOffline.value = true);
+window.addEventListener('online', () => status.state.isOffline.value = false);
 
 export default status;

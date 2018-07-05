@@ -45,4 +45,18 @@
 		text-align: center;
 		padding: 0;
 	}
+
+	&__collaborators {
+		display: flex;
+		margin: 0.75rem 0 0.25rem;
+		flex-wrap: nowrap;
+
+		&--hidden {
+			display: none;	
+		}
+	}
+
+	&__collaborator {
+		margin-right: 1rem;
+	}
 }

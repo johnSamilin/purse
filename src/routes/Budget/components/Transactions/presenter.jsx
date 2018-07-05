@@ -19,6 +19,7 @@ function Transactions(props) {
     currency,
     onTransactionClick,
     users,
+    activeUserIds = new Set(),
   } = props;
   const classes = new BEMHelper('budget-transactions');
   const defaultUser = {
@@ -34,6 +35,7 @@ function Transactions(props) {
       author={users.get(transaction.ownerId) || defaultUser}
       currency={currency}
       onClick={onTransactionClick}
+      activeUserIds={activeUserIds}
     />);
   }
 

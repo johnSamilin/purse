@@ -25,6 +25,11 @@ export default {
       transaction.isSynced = false;
       return transaction;
     },
+    2: function(transaction) {
+      transaction.collaborators = [];
+      transaction.isPaidByOwner = false;
+      return transaction;
+    },
   },
   seenTransactions: {},
   users: {

@@ -1,4 +1,5 @@
 // @ts-check
+import isEmpty from 'lodash/isEmpty';
 import { budgetStates } from '../../const';
 import { apiPaths } from '../../routes/Budgets/const';
 import api from '../../services/api';
@@ -19,15 +20,15 @@ function getBudgetFromServer(id) {
 
 /**
  * 
- * @param {any} transaction 
- * @param {array} participants 
+ * @param {any} transaction
+ * @param {array} participants
  * @returns {{participantId: number, balance: number }[]}
  */
 function splitTransaction(transaction, participants) {
   let sum = transaction.amount / participants.length;
   sum = parseFloat(sum.toFixed(2));
 
-  return participants.map(participant => {
+  return participants.map((participant) => {
     return {
       participantId: participant.id,
       balance: participant.id.toString() === transaction.ownerId
@@ -39,18 +40,24 @@ function splitTransaction(transaction, participants) {
 
 /**
  * 
- * @param {array} transactions 
- * @param {any} users 
+ * @param {array} transactions
+ * @param {any} users
  * @returns {Map<number, number>}
  */
 function calculateBalances(transactions = [], users = []) {
   const balances = new Map(); // userId: balance
+  const activeUserIds = new Set();
   const activeUsers = users.filter(user => user.status === userStatuses.active);
+  activeUsers.forEach(user => activeUserIds.add(user.id));
+
   transactions
     .filter(transaction => !transaction.cancelled)
-    .forEach(transaction => {
-      const ownerId = transaction.ownerId;
-      const participants = activeUsers;
+    .forEach((transaction) => {
+      const activeCollaborators = transaction.collaborators
+        .filter(clbr => activeUserIds.has(clbr.id));
+      const participants = isEmpty(transaction.collaborators)
+        ? activeUsers
+        : [{ id: transaction.ownerId }, ...activeCollaborators]; // создатель + коллабораторы (те, которые в бюджете активны)
       const splitted = splitTransaction(transaction, participants);
       splitted.forEach((piece) => {
         if (!balances.has(piece.participantId)) {

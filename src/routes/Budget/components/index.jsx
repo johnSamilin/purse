@@ -29,6 +29,7 @@ export const Budget = (props) => {
     currentUserStatus,
     usersList,
     isLoading,
+    activeUserIds,
 
     transactions,
     newUsersCount,
@@ -60,6 +61,7 @@ export const Budget = (props) => {
             key={4}
             currency={get(budget, 'currency.key')}
             onAdd={addTransaction}
+            usersList={usersList}
           />
           : null
       }
@@ -69,6 +71,7 @@ export const Budget = (props) => {
         currency={get(budget, 'currency.key')}
         canBeDeleted={currentUserStatus === userStatuses.active}
         rev={budget._rev}
+        activeUserIds={activeUserIds}
       />
     </div>,
   ];

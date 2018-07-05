@@ -23,6 +23,7 @@ class Budget extends Page {
       currentUserStatus: userStatuses.none,
       usersList: [],
       isLoading: false,
+      activeUserIds: new Set(),
     };
     this.path = path;
     this.showCollaborators = this.showCollaborators.bind(this);
@@ -51,7 +52,7 @@ class Budget extends Page {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log(difference(this.props, newProps))
+    // TODO: fix router
     if (this.props.router.params.id && !newProps.router.params.id) {
       this.unload();
     }
@@ -109,9 +110,16 @@ class Budget extends Page {
         currentUserStatus = user.status;
       }
     }
+    const activeUserIds = new Set();
+    budget.users.forEach(user => {
+      if (user.status === userStatuses.active) {
+        activeUserIds.add(user.id);
+      }
+    });
     this.setState({
       budget,
       currentUserStatus,
+      activeUserIds,
     });
 
     this.transactionsQuery = Database.instance.collections.transactions.find().where({ budgetId: budget.id });
@@ -170,23 +178,8 @@ class Budget extends Page {
     }
     this.setLoading(false);
   }
-  // changeUserStatus(user, newStatus) {
-  //   let updatedUsers = this.budgetDocument.users;
-  //   if (newStatus === '') {
-  //     // revoked invite
-  //     updatedUsers = updatedUsers.filter(u => u.id !== user.id);
-  //   }
-  //   updatedUsers = updatedUsers.map((u) => {
-  //     if (u.id === user.id) {
-  //       u.status = newStatus;
-  //     }
-  //     return u;
-  //   });
-  //   this.budgetDocument.users = updatedUsers;
-  //   this.budgetDocument.save();
-  // }
 
-  addTransaction(amount, note) {
+  addTransaction(amount, note, collaborators, isPaidByOwner = false) {
     const currentUserId = GlobalStore.modules.users.activeUser.value.id;
     this.transactionsQuery.collection.insert({
       id: `${currentUserId}_${Date.now().toString()}`,
@@ -197,6 +190,7 @@ class Budget extends Page {
       cancelled: false,
       ownerId: currentUserId,
       isSynced: false,
+      collaborators,
     });
   }
 

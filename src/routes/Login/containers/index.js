@@ -62,8 +62,8 @@ export class Login extends Page {
         this.accountKitIsInitialized = true;
         AccountKit.init(
           {
-            appId: accountkitAppId, 
-            state: csrf, 
+            appId: accountkitAppId,
+            state: csrf,
             version: accountkitApiVersion,
             fbAppEventsEnabled: true,
             debug: __DEV__,
@@ -108,9 +108,6 @@ export class Login extends Page {
 
   accountKitLogin(params) {
     this.setIsLoading(true);
-    if (__DEV__) {
-      return this.handleLoginResult({ status: 'PARTIALLY_AUTHENTICATED', code: null }, { phoneNumber: 'test-user', countryCode: '+7' });
-    }
     AccountKit.login(
       this.state.activeTab,
       params, // will use default values if not specified

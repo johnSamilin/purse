@@ -76,11 +76,11 @@ export class Construct extends Page {
   }
 
   onChangeInvitedUsers(userId) {
-    const isInvited = !this.state.values.invitedUsers.has(userId);
+    const isInvited = this.state.values.invitedUsers.has(userId);
     const invitedUsers = this.state.values.invitedUsers;
     isInvited
-      ? invitedUsers.add(userId)
-      : invitedUsers.delete(userId)
+      ? invitedUsers.delete(userId)
+      : invitedUsers.add(userId)
     this.setState((state) => ({
       ...state,
       values: {
@@ -100,17 +100,12 @@ export class Construct extends Page {
       status: 'active',
       decision: 'pending',
     }];
-    const iterator = this.state.values.invitedUsers.entries();
-    let { done, value: userId } = iterator.next();
-    while (!done && userId) {
+    for (let userId of this.state.values.invitedUsers) {
       users.push({
         id: userId,
         status: 'invited',
         decision: 'pending',
-      });      
-      const next = iterator.next();
-      done = next.done;
-      userId = next.value;
+      });
     }
 
     const id = Date.now().toString();

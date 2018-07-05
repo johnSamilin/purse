@@ -59,16 +59,18 @@ export const logger = {
 export function mapTransactionsToBudgets(transactions) {
   const map = {};
   if (transactions !== null) {
-    transactions.forEach((transaction) => {
-      if (!map[transaction.budgetId]) {
-        map[transaction.budgetId] = {
-          count: 0,
-          sum: 0,
-        };
-      }
-      map[transaction.budgetId].count += 1;
-      map[transaction.budgetId].sum += transaction.cancelled ? 0 : transaction.amount;
-    });
+    transactions
+      .filter(transaction => transaction.cancelled !== true)
+      .forEach((transaction) => {
+        if (!map[transaction.budgetId]) {
+          map[transaction.budgetId] = {
+            count: 0,
+            sum: 0,
+          };
+        }
+        map[transaction.budgetId].count += 1;
+        map[transaction.budgetId].sum += transaction.cancelled ? 0 : transaction.amount;
+      });
   }
 
   return map;

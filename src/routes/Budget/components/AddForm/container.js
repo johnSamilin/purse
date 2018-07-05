@@ -1,6 +1,8 @@
 // @ts-check
 import { Component } from 'react';
 import presenter from './presenter';
+import { GlobalStore } from '../../../../store/globalStore';
+import { userStatuses } from '../../const';
 
 export class AddForm extends Component {
   constructor(props) {
@@ -8,26 +10,38 @@ export class AddForm extends Component {
     this.state = {
       amount: '',
       note: '',
+      collaborators: new Map(),
+      users: [],
     };
     this.changeAmount = this.changeAmount.bind(this);
     this.changeNote = this.changeNote.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.toggleAllUsers = this.toggleAllUsers.bind(this);
+    this.toggleUser = this.toggleUser.bind(this);
   }
 
   componentWillMount() {
     this.flush();
   }
 
-  onSubmit(e) {
-    e.preventDefault();
-    this.props.onAdd(this.state.amount, this.state.note);
-    this.flush();
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.usersList) {
+      const users = nextProps.usersList
+        .filter(user => user.id !== GlobalStore.modules.users.activeUser.value.id)
+        .filter(user => user.status === userStatuses.active)
+        .map(user => GlobalStore.users.value.get(user.id));
+      
+      this.setState({
+        users,
+      });
+    }
   }
 
   flush() {
     this.setState({
       amount: '',
       note: '',
+      collaborators: new Map(),
     });
   }
 
@@ -43,6 +57,35 @@ export class AddForm extends Component {
     });
   }
 
+  toggleAllUsers() {
+    this.setState({
+      collaborators: new Map(),
+    });
+  }
+
+  toggleUser(user) {
+    this.setState((state) => {
+      const collaborators = state.collaborators;
+      collaborators.has(user.id)
+        ? collaborators.delete(user.id)
+        : collaborators.set(user.id, user);
+      
+      return {
+        ...state,
+        collaborators,
+      };
+    });
+  }
+  
+  onSubmit(e) {
+    e.preventDefault();
+    const collaborators = Array.from(this.state.collaborators)
+      .map(([id, user]) => ({ id }));
+
+    this.props.onAdd(this.state.amount, this.state.note, collaborators);
+    this.flush();
+  }
+
   render() {
     return presenter({
       ...this.props,
@@ -50,6 +93,8 @@ export class AddForm extends Component {
       changeAmount: this.changeAmount,
       changeNote: this.changeNote,
       onSubmit: this.onSubmit,
+      toggleAllUsers: this.toggleAllUsers,
+      toggleUser: this.toggleUser,
     });
   }
 }
