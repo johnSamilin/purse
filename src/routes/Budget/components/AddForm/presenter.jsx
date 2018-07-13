@@ -73,13 +73,17 @@ export default function AddForm(props) {
           mods={['inline', collaborators.size !== 0 ? 'success' : '']}
         >Я</Button>
         {
-          users.map(user => 
-            <Button
-            {...classes('collaborator')}
-              type={'button'}
-              onClick={() => toggleUser(user)}
-              mods={['inline', collaborators.has(user.id) ? 'success' : '']}
-            >{user.phone || user.email}</Button>
+          users.map((user) => {
+            if (!user) {
+              return null;
+            }
+            return (<Button
+              {...classes('collaborator')}
+                type={'button'}
+                onClick={() => toggleUser(user)}
+                mods={['inline', collaborators.has(user.id) ? 'success' : '']}
+              >{user.phone || user.email}</Button>);
+            }
           )
         }
       </div>

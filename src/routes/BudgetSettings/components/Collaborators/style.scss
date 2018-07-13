@@ -1,8 +1,7 @@
 @import '~styles/core.scss';
 
 .collaborators {
-    width: 300px;
-    max-width: 300px;
+	flex-grow: 1;
 
 	&__user {
 		display: flex;
@@ -31,20 +30,9 @@
 	&__action {
 		margin-left: 0.5rem;
 	}
-}
 
-.core-layout {
-	&__viewport {
-		&--mobile {
-			& .collaborators {
-				width: 100%;
-				max-width: 100%;
-
-				&.page--active {
-					width: 100%;
-					max-width: 100%;
-				}
-			}
-		}
+	&--empty {
+		display: flex;
+		align-items: center;
 	}
 }

@@ -26,7 +26,7 @@ class Budget extends Page {
       activeUserIds: new Set(),
     };
     this.path = path;
-    this.showCollaborators = this.showCollaborators.bind(this);
+    this.showSettings = this.showSettings.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
   }
   
@@ -135,7 +135,6 @@ class Budget extends Page {
   }
 
   setTransactions(transactions = []) {
-    const budgetId = get(this.state.budget, 'id', -1);
     const transactionsSorted = sortBy(transactions, transaction => transaction.date);
     this.setState({
       transactions: transactionsSorted.reverse(),
@@ -191,11 +190,12 @@ class Budget extends Page {
       ownerId: currentUserId,
       isSynced: false,
       collaborators,
+      isPaidByOwner,
     });
   }
 
-  showCollaborators() {
-    this.props.router.push(paths.collaborators(this.state.budget.id));
+  showSettings() {
+    this.props.router.push(paths.settings(this.state.budget.id));
   }
 
   render() {
@@ -203,7 +203,7 @@ class Budget extends Page {
       ...this.props,
       ...this.state,
       getPageClasses: this.getPageClasses,
-      showCollaborators: this.showCollaborators,
+      showSettings: this.showSettings,
       addTransaction: this.addTransaction,
     });
   }

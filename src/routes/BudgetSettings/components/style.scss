@@ -1,0 +1,22 @@
+@import '~styles/core.scss';
+
+.budget-settings {  
+  width: 300px;
+  max-width: 300px;
+}
+
+.core-layout {
+	&__viewport {
+		&--mobile {
+			& .budget-settings {
+				width: 100%;
+				max-width: 100%;
+
+				&.page--active {
+					width: 100%;
+					max-width: 100%;
+				}
+			}
+		}
+	}
+}

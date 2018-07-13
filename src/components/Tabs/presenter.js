@@ -22,6 +22,7 @@ function Tabs(props) {
   return (
     <ReactTabs
       {...classes()}
+      forceRenderTabPanel
       onSelect={(index) => {
         setSelectedTab(index);
         if (onChange) {

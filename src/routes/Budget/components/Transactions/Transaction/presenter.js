@@ -21,6 +21,7 @@ export function Transaction(props) {
     note,
     cancelled,
     collaborators = [],
+    isPaidByOwner,
   } = data;
 
   const activeCollaborators = collaborators.filter(c => activeUserIds.has(c.id));
@@ -28,24 +29,39 @@ export function Transaction(props) {
   return (
     <div {...classes({ modifiers: { cancelled } })} onClick={() => onClick(data)}>
       <div {...classes('mandatory-info')}>
-        <UserInfo {...classes('info')} {...author} />
+        <div {...classes('info')}>
+          <UserInfo {...classes('user-info')} {...author} />
+        </div>
         <div {...classes('amount')}>
           <span>{numeral(amount).format('0,[.]00')} {currency}</span>
           <div
             {...classes({
               element: 'icon-wrapper',
               modifiers: {
-                hidden: isEmpty(collaborators),
+                hidden: isEmpty(collaborators) && !isPaidByOwner,
               },
             })}
           >
-            <div>
-              {`${activeCollaborators.length > 0 ? `+${activeCollaborators.length - 0}` : ''}`}
-            </div> <div {...classes({ element: 'icon', extra: 'material-icons mi-group' })} />
+            {!isEmpty(collaborators) &&
+              <div {...classes('group')}>
+                {`${activeCollaborators.length > 0 ? `+${activeCollaborators.length - 0}` : ''}`}
+              <div {...classes({ element: 'icon', extra: 'material-icons mi-group' })} />
+              </div>
+            }
+            {isPaidByOwner &&
+              <div {...classes('paid-indicator')}>Оплачено</div>
+            }
           </div>
         </div>
       </div>
-      <div {...classes({ element: 'note', modifiers: { hidden: !note } })}>
+      <div {...classes({
+        element: 'note',
+        modifiers: {
+          hidden: !note,
+          padded: isEmpty(collaborators),
+        },
+      })}
+      >
         <span>{note}</span>
       </div>
     </div>

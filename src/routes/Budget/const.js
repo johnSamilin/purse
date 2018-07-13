@@ -16,7 +16,7 @@ const apiPaths = {
 
 const paths = {
   budget: id => `/budget/${id}`,
-  collaborators: budgetId => `/budget/${budgetId}/collaborators`,
+  settings: budgetId => `/budget/${budgetId}/settings`,
 };
 
 const userStatuses = {
@@ -29,22 +29,22 @@ const userStatuses = {
 
 const statusesMap = {
   active: {
-    title: 'Disable',
+    title: 'Убрать',
     modifier: 'removed',
     nextStatus: 'removed',
   },
   pending: {
-    title: 'Approve',
+    title: 'Добавить',
     modifier: 'success',
     nextStatus: 'active',
   },
   removed: {
-    title: 'Invite',
+    title: 'Пригласить',
     modifier: 'success',
     nextStatus: 'invited',
   },
   invited: {
-    title: 'Revoke',
+    title: 'Отозвать',
     modifier: 'removed',
     nextStatus: 'removed',
   },

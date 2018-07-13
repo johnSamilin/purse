@@ -1,6 +1,6 @@
 {
   "name": "purse",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "purse",
   "main": "index.js",
   "scripts": {
@@ -68,6 +68,8 @@
   "license": "MIT",
   "dependencies": {
     "currency-symbol-map": "^4.0.4",
+    "d3": "^5.5.0",
+    "d3-cluster": "^1.0.0-alpha.8",
     "lodash": "^4.17.10",
     "material-icons": "^0.1.0",
     "mobile-detect": "^1.4.1",

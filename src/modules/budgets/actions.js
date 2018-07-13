@@ -24,16 +24,34 @@ function getBudgetFromServer(id) {
  * @param {array} participants
  * @returns {{participantId: number, balance: number }[]}
  */
-function splitTransaction(transaction, participants) {
+function splitTransaction(transaction, participants, budgetOwnerId) {
   let sum = transaction.amount / participants.length;
   sum = parseFloat(sum.toFixed(2));
+  const result = [];
+  if (transaction.isPaidByOwner) {
+    result.push({
+      id: budgetOwnerId,
+      balance: transaction.amount - sum,
+    });
+  }
 
   return participants.map((participant) => {
+    const isOwner = participant.id.toString() === transaction.ownerId;
+    const isPaidByOwner = transaction.isPaidByOwner;
+    let balance = sum;
+    if (isPaidByOwner) {
+      balance = (-balance);
+    } else {
+      if (isOwner) {
+        balance = transaction.amount - sum;
+      } else {
+        balance = (-balance);
+      }
+    }
+
     return {
       participantId: participant.id,
-      balance: participant.id.toString() === transaction.ownerId
-        ? transaction.amount - sum
-        : (-sum),
+      balance,
     };
   });
 }
@@ -44,7 +62,7 @@ function splitTransaction(transaction, participants) {
  * @param {any} users
  * @returns {Map<number, number>}
  */
-function calculateBalances(transactions = [], users = []) {
+function calculateBalances(transactions = [], users = [], budgetOwnerId = -1) {
   const balances = new Map(); // userId: balance
   const activeUserIds = new Set();
   const activeUsers = users.filter(user => user.status === userStatuses.active);
@@ -58,7 +76,7 @@ function calculateBalances(transactions = [], users = []) {
       const participants = isEmpty(transaction.collaborators)
         ? activeUsers
         : [{ id: transaction.ownerId }, ...activeCollaborators]; // создатель + коллабораторы (те, которые в бюджете активны)
-      const splitted = splitTransaction(transaction, participants);
+      const splitted = splitTransaction(transaction, participants, budgetOwnerId);
       splitted.forEach((piece) => {
         if (!balances.has(piece.participantId)) {
           balances.set(piece.participantId, 0);
@@ -67,7 +85,7 @@ function calculateBalances(transactions = [], users = []) {
       });
     });
 
-    console.log(balances)
+  console.log(balances)
   return balances;
 }
 

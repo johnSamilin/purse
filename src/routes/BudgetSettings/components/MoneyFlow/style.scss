@@ -1,0 +1,56 @@
+@import '~styles/core';
+
+.money-flow {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+
+  &__chart {
+    &--hidden {
+      display: none;
+    }
+  }
+
+  &__node {
+    fill: #000;
+
+    &:hover,
+    &--source,
+    &--target {
+      font-weight: 700;
+    }
+
+    &--source {
+      fill: #2ca02c;
+    }
+    
+    &--target {
+      fill: #d62728;
+    }
+  }
+  
+  &__link {
+    stroke: steelblue;
+    stroke-opacity: 0.4;
+    fill: none;
+    pointer-events: none;
+
+    &--source,
+    &--target {
+      stroke-opacity: 1;
+      stroke-width: 2px;
+    }
+    
+    &--source {
+      stroke: #d62728;
+    }
+    
+    &--target {
+      stroke: #2ca02c;
+    }
+  }  
+  
+  &__amount {
+    text-anchor: middle;
+  }
+}

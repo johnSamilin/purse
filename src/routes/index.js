@@ -1,10 +1,10 @@
 // We only need to import the modules necessary for initial render
 import CoreLayout from '../layouts/CoreLayout';
-import BudgetRoute from './Budget';
-import ConstructorRoute from './Constructor';
-import BudgetsRoute from './Budgets';
-import LoginRoute from './Login';
-import CollaboratorsRoute from './Collaborators';
+import Budget from './Budget';
+import Constructor from './Constructor';
+import Budgets from './Budgets';
+import Login from './Login';
+import BudgetSettings from './BudgetSettings';
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -13,16 +13,16 @@ export const routes = {
   path: '/',
   component: CoreLayout,
   getIndexRoute(partialNextState, callback) {
-    BudgetsRoute.onEnter();
-    callback(null, BudgetsRoute);
+    Budgets.onEnter();
+    callback(null, Budgets);
   },
   getChildRoutes(partialNextState, callback) {
     const childRoutes = [
-      BudgetsRoute,
-      BudgetRoute,
-      LoginRoute,
-      ConstructorRoute,
-      CollaboratorsRoute,
+      Budgets,
+      Budget,
+      Login,
+      Constructor,
+      BudgetSettings,
     ];
     
     const path = partialNextState.location.pathname;

@@ -34,7 +34,7 @@ export const Budget = (props) => {
     transactions,
     newUsersCount,
 
-    showCollaborators,
+    showSettings,
     getPageClasses,
     addTransaction,
   } = props;
@@ -99,10 +99,10 @@ export const Budget = (props) => {
     <div {...classes({ extra: getPageClasses() })}>
       <Header title={budget.title} backurl={'/'} rev={budget._rev}>
         <Button
-          onClick={showCollaborators}
+          onClick={showSettings}
           {...classes({
-            element: 'collaborators',
-            extra: 'material-icons mi-tag-faces',
+            element: 'settings',
+            extra: 'material-icons mi-settings',
           })}
         >
           {newUsersCount > 0 && <span {...classes('badge')}>{newUsersCount}</span>}

@@ -6,7 +6,7 @@ import { Budget } from '../../routes/Budget/containers';
 import { Budgets } from '../../routes/Budgets/containers';
 import { Construct } from '../../routes/Constructor/containers';
 import { Login } from '../../routes/Login/containers';
-import { Collaborators } from '../../routes/Collaborators/containers';
+import { Settings as BudgetSettings } from '../../routes/BudgetSettings/containers';
 import { notify } from '../../services/helpers';
 
 import './CoreLayout.scss';
@@ -59,7 +59,7 @@ export class CoreLayout extends Component {
         >
           {isLoggedIn === true
             ? [
-              <Collaborators key={1} />,
+              <BudgetSettings key={1} />,
               <Budget key={2} />,
               <Construct key={3} />,
               <Budgets key={4} />,

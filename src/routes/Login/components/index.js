@@ -13,7 +13,6 @@ import { Tabs } from '../../../components/Tabs/index';
 export const Login = (props) => {
   const {
     getPageClasses,
-    isActive,
     onSubmit,
     isLoading,
     onTabChange,

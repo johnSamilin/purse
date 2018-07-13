@@ -1,27 +1,22 @@
 // @ts-check
-import presenter from '../components';
-import { Page } from '../../../providers/Page';
-import { path } from '../const';
-import { GlobalStore } from '../../../store/globalStore';
-import { budgetStates } from '../../../const';
+import { Component } from 'react';
 import get from 'lodash/get';
+import presenter from './presenter';
+import { GlobalStore } from '../../../../store/globalStore';
+import { budgetStates } from '../../../../const';
 
-export class Collaborators extends Page {
+export class Collaborators extends Component {
   constructor(params) {
     super(params);
     this.state = {
       collaborators: [],
       canManage: false,
     };
-    this.path = path;
     this.changeUserStatus = this.changeUserStatus.bind(this);
   }
 
   componentWillMount() {
-    super.componentWillMount();
-    this.budgetSub = GlobalStore.modules.budgets.activeBudget.subscribe(
-      () => this.setCollaborators()
-    );
+    this.budgetSub = GlobalStore.modules.budgets.activeBudget.subscribe(() => this.setCollaborators());
     this.usersSub = GlobalStore.users.subscribe(() => this.setCollaborators());
   }
 
@@ -42,7 +37,7 @@ export class Collaborators extends Page {
           ...user,
           ...GlobalStore.users.value.get(user.id),
         }));
-      }
+    }
     const isOwner = budget.ownerId === get(GlobalStore.modules.users.activeUser.value, 'id');
 
     this.setState({
@@ -72,7 +67,6 @@ export class Collaborators extends Page {
     return presenter({
       ...this.props,
       ...this.state,
-      getPageClasses: this.getPageClasses,
       changeUserStatus: this.changeUserStatus,
     });
   }

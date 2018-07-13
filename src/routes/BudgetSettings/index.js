@@ -3,9 +3,9 @@ import { Route } from '../../providers/Route';
 import { path } from './const';
 import { path as budgetpath } from '../../routes/Budget/const';
 import { path as budgetspath } from '../../routes/Budgets/const';
-import { Collaborators } from './containers';
+import { Settings } from './containers';
 
-class CollaboratorsRoute extends Route {
+class SettingsRoute extends Route {
   constructor() {
     super();
     this.route = path;
@@ -14,8 +14,8 @@ class CollaboratorsRoute extends Route {
   }
 
   getContainer() {
-    return Collaborators;
+    return Settings;
   }
 }
 
-export default new CollaboratorsRoute();
+export default new SettingsRoute();

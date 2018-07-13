@@ -13,66 +13,82 @@
 	&__info {
 		align-items: center;
 		display: flex;
-		flex-direction: column;
+		align-items: flex-start;
 		flex-grow: 1;
-		& span {
-			width: 100%;
-			display: inline-block;
-			text-align: left;
+
+		& .budget-transaction {
+			&__user-info {
+				width: 100%;
+				display: inline-block;
+				text-align: left;
+			}
 		}
 	}
-
+	
 	&__amount {
 		align-items: center;
 		display: flex;
 		flex-direction: column;
 		width: 10rem;
-
+		
 		& span {
 			width: 100%;
 			display: inline-block;
 			text-align: right;
 		}
 	}
-
+	
 	&__author {
 		font-weight: bold;
 	}
 	&__author-contacts {
 		font-size: smaller;
 	}
-
+	
 	&__note {
-		margin-top: 1rem;
 		&--hidden {
 			display: none;
 		}
+		&--padded {
+			margin-top: 2rem;
+		}
 	}
-
+	
 	&--cancelled {
 		.budget-transaction__info {
 			& span {
 				text-decoration: line-through;
 			}
 		}
-
+		
 		.budget-transaction__amount {
 			& span {
 				text-decoration: line-through;
 			}
 		}
 	}
-
+	
 	&__icon-wrapper {
 		display: flex;
-		justify-content: flex-end;
+		flex-direction: column-reverse;
+		align-items: flex-end;
 		width: 100%;
 		margin-top: 0.5rem;
 		
 		&--hidden {
 			display: none;
 		}
+		
+	}
+	
+	&__paid-indicator {
+		margin-left: 0.5rem;
+		opacity: 0.75;
+		font-size: smaller;
+	}
 
+	&__group {
+		display: flex;
 	}
 
 	&__icon {
