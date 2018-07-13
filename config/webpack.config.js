@@ -6,7 +6,7 @@ const project = require('./project.config');
 const debug = require('debug')('app:config:webpack');
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const OfflinePlugin = require('offline-plugin');
+// const OfflinePlugin = require('offline-plugin');
 
 const __DEV__ = project.globals.__DEV__;
 const __PROD__ = project.globals.__PROD__;
@@ -140,7 +140,7 @@ if (__DEV__) {
     hashDigestLength: 7,
   }));
   webpackConfig.plugins.push(new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru/));
-  webpackConfig.plugins.push(new OfflinePlugin({
+  /*webpackConfig.plugins.push(new OfflinePlugin({
     externals: ['https://fonts.gstatic.com/s/materialicons/v22/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2'],
     autoUpdate: true,
     cacheMaps: [
@@ -150,7 +150,7 @@ if (__DEV__) {
         requestTypes: ['navigate'],
       },
     ],
-  }));
+  }));*/
 }
 
 // ------------------------------------
