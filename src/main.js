@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import api from 'services/api';
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+// import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import moment from 'moment';
 import numeral from 'numeral';
 import 'numeral/locales/ru';
@@ -24,7 +24,7 @@ if ('Notification' in window && !Notification.permission !== 'denied') {
 }
 
 // SW
-if (!__DEV__) {
+/*if (!__DEV__) {
   OfflinePluginRuntime.install({
     // responseStrategy: 'network-first',
     onUpdating: () => {
@@ -47,7 +47,7 @@ if (!__DEV__) {
       console.tlog('SW Event:', 'onUpdateFailed');
     },
   });
-}
+}*/
 // ========================================================
 // Modules Setup
 // ========================================================
