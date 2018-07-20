@@ -2,7 +2,12 @@
 const MobileDetect = require('mobile-detect');
 import { Observable } from '../../providers/Observable';
 
-const isOffline = navigator.connection.type === 'none' || navigator.onLine;
+let isOffline = false;
+try {
+  isOffline = navigator.connection.type === 'none' || false;
+} catch (er) {
+  isOffline = navigator.onLine;
+}
 const md = new MobileDetect(window.navigator.userAgent);
 const isMobile = md.mobile() && !md.tablet();
 
