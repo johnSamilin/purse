@@ -130,9 +130,8 @@ if (__DEV__) {
 } else if (__PROD__ || __TEST__) {
   debug('Enabling plugins for production (OccurenceOrder, Dedupe & UglifyJS).');
   webpackConfig.devtool = 'none';
-  webpackConfig.optimization.minimize = true;
   webpackConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
-  webpackConfig.optimization.minimize = true;
+  webpackConfig.optimization.minimize = false;
   webpackConfig.plugins.push(new webpack.optimize.AggressiveMergingPlugin());
   webpackConfig.plugins.push(new webpack.HashedModuleIdsPlugin({
     hashFunction: 'sha256',
