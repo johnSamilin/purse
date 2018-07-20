@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import api from 'services/api';
-// import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 import moment from 'moment';
 import numeral from 'numeral';
 import 'numeral/locales/ru';
