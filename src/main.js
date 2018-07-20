@@ -24,7 +24,7 @@ if ('Notification' in window && !Notification.permission !== 'denied') {
 }
 
 // SW
-/*if (!__DEV__) {
+if (!__DEV__) {
   OfflinePluginRuntime.install({
     // responseStrategy: 'network-first',
     onUpdating: () => {
@@ -47,7 +47,7 @@ if ('Notification' in window && !Notification.permission !== 'denied') {
       console.tlog('SW Event:', 'onUpdateFailed');
     },
   });
-}*/
+}
 // ========================================================
 // Modules Setup
 // ========================================================
