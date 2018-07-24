@@ -16,6 +16,7 @@ const status = {
   state: {
     isOffline: new Observable(isOffline),
     isMobile: new Observable(isMobile),
+    isIPhone: md.is('iPhone'),
   },
 };
 
