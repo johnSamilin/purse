@@ -45,10 +45,7 @@ const config = {
     chunkModules : false,
     colors : true,
   },
-  compiler_vendors : [
-    'react',
-    'react-router',
-  ],
+  compiler_vendors : ['abstract-leveldown'],
 
   // ----------------------------------
   // Test Configuration
