@@ -5,15 +5,28 @@ import some from 'lodash/some';
 import schemas from './schema';
 import migrations from './migrations';
 import { GlobalStore } from '../store/globalStore';
-import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger } from '../services/helpers';
+import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger, notify } from '../services/helpers';
 import { Observable } from '../providers/Observable';
 RxDB.plugin(require('pouchdb-adapter-websql'));
 RxDB.plugin(require('pouchdb-adapter-idb'));
-RxDB.plugin(require('pouchdb-adapter-http')); //enable syncing over http
+RxDB.plugin(require('pouchdb-adapter-http')); // enable syncing over http
+RxDB.plugin(require('pouchdb-adapter-memory'));
 // RxDB.plugin(require('pouchdb-auth'));
 import isEqual from 'lodash/isEqual';
+import { getAvailableQuota } from '../modules/status/actions';
+import { minQuota } from '../const';
 
 export const dbUrl = 'https://purse.smileupps.com';
+
+async function getAdapter() {
+  const isIphone = GlobalStore.modules.status.isIPhone;
+  const availableQuota = await getAvailableQuota();
+  if (availableQuota > minQuota) {
+    notify(`Система выделила очень мало памяти (${Math.ceil(availableQuota / 1000)}KB), так что офлайн-режим работать не будет`);
+    return 'memory';
+  }
+  return isIphone ? 'websql' : 'idb';
+}
 
 class Model {
   async init() {
@@ -22,7 +35,7 @@ class Model {
     }
     this.instance = await RxDB.create({
       name: 'purse',
-      adapter: GlobalStore.modules.status.isIPhone ? 'websql' : 'idb',
+      adapter: await getAdapter(),
       password: 'myPassword',
       multiInstance: false,
     });
@@ -51,6 +64,7 @@ class Model {
       schema: schemas.users,
       migrationStrategies: migrations.users,
     });
+    this.instance.collections.users.find().$.subscribe(u => console.log('all users', u))
   }
 
   dropUserRelatedCollections() {

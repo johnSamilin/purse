@@ -158,7 +158,7 @@ if (__DEV__) {
 // JavaScript / JSON
 webpackConfig.module.rules = [{
   test: /\.(js|jsx)$/,
-  exclude: /node_modules/,
+  exclude: /(node_modules|localstorage-down)/,
   use: [
     {
       loader: 'eslint-loader',

@@ -33,7 +33,6 @@ if (!__DEV__) {
     onUpdateReady: () => {
       console.tlog('SW Event:', 'onUpdateReady');
         // Tells to new SW to take control immediately
-      alert('Доступна новая версия Росплаты');
       OfflinePluginRuntime.applyUpdate();
     },
     onUpdated: () => {

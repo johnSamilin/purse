@@ -17,6 +17,8 @@ const budgetStates = {
   closing: 'closing',
 };
 
+const minQuota = 10000;
+
 export {
   accountkitAppId,
   accountkitApiVersion,
@@ -24,4 +26,5 @@ export {
   accountkitRedirect,
   apiPaths,
   budgetStates,
+  minQuota,
 };

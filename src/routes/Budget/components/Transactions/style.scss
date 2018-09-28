@@ -12,13 +12,12 @@
 	}
 
 	&-divider {
-		background: $grey;
 		display: flex;
 
 		&__text {
-			color: darken($grey, 50%);
+			color: $grey;
 			font-weight: bold;
-			margin: 2px auto;
+			margin: 5px auto 2px;
 			display: inline-block;
 		}
 	}

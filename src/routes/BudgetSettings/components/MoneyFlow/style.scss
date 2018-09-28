@@ -48,6 +48,10 @@
     &--target {
       stroke: #2ca02c;
     }
+
+    &--hidden {
+      display: none;
+    }
   }  
   
   &__amount {

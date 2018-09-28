@@ -71,8 +71,7 @@ function calculateBalances(transactions = [], users = [], budgetOwnerId = -1) {
   transactions
     .filter(transaction => !transaction.cancelled)
     .forEach((transaction) => {
-      const activeCollaborators = transaction.collaborators
-        .filter(clbr => activeUserIds.has(clbr.id));
+      const activeCollaborators = transaction.collaborators.filter(clbr => activeUserIds.has(clbr.id));
       const participants = isEmpty(transaction.collaborators)
         ? activeUsers
         : [{ id: transaction.ownerId }, ...activeCollaborators]; // создатель + коллабораторы (те, которые в бюджете активны)
@@ -85,7 +84,6 @@ function calculateBalances(transactions = [], users = [], budgetOwnerId = -1) {
       });
     });
 
-  console.log(balances)
   return balances;
 }
 

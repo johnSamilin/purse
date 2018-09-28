@@ -125,16 +125,20 @@ export class MoneyFlow extends Component {
       .each((d) => {
         d.source = d[0];
         d.target = d[d.length - 1];
-        d.amount = d.source.data.debts.find(debt => debt.key === d.target.key).amount;
+        d.amount = d.source.data.debts.find(debt => debt.receiver === d.target.data.key).amount;
       })
       .attr('class', (d) => {
         const rootName = 'money-flow__link';
         const className = [rootName];
-        if (d.target.data.key === GlobalStore.modules.users.activeUser.value.id) {
-          className.push(`${rootName}--target`);
-        }
-        if (d.source.data.key === GlobalStore.modules.users.activeUser.value.id) {
-          className.push(`${rootName}--source`);
+        if (d.amount === 0) {
+          className.push('hidden');
+        } else {
+          if (d.target.data.key === GlobalStore.modules.users.activeUser.value.id) {
+            className.push(`${rootName}--target`);
+          }
+          if (d.source.data.key === GlobalStore.modules.users.activeUser.value.id) {
+            className.push(`${rootName}--source`);
+          }
         }
 
         return className.join(' ');
@@ -150,7 +154,7 @@ export class MoneyFlow extends Component {
       .append('textPath')
       .attr('xlink:href', d => `#${d.source.data.key}_${d.target.data.key}`)
       .attr('startOffset', '48%')
-      .text(d => numeral(d.amount).format('0,[.]00'));
+      .text(d => d.amount > 0 ? numeral(d.amount).format('0,[.]00') : '');
         
     const nodes = this.nodeContainer.selectAll('.money-flow__node').data(root.leaves());
     nodes.enter().append('text')
@@ -198,26 +202,24 @@ export class MoneyFlow extends Component {
     this.negative.forEach((donor) => {
       let remainingDebt = donor.balance;
       const donorFlow = [];
-      for (let i=0; i<this.positive.length; i++) {
-        if (this.positive[i].balance === 0) {
-          continue;
-        }
-        remainingDebt = this.positive[i].balance + donor.balance;
-        if (this.positive[i].balance > Math.abs(donor.balance)) {
-          this.positive[i].balance = remainingDebt;
-          donorFlow.push({
-            receiver: this.positive[i].userId,
-            amount: -donor.balance,
-          });
-          donor.balance = 0;
-          break;
-        } else {
-          donor.balance = remainingDebt;
-          donorFlow.push({
-            receiver: this.positive[i].userId,
-            amount: this.positive[i].balance,
-          });
-          this.positive[i].balance = 0;
+      for (let i = 0; i < this.positive.length && donor.balance !== 0; i++) {
+        if (this.positive[i].balance !== 0) {
+          remainingDebt = this.positive[i].balance + donor.balance;
+          if (remainingDebt >= 0) {
+            this.positive[i].balance = remainingDebt;
+            donorFlow.push({
+              receiver: this.positive[i].userId,
+              amount: -donor.balance,
+            });
+            donor.balance = 0;
+          } else {
+            donor.balance = remainingDebt;
+            donorFlow.push({
+              receiver: this.positive[i].userId,
+              amount: this.positive[i].balance,
+            });
+            this.positive[i].balance = 0;
+          }
         }
       }
       this.flow.set(donor.userId, { debts: donorFlow });
