@@ -21,7 +21,7 @@ export const dbUrl = 'https://purse.smileupps.com';
 async function getAdapter() {
   const isIphone = GlobalStore.modules.status.isIPhone;
   const availableQuota = await getAvailableQuota();
-  if (availableQuota > minQuota) {
+  if (availableQuota < minQuota) {
     notify(`Система выделила очень мало памяти (${Math.ceil(availableQuota / 1000)}KB), так что офлайн-режим работать не будет`);
     return 'memory';
   }

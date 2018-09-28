@@ -1,6 +1,6 @@
 {
   "name": "purse",
-  "version": "0.2.4",
+  "version": "0.2.7",
   "description": "purse",
   "main": "index.js",
   "scripts": {
