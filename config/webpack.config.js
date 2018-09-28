@@ -7,6 +7,7 @@ const debug = require('debug')('app:config:webpack');
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const OfflinePlugin = require('offline-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const __DEV__ = project.globals.__DEV__;
 const __PROD__ = project.globals.__PROD__;
@@ -150,6 +151,9 @@ if (__DEV__) {
       },
     ],
   }));
+  webpackConfig.plugins.push(new CopyWebpackPlugin([
+    { from: './server', to: './' },
+  ]));
 }
 
 // ------------------------------------
