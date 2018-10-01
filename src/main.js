@@ -10,6 +10,9 @@ import { notify } from './services/helpers';
 import { GlobalStore } from './store/globalStore';
 import routes from './routes';
 import { Database } from './database';
+import Splash from './containers/Splash';
+import { getAvailableQuota } from './modules/status/actions';
+import { minQuota } from './const';
 
 console.tlog = (...messages) => {
   console.timeEnd('delta');
@@ -97,13 +100,34 @@ if (__DEV__) {
   }
 }
 
+const renderSplash = (grantedQuota, onContinue) => {
+  ReactDOM.render(
+    <Splash grantedQuota={grantedQuota} onContinue={onContinue} />,
+    MOUNT_NODE
+  );
+};
+
 // ========================================================
 // Go!
 // ========================================================
-Database
-  .init()
-  .then(render)
-  .catch(er => {
+async function normalFlow() {
+  try {
+    await Database.init();
+    render();
+  } catch (er) {
     console.error(er);
-    alert('Что-то пошло не так... ' + JSON.stringify(er));
-  });
+    alert(`Что-то пошло не так... ${JSON.stringify(er)}`);
+  }
+}
+
+async function run() { 
+  const grantedQuota = await getAvailableQuota();
+
+  if (grantedQuota < minQuota) {
+    renderSplash(grantedQuota, normalFlow);
+  } else {
+    normalFlow();
+  }
+}
+
+run();
