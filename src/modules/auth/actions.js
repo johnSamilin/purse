@@ -1,5 +1,4 @@
 // @ts-check
-import * as Cookies from 'js-cookie';
 import { apiPaths } from '../../routes/Login/const';
 import Api from '../../services/api';
 import { GlobalStore } from '../../store/globalStore';
@@ -19,19 +18,19 @@ function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
 }
 
 function restoreToken() {
-  return Cookies.get(LS_TOKEN_KEY);
+  return localStorage.getItem(LS_TOKEN_KEY);
 }
 
 function login(token) {
   GlobalStore.modules.auth.token.value = token;
   GlobalStore.modules.auth.isLoggedIn.value = true;
-  Cookies.set(LS_TOKEN_KEY, token);
+  localStorage.setItem(LS_TOKEN_KEY, token);
 }
 
 function logout() {
   GlobalStore.modules.auth.token.value = null;
   GlobalStore.modules.auth.isLoggedIn.value = null;
-  Cookies.remove(LS_TOKEN_KEY);
+  localStorage.removeItem(LS_TOKEN_KEY);
 }
 
 export const actions = {
