@@ -38,10 +38,14 @@ export class Budgets extends Page {
       // когда только что залогинились
       await Database.syncUsers();
       let isUserInfoLoaded = false;
-      Database.usersSync.complete$.subscribe((isComplete) => {
+      Database.usersSync.complete$.subscribe(async (isComplete) => {
         if (isComplete !== false && !isUserInfoLoaded) {
           isUserInfoLoaded = true;
-          this.getUserInfo(token);
+          if (await this.getUserInfo(token)) {
+            Database.attachSideEffects();
+            await Database.createUserRelatedCollections();
+            Database.startSync();
+          }
         }
       });
     }
@@ -73,18 +77,22 @@ export class Budgets extends Page {
   }
 
   setBudgetsList() {
-    console.tlog('set budgets list started');    
+    console.log('set budgets list started');    
     this.setState(getBudgets());
-    console.tlog('set budgets list ended');
+    console.log('set budgets list ended');
   }
 
   async getUserInfo(token) {
-    console.tlog('get user info', token, users)
+    console.log('get user info', token)
     const users = await Database.instance.collections.users.find().where({ token }).exec();
     this.setIsLoading(false);
-    users[0]
-        ? usersActions.setActiveUser(users[0])
-        : this.logout();
+    if (users[0]) {
+      usersActions.setActiveUser(users[0]);
+      return true;
+    } else {
+      this.logout();
+      return false;
+    }
   }
 
   logout() {

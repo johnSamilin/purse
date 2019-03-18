@@ -28,7 +28,15 @@ async function getAdapter() {
 }
 
 class Model {
+
   async init() {
+    this.budgetsSync = null;
+    this.transactionsSync = null;
+    this.usersSync = null;
+    this.isSyncing = false;
+    this.budgetIds = new Observable([]); // чтобы пересинхронизировать только если они изменились
+    this.isReady = new Observable(false);
+
     if (this.instance) {
       return this.instance;
     }
@@ -39,21 +47,15 @@ class Model {
       multiInstance: false,
     });
 
-    this.budgetsSync = null;
-    this.transactionsSync = null;
-    this.usersSync = null;
-    this.isSyncing = false;
-    this.budgetIds = new Observable([]); // чтобы пересинхронизировать только если они изменились
-    this.isReady = new Observable(false);
-
-    const promise = this.createUsersCollection();
+    await this.createUsersCollection();
+  }
+  
+  attachSideEffects() {    
     GlobalStore.modules.users.activeUser.subscribe(userInfo => this.onUserChanged(userInfo));
     GlobalStore.budgets.subscribe((budgets) => {
       this.budgetIds.value = budgets.map(budget => budget.id);
     });
     this.budgetIds.subscribe(budgetIds => this.syncTransactions(budgetIds));
-
-    return promise;
   }
 
   async createUsersCollection() {
@@ -63,7 +65,6 @@ class Model {
       schema: schemas.users,
       migrationStrategies: migrations.users,
     });
-    this.instance.collections.users.find().$.subscribe(u => console.log('all users', u))
   }
 
   dropUserRelatedCollections() {
@@ -121,7 +122,6 @@ class Model {
       GlobalStore.users.value = usersMap;
     });
     this.instance.collections.budgets.find().$.subscribe((budgets) => {
-      console.warn('budgets query changed', isEqual(GlobalStore.budgets.value, budgets), GlobalStore.budgets.value, budgets)
       GlobalStore.budgets.value = budgets;
     });
     this.instance.collections.transactions.find().$.subscribe((transactions) => {
@@ -136,7 +136,6 @@ class Model {
     console.tlog('user changed', newUser);
     if (newUser) {
       await this.createUserRelatedCollections();
-      this.syncBudgets(); // will trigger syncTransactions via observable subscrition
     } else {
       this.dropUserRelatedCollections();
     }
@@ -173,11 +172,14 @@ class Model {
     return this.budgetsSync;
   }
 
-  syncTransactions(budgetIds) {
+  async syncTransactions(budgetIds) {
     if (!this.instance) {
       return Promise.reject(null);
     }
     //TODO: сделать пооптимальней
+    if (this.transactionsSync) {
+      (await this.transactionsSync).cancel();
+    }
     this.transactionsSync = this.instance.collections.transactions.sync({
       remote: `${dbUrl}/transactions`,
       options: {

@@ -4,7 +4,7 @@ import {
   csrf,
 } from 'const';
 import { notify } from 'services/helpers';
-import { Database } from 'database';
+import { Database } from '../../../database';
 import { tabs, path } from '../const';
 import presenter from '../components';
 import { Page } from '../../../providers/Page';
@@ -48,10 +48,13 @@ export class Login extends Page {
   async login(token) {
     this.setIsLoading(true);
     await Database.syncUsers();
-    Database.usersSync.complete$.subscribe((isComplete) => {
+    Database.usersSync.complete$.subscribe(async (isComplete) => {
       if (isComplete !== false) {
         actions.login(token);
         this.setIsLoading(false);
+        Database.attachSideEffects();
+        await Database.createUserRelatedCollections();
+        Database.startSync();
       }
     });
   }

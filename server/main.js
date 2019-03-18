@@ -13,4 +13,6 @@ app.get('/', (req, res) => {
   res.sendFile('index.html');
 });
 
-http.createServer(app).listen(PORT);
+const server = http.createServer(app).listen(PORT);
+
+module.exports = server;
