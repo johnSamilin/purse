@@ -31,9 +31,7 @@ const config = {
   // Compiler Configuration
   // ----------------------------------
   compiler_babel : {
-    cacheDirectory : true,
-    plugins        : [],
-    presets        : ['es2015', 'react', 'stage-0'],
+    cacheDirectory : true,    
   },
   compiler_devtool         : 'source-map',
   compiler_hash_type       : 'hash',
