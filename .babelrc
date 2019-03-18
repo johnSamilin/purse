@@ -1,17 +1,16 @@
 {
+  "plugins": [[ "@babel/plugin-proposal-decorators", { "legacy": true } ]],
   "presets": [
-    "react",
-    ["env", {
-      "targets": {
-        "browsers": ["last 2 versions"]
+    "@babel/react",
+    [
+      "@babel/env",
+      {
+        "targets": {
+          "chrome": "64",
+        },
+        "exclude": ["@babel/plugin-transform-regenerator", "@babel/plugin-transform-async-to-generator"],
+        "useBuiltIns": "entry"
       },
-      "uglify": true,
-      "exclude": ["transform-regenerator"],
-      "useBuiltIns": true
-    }]
+    ],
   ],
-  "plugins": [
-    "transform-decorators-legacy",
-    ["transform-object-rest-spread", { "useBuiltIns": true }]
-  ]
 }
