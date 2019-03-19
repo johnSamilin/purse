@@ -5,14 +5,13 @@ import some from 'lodash/some';
 import schemas from './schema';
 import migrations from './migrations';
 import { GlobalStore } from '../store/globalStore';
-import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger, notify } from '../services/helpers';
+import { mapTransactionsToBudgets, mapSeenTransactionsToBudgets, logger, notify, whenSynced } from '../services/helpers';
 import { Observable } from '../providers/Observable';
 RxDB.plugin(require('pouchdb-adapter-websql'));
 RxDB.plugin(require('pouchdb-adapter-idb'));
 RxDB.plugin(require('pouchdb-adapter-http')); // enable syncing over http
 RxDB.plugin(require('pouchdb-adapter-memory'));
-// RxDB.plugin(require('pouchdb-auth'));
-import isEqual from 'lodash/isEqual';
+RxDB.plugin(require('pouchdb-auth'));
 import { getAvailableQuota } from '../modules/status/actions';
 import { minQuota } from '../const';
 
@@ -28,7 +27,6 @@ async function getAdapter() {
 }
 
 class Model {
-
   async init() {
     this.budgetsSync = null;
     this.transactionsSync = null;
@@ -37,6 +35,11 @@ class Model {
     this.budgetIds = new Observable([]); // чтобы пересинхронизировать только если они изменились
     this.isReady = new Observable(false);
 
+    GlobalStore.budgets.subscribe((budgets) => {
+      this.budgetIds.value = budgets.map(budget => budget.id);
+    });
+    this.budgetIds.subscribe(budgetIds => this.syncTransactions(budgetIds));
+    
     if (this.instance) {
       return this.instance;
     }
@@ -46,31 +49,17 @@ class Model {
       password: 'myPassword',
       multiInstance: false,
     });
+    
 
-    await this.createUsersCollection();
+    // authentication
+    this.authenticator = new RxDB.PouchDB(dbUrl, { adapter: 'http' }); //remove 'jsnext:main' and 'main' fields from 'pouchdb-promise' package.json
+    await Database.authenticator.useAsAuthenticationDB();
   }
   
-  attachSideEffects() {    
-    GlobalStore.modules.users.activeUser.subscribe(userInfo => this.onUserChanged(userInfo));
-    GlobalStore.budgets.subscribe((budgets) => {
-      this.budgetIds.value = budgets.map(budget => budget.id);
-    });
-    this.budgetIds.subscribe(budgetIds => this.syncTransactions(budgetIds));
-  }
-
-  async createUsersCollection() {
-    // users
-    await this.instance.collection({
-      name: 'users',
-      schema: schemas.users,
-      migrationStrategies: migrations.users,
-    });
-  }
-
-  dropUserRelatedCollections() {
-    console.tlog('destroy user related collections')
+  dropCollections() {
     this.isReady.value = false;
     const promises = Promise.all([
+      this.instance.collections.users.destroy(),
       this.instance.collections.budgets.destroy(),
       this.instance.collections.transactions.destroy(),
       this.instance.collections.seentransactions.destroy(),
@@ -80,9 +69,14 @@ class Model {
     return promises;
   }
 
-  createUserRelatedCollections() {
-    console.tlog('create user related collections')
+  createCollections() {
     const promises = Promise.all([
+      // users
+      this.instance.collection({
+        name: 'users',
+        schema: schemas.users,
+        migrationStrategies: migrations.users,
+      }),
       // budgets
       this.instance.collection({
         name: 'budgets',
@@ -103,8 +97,10 @@ class Model {
       }),
     ]);
     promises
-      .then(() => this.mapCollectionsToStore())
-      .then(() => {
+      .then(() => {        
+        this.instance.collections.seentransactions.find().$.subscribe((seentransactions) => {
+          GlobalStore.seentransactions.value = mapSeenTransactionsToBudgets(seentransactions);
+        });
         this.isReady.value = true;
       })
       .catch(er => {
@@ -115,58 +111,47 @@ class Model {
     return promises;
   }
 
-  mapCollectionsToStore() {
-    this.instance.collections.users.find().$.subscribe((users) => {
-      const usersMap = new Map();
-      users.forEach(user => usersMap.set(user.id, user));
-      GlobalStore.users.value = usersMap;
-    });
-    this.instance.collections.budgets.find().$.subscribe((budgets) => {
-      GlobalStore.budgets.value = budgets;
-    });
-    this.instance.collections.transactions.find().$.subscribe((transactions) => {
-      GlobalStore.transactions.value = mapTransactionsToBudgets(transactions);
-    });
-    this.instance.collections.seentransactions.find().$.subscribe((seentransactions) => {
-      GlobalStore.seentransactions.value = mapSeenTransactionsToBudgets(seentransactions);
-    });
-  }
-
-  async onUserChanged(newUser) {
-    console.tlog('user changed', newUser);
-    if (newUser) {
-      await this.createUserRelatedCollections();
-    } else {
-      this.dropUserRelatedCollections();
-    }
-  }
-
-  syncUsers() {
+  async syncUsers(filter = u => u) {
     if (!this.instance) {
       return Promise.reject(null);
+    }
+    if (this.usersSync) {
+      (await this.usersSync).cancel();
     }
     this.usersSync = this.instance.collections.users.sync({
       remote: `${dbUrl}/collaborators`,
       options: {
         live: false,
         retry: false,
+        filter,
       },
+    });
+    this.instance.collections.users.find().$.subscribe((users) => {
+      const usersMap = new Map();
+      users.forEach(user => usersMap.set(user.id, user));
+      GlobalStore.users.value = usersMap;
     });
 
     return this.usersSync;
   }
 
-  syncBudgets() {
+  async syncBudgets() {
     if (!this.instance) {
       return Promise.reject(null);
+    }
+    if (this.budgetsSync) {
+      (await this.budgetsSync).cancel();
     }
     this.budgetsSync = this.instance.collections.budgets.sync({
       remote: `${dbUrl}/budgets`,
       options: {
         live: true,
         retry: true,
-        filter: doc => some(doc.users, user => user.id === GlobalStore.modules.user.activeUser.value.id),
+        filter: doc => some(doc.users, user => user.id === GlobalStore.modules.users.activeUser.value.id),
       },
+    });
+    this.instance.collections.budgets.find().$.subscribe((budgets) => {
+      GlobalStore.budgets.value = budgets;
     });
 
     return this.budgetsSync;
@@ -188,22 +173,25 @@ class Model {
         filter: doc => budgetIds.includes(doc.budgetId),
       },
     });
+    this.instance.collections.transactions.find().$.subscribe((transactions) => {
+      GlobalStore.transactions.value = mapTransactionsToBudgets(transactions);
+    });
 
     return this.transactionsSync;
   }
 
   async startSync() {
-    console.tlog('syncyng started')
+    await this.syncUsers();
+    await whenSynced(this.usersSync);
     await this.syncBudgets();
-    await this.syncTransactions(this.budgetIds.value);
     
     this.isSyncing = true;
   }
 
   async stopSync() {
-    console.tlog('syncyng stopped')
     try {
       const promises = Promise.all([
+        (await this.usersSync).cancel(),
         (await this.budgetsSync).cancel(),
         (await this.transactionsSync).cancel(),
       ]);
@@ -215,6 +203,35 @@ class Model {
       console.error(er);
     }
   }
+
+  async getSession(username, token) {
+    const { ok } = await this.authenticator.session();
+    if (ok) {
+      return true;
+    }
+    const result = await this.authenticator.logIn(username, token);
+    if (!result.ok) {
+      throw new Error(result);
+    }
+  }
+
+  stopSession() {
+    this.dropCollections();
+    this.authenticator.logOut();
+  }
+
+  async logInLocal(token) {
+    await this.createCollections();
+    await this.syncUsers(user => user.token === token);
+    await whenSynced(this.usersSync);
+    const users = await this.instance.collections.users.find().where({ token }).exec();
+    if (users.length === 0)  {
+      throw new Error('User not found');
+    }
+    
+    return users[0];
+  }
+
 }
 
 export const Database = new Model();

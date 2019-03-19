@@ -8,6 +8,7 @@ import { GlobalStore } from '../../../store/globalStore';
 import presenter from '../components';
 import { currencies, path } from '../const';
 import { paths } from '../../Budgets/const';
+import get from 'lodash/get';
 
 @withRouter
 export class Construct extends Page {
@@ -37,7 +38,7 @@ export class Construct extends Page {
     GlobalStore.users.subscribe((users) => {
       this.setState({
         users: Array.from(users)
-          .filter(([id, user]) => id !== GlobalStore.modules.users.activeUser.value.id)
+          .filter(([id, user]) => id !== get(GlobalStore.modules.users.activeUser.value, 'id', -1))
           .map(([id, user]) => user),
       });
     });

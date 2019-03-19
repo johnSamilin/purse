@@ -86,3 +86,13 @@ export function mapSeenTransactionsToBudgets(transactions) {
 
   return map;
 }
+
+export function whenSynced(syncronizer) {
+  return new Promise(async (resolve, reject) => {
+    syncronizer.complete$.subscribe((isComplete) => {
+      if (isComplete !== false) {
+        resolve();
+      }
+    });
+  });
+}

@@ -9,6 +9,8 @@ import { tabs, path } from '../const';
 import presenter from '../components';
 import { Page } from '../../../providers/Page';
 import { actions } from '../../../modules/auth/actions';
+import { GlobalStore } from '../../../store/globalStore';
+import { usersActions } from '../../../modules/users/actions';
 
 export class Login extends Page {
   constructor() {
@@ -45,18 +47,15 @@ export class Login extends Page {
     });
   }
 
-  async login(token) {
+  async login(phone, token) {
     this.setIsLoading(true);
-    await Database.syncUsers();
-    Database.usersSync.complete$.subscribe(async (isComplete) => {
-      if (isComplete !== false) {
-        actions.login(token);
-        this.setIsLoading(false);
-        Database.attachSideEffects();
-        await Database.createUserRelatedCollections();
-        Database.startSync();
-      }
-    });
+    try {
+      await Database.getSession(phone, token);
+      actions.login(token);
+    } catch(er) {
+      notify(er.message);
+      this.setIsLoading(false);
+    }
   }
 
   initAccountKit() {
@@ -92,7 +91,7 @@ export class Login extends Page {
           csrf,
           ...params,
         });
-        this.login(res.access_token);
+        this.login(params.phoneNumber, res.access_token);
       } catch(er) {
         notify('Попытка входа не удалась');
         console.error(er);
@@ -120,12 +119,7 @@ export class Login extends Page {
 
   async onSubmit(event) {
     event.preventDefault();
-    if (__DEV__) {
-      this.login('testen');
-      return false;
-    }
 
-    
     let params = {};
     const { emailAddress, phoneNumber, countryCode } = this.values;
     switch (this.state.activeTab) {

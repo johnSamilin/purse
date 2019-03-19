@@ -85,7 +85,7 @@
     "pouchdb-adapter-localstorage": "^7.0.0",
     "pouchdb-adapter-memory": "^7.0.0",
     "pouchdb-adapter-websql": "^7.0.0",
-    "pouchdb-auth": "^2.1.1",
+    "pouchdb-auth": "^4.1.0",
     "react": "^16.4.0",
     "react-bem-helper": "^1.4.1",
     "react-dom": "^16.4.0",

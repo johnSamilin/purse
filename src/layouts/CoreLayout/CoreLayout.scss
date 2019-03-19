@@ -23,7 +23,7 @@
 		overflow: hidden;
 		
 		&--offline {
-			filter: grayscale(75%);
+			filter: grayscale(100%);
 		}
 
 		& .page {
@@ -55,6 +55,7 @@
 				transform: translateX(0);
 				position: absolute;
 				width: 100%;
+				border: none;
 
 				&--active {
 					~ .page {

@@ -8,7 +8,7 @@ export function getBudgets() {
   let budgetsList = GlobalStore.budgets.value;
   const transactionsList = GlobalStore.transactions.value;
   const seentransactionsList = GlobalStore.seentransactions.value;
-  const userId = GlobalStore.modules.users.activeUser.value.id;
+  const userId = get(GlobalStore.modules.users.activeUser.value, 'id', -1);
 
   budgetsList = budgetsList.map((budget) => {
     const activeUsers = budget.users.filter(user => user.status === userStatuses.active).length;

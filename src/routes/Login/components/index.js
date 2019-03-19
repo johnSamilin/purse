@@ -38,18 +38,18 @@ export const Login = (props) => {
         </div>
       ),
     },
-    {
-      title: 'По Email',
-      content: (
-        <div {...classes('input')}>
-          <Input
-            {...classes('email')}
-            onChange={e => onInputChange('emailAddress', e)}
-            placeholder={'boss@acme.com'}
-          />
-        </div>
-      ),
-    },
+    // {
+    //   title: 'По Email',
+    //   content: (
+    //     <div {...classes('input')}>
+    //       <Input
+    //         {...classes('email')}
+    //         onChange={e => onInputChange('emailAddress', e)}
+    //         placeholder={'boss@acme.com'}
+    //       />
+    //     </div>
+    //   ),
+    // },
   ];
 
   return (

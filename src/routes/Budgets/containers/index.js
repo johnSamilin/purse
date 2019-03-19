@@ -31,31 +31,29 @@ export class Budgets extends Page {
 
   async componentDidMount() {
     this.setIsLoading(true);
-    const token = GlobalStore.modules.auth.token.value;
-    if (GlobalStore.modules.status.isOffline.value) {
-      this.getUserInfo(token);
-    } else {
-      // когда только что залогинились
-      await Database.syncUsers();
-      let isUserInfoLoaded = false;
-      Database.usersSync.complete$.subscribe(async (isComplete) => {
-        if (isComplete !== false && !isUserInfoLoaded) {
-          isUserInfoLoaded = true;
-          if (await this.getUserInfo(token)) {
-            Database.attachSideEffects();
-            await Database.createUserRelatedCollections();
-            Database.startSync();
-          }
-        }
-      });
-    }
 
     // TODO: fix possible memory leak
-    GlobalStore.modules.users.activeUser.subscribe(userInfo => this.setActiveUser(userInfo));
     GlobalStore.budgets.subscribe(() => this.setBudgetsList());
     GlobalStore.transactions.subscribe(() => this.setBudgetsList());
     GlobalStore.seentransactions.subscribe(() => this.setBudgetsList());
     GlobalStore.modules.budgets.activeBudget.subscribe(activeBudget => this.setActiveBudget(activeBudget));
+    
+    let userInfo;
+    const isOffline = GlobalStore.modules.status.isOffline.value;
+    const token = GlobalStore.modules.auth.token.value;
+    try {
+      if (!isOffline) {
+        userInfo = await Database.getSession('+7test-user', token);
+      }
+      userInfo = await Database.logInLocal(token);
+      usersActions.setActiveUser(userInfo);
+      this.setActiveUser(userInfo);
+      Database.startSync();
+    } catch(er) {
+      notify(er.message);
+      this.logout();
+    } 
+    this.setIsLoading(false);
   }
 
   setActiveUser(userInfo) {
@@ -76,27 +74,17 @@ export class Budgets extends Page {
     });
   }
 
-  setBudgetsList() {
-    console.log('set budgets list started');    
+  setBudgetsList() {  
     this.setState(getBudgets());
-    console.log('set budgets list ended');
   }
 
-  async getUserInfo(token) {
-    console.log('get user info', token)
-    const users = await Database.instance.collections.users.find().where({ token }).exec();
-    this.setIsLoading(false);
-    if (users[0]) {
-      usersActions.setActiveUser(users[0]);
-      return true;
-    } else {
-      this.logout();
-      return false;
-    }
+  getUserInfo(token) {
+    return Database.instance.collections.users.find().where({ token }).exec();    
   }
 
   logout() {
     usersActions.setActiveUser(null);
+    Database.stopSession();
     actions.logout();
   }
 

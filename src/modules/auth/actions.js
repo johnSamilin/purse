@@ -6,6 +6,7 @@ import { GlobalStore } from '../../store/globalStore';
 export const LS_TOKEN_KEY = 'pursetoken';
 
 function getToken({ code, csrf, countryCode, phoneNumber, emailAddress }) {
+  //TODO: signup user
   return Api.doPost(
     apiPaths.getToken(),
     {
