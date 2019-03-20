@@ -45,8 +45,7 @@ export class Budgets extends Page {
       if (!isOffline) {
         userInfo = await Database.getSession('+7test-user', token);
       }
-      userInfo = await Database.logInLocal(token);
-      usersActions.setActiveUser(userInfo);
+      userInfo = await Database.logInLocal(token);      
       this.setActiveUser(userInfo);
       Database.startSync();
     } catch(er) {
@@ -57,6 +56,7 @@ export class Budgets extends Page {
   }
 
   setActiveUser(userInfo) {
+    usersActions.setActiveUser(userInfo);
     this.setState({
       userInfo,
     });

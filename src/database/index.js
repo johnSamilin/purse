@@ -205,8 +205,8 @@ class Model {
   }
 
   async getSession(username, token) {
-    const { ok } = await this.authenticator.session();
-    if (ok) {
+    const { userCtx } = await this.authenticator.session();
+    if (userCtx.name !== null) {
       return true;
     }
     const result = await this.authenticator.logIn(username, token);
