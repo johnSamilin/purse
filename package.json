@@ -108,7 +108,7 @@
     "css-loader": "^0.28.11",
     "cssnano": "^3.7.4",
     "debug": "^2.6.9",
-    "eslint": "^3.8.1",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb": "^12.0.0",
     "eslint-import-resolver-webpack": "^0.8.4",
     "eslint-loader": "^2.0.0",
